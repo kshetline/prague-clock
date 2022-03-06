@@ -6,5 +6,13 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'prague-clock';
+  eclipticAngle = 0;
+  handAngle = 0;
+  moonAngle = 0;
+  outerRingAngle = 0;
+  sunAngle = 0;
+
+  rotate(angle: number): string {
+    return `rotate(${angle})`;
+  }
 }

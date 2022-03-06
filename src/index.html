@@ -2,12 +2,49 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>PragueClock</title>
+  <title>Prague Astronomical Clock Simulator</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <style>
+    .startup-spinner {
+      animation-delay: 0s;
+      animation-direction: normal;
+      animation-duration: 1s;
+      animation-fill-mode: none;
+      animation-iteration-count: infinite;
+      animation-name: startup-spin;
+      animation-timing-function: steps(8);
+      display: inline-block;
+      font-size: 2em;
+      position: relative;
+      top: 0.3em;
+      width: 1em;
+    }
+
+    @keyframes startup-spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(359deg);
+      }
+    }
+  </style>
 </head>
 <body>
-  <app-root></app-root>
+    <div class="app-wrapper"><app-root>
+      <div style="font: 14px Arial, Helvetica, sans-serif; text-align: center;
+        position: absolute; top: 0; bottom: 0; left: 0; right: 0; margin: auto; height: 3em;">
+        <svg role="img" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="spinner"
+             class="startup-spinner" xmlns="http://www.w3.org/2000/svg"
+             viewBox="0 0 512 512"><path fill="currentColor" d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48
+                48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51
+                0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49
+                48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49
+                48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49
+                48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49
+                48-48-21.491-48-48-48z"></path></svg>&nbsp; Loading...</div>
+    </app-root></div>
 </body>
 </html>

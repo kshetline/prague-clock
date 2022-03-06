@@ -1,0 +1,210 @@
+:host {
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  font-family: Horologium;
+  height: 100vh;
+  justify-content: center;
+  padding: 8px;
+  width: 100vw;
+}
+
+svg {
+  height: calc(min(100vw, 100vh) - 16px);
+  margin: auto;
+  width: calc(min(100vw, 100vh) - 16px);
+}
+
+.maskBlack {
+  fill: black;
+}
+
+.maskWhite {
+  fill: white;
+}
+
+.textPath {
+  stroke: none;
+  fill: none;
+}
+
+.timeText {
+  font-size: 50px;
+  text-anchor: middle;
+  fill: #ffe696;
+}
+
+.baseCircle {
+  stroke: #ffe696;
+  stroke-width: 3px;
+  fill: none;
+}
+
+.eclipticDial {
+  stroke: #ffe696;
+  stroke-width: 3px;
+  fill: none;
+}
+
+.eclipticCircle {
+  stroke: #ffe696;
+  stroke-width: 4px;
+  fill: none;
+}
+
+.eclipticSymbol {
+  font-size: 85px;
+  text-anchor: middle;
+  fill: #ffe696;
+}
+
+.signsArea {
+  stroke: none;
+  fill: #575652;
+}
+
+.handSymbol {
+  stroke: #000000;
+  stroke-width: 0.25;
+  fill: #EED68D;
+}
+
+.sunBeamLargeSymbol {
+  fill: #ffe696;
+}
+
+.sunBeamSmallSymbol {
+  fill: #ffe696;
+}
+
+.leverRafieSymbol {
+  stroke: none;
+  fill: #575652;
+}
+
+.leverRafieGolden {
+  stroke: #ffe696;
+  stroke-width: 5px;
+}
+
+.leverSymbol {
+  stroke: none;
+  fill: #575652;
+}
+
+.hourAngleStarSymbol {
+  stroke: none;
+  fill: #ffe696;
+}
+
+.moonDark {
+  stroke: none;
+  fill: gray;
+}
+
+.moonSunlit {
+  stroke: none;
+  fill: yellow;
+}
+
+.moonSphere {
+  stroke: none;
+  fill: url(#gradientMoonSphere);
+}
+
+.sunSphere {
+  stroke: none;
+  fill: url(#gradientSunSphere);
+}
+
+.pin {
+  stroke: none;
+  fill: orange;
+}
+
+.pinSphere {
+  stroke: none;
+  fill: url(#gradientSunSphere);
+}
+
+.outerRingBackground {
+  stroke: none;
+  fill: none;
+  /* fill: #575652; */
+}
+
+.outerRingBorder {
+  stroke: #ffe696;
+  stroke-width: 4px;
+  fill: none;
+}
+
+.outerRingText {
+  font-size: 60px;
+  text-anchor: middle;
+  fill: #ffe696;
+}
+
+.unequalHourText {
+  font-size: 30px;
+  text-anchor: middle;
+  fill: gray;
+  font-family: Horologium;
+}
+
+.eventTextStart,
+.eventTextEnd {
+  /* spacing: exact; */
+  font-size: 15px;
+  fill: black;
+}
+
+.eventTextEnd {
+  text-anchor: end;
+}
+
+.eventTextStart {
+  text-anchor: start;
+}
+
+.unequalHourArea {
+  stroke: none;
+}
+
+.unequalHourBorder {
+  stroke: #ffe696;
+  stroke-width: 2px;
+  fill: none;
+}
+
+.unequalHour6 {
+  fill: #869494;
+}
+
+.unequalHour5 {
+  fill: #889794;
+}
+
+.unequalHour4 {
+  fill: #959a94;
+}
+
+.unequalHour3 {
+  fill: #a7a594;
+}
+
+.unequalHour2 {
+  fill: #c1b193;
+}
+
+.unequalHour1 {
+  fill: #d0bb90;
+}
+
+.horizonArea {
+  fill: #da9c52;
+}
+
+.darkArea {
+  fill: #41413a;
+}
