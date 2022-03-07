@@ -9,17 +9,14 @@
   width: 100vw;
 }
 
-tbw-time-editor {
+.controls {
+  align-items: flex-end;
+  display: flex;
+  flex-direction: column;
   font-size: 18px;
   position: fixed;
   right: 16px;
   top: 16px;
-}
-
-.now-button {
-  position: fixed;
-  right: 16px;
-  top: 50px;
 }
 
 .graphics-credit {

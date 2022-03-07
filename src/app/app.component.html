@@ -1,11 +1,13 @@
-<tbw-time-editor
-  tai
-  max="2399-12-31"
-  min="1400-01-01"
-  [options]="timeOptions"
-  [timezone]="zone"
-  [(ngModel)]="time"></tbw-time-editor>
-<button class="now-button" (click)="setNow()">Now</button>
+<div class="controls">
+  <tbw-time-editor
+    tai
+    max="2399-12-31"
+    min="1400-01-01"
+    [options]="timeOptions"
+    [timezone]="zone"
+    [(ngModel)]="time"></tbw-time-editor>
+  <button (click)="setNow()">Now</button>
+</div>
 
 <div class="graphics-credit">SVG clock graphics by Jan Tošovský</div>
 
@@ -87,7 +89,7 @@
 </mask>
 <mask id="dayArea">
 	<g class="maskWhite">
-		<path d="M196.32937427769704 154.7733077624432A200.3358932747045 200.3358932747045 0 0 0 84.59639135151046 -66.69029207885985 107.72253472352732 107.72253472352732 0 0 0 -84.59639135151046 -66.69029207885985 200.3358932747045 200.3358932747045 0 0 0 -196.32937427769704 154.7733077624432A 249.99999999999997 249.99999999999997 0 1 1 196.32937427769704 154.7733077624432"/>
+    <path d="M214.05415125737062 129.1542501410105A214.22471010966888 214.22471010966888 0 0 0 92.23392664882911 -55.65135534123541 107.72265581751148 107.72265581751148 0 0 0 -92.23392664882911 -55.65135534123541 214.22471010966888 214.22471010966888 0 0 0 -214.05415125737062 129.1542501410105A 249.99999999999997 249.99999999999997 0 1 1 214.05415125737062 129.1542501410105"/>
 	</g>
 </mask>
 <clipPath id="backgroundArea">
@@ -95,16 +97,16 @@
 </clipPath></defs><g transform="translate(300, 300)" class="content">
 <g id="base">
 	<defs>
-		<path id="unequalHour5" d="M618.9 -495.5C984.1 -495.5 1280.2 -199.4 1280.2 165.8C1280.2 531.1 984.1 827.2 618.9 827.2C253.6 827.2 -42.5 531.1 -42.5 165.8C-42.5 -199.4 253.6 -495.5 618.9 -495.5"/>
-		<path id="unequalHour11" d="M-618.9 -495.5C-253.6 -495.5 42.5 -199.4 42.5 165.8C42.5 531.1 -253.6 827.2 -618.9 827.2C-984.1 827.2 -1280.2 531.1 -1280.2 165.8C-1280.2 -199.4 -984.1 -495.5 -618.9 -495.5"/>
-		<path id="unequalHour4" d="M279.2 -200.5C478.9 -200.5 640.9 -38.6 640.9 161.2C640.9 360.9 478.9 522.9 279.2 522.9C79.4 522.9 -82.6 360.9 -82.6 161.2C-82.6 -38.6 79.4 -200.5 279.2 -200.5"/>
-		<path id="unequalHour10" d="M-279.2 -200.5C-79.4 -200.5 82.6 -38.6 82.6 161.2C82.6 360.9 -79.4 522.9 -279.2 522.9C-478.9 522.9 -640.9 360.9 -640.9 161.2C-640.9 -38.6 -478.9 -200.5 -279.2 -200.5"/>
-		<path id="unequalHour3" d="M153.5 -118.6C303.9 -118.6 425.7 3.2 425.7 153.5C425.7 303.9 303.9 425.7 153.5 425.7C3.2 425.7 -118.6 303.9 -118.6 153.5C-118.6 3.2 3.2 -118.6 153.5 -118.6"/>
-		<path id="unequalHour9" d="M-153.5 -118.6C-3.2 -118.6 118.6 3.2 118.6 153.5C118.6 303.9 -3.2 425.7 -153.5 425.7C-303.9 425.7 -425.7 303.9 -425.7 153.5C-425.7 3.2 -303.9 -118.6 -153.5 -118.6"/>
-		<path id="unequalHour2" d="M82.6 -89.8C211.2 -89.8 315.5 14.5 315.5 143.1C315.5 271.7 211.2 376.0 82.6 376.0C-46.0 376.0 -150.3 271.7 -150.3 143.1C-150.3 14.5 -46.0 -89.8 82.6 -89.8"/>
-		<path id="unequalHour8" d="M-82.6 -89.8C46.0 -89.8 150.3 14.5 150.3 143.1C150.3 271.7 46.0 376.0 -82.6 376.0C-211.2 376.0 -315.5 271.7 -315.5 143.1C-315.5 14.5 -211.2 -89.8 -82.6 -89.8"/>
-		<path id="unequalHour1" d="M34.9 -82.2C152.1 -82.2 247.2 12.9 247.2 130.1C247.2 247.4 152.1 342.4 34.9 342.4C-82.4 342.4 -177.5 247.4 -177.5 130.1C-177.5 12.9 -82.4 -82.2 34.9 -82.2"/>
-		<path id="unequalHour7" d="M-34.9 -82.2C82.4 -82.2 177.5 12.9 177.5 130.1C177.5 247.4 82.4 342.4 -34.9 342.4C-152.1 342.4 -247.2 247.4 -247.2 130.1C-247.2 12.9 -152.1 -82.2 -34.9 -82.2"/>
+    <path id="unequalHour5" d="M760.5 -600.4C1204.6 -600.4 1564.7 -240.4 1564.7 203.8C1564.7 647.9 1204.6 1008.0 760.5 1008.0C316.3 1008.0 -43.7 647.9 -43.7 203.8C-43.7 -240.4 316.3 -600.4 760.5 -600.4"/>
+    <path id="unequalHour11" d="M-760.5 -600.4C-316.3 -600.4 43.7 -240.4 43.7 203.8C43.7 647.9 -316.3 1008.0 -760.5 1008.0C-1204.6 1008.0 -1564.7 647.9 -1564.7 203.8C-1564.7 -240.4 -1204.6 -600.4 -760.5 -600.4"/>
+    <path id="unequalHour4" d="M342.3 -230.3C578.7 -230.3 770.3 -38.7 770.3 197.6C770.3 434.0 578.7 625.6 342.3 625.6C105.9 625.6 -85.7 434.0 -85.7 197.6C-85.7 -38.7 105.9 -230.3 342.3 -230.3"/>
+    <path id="unequalHour10" d="M-342.3 -230.3C-105.9 -230.3 85.7 -38.7 85.7 197.6C85.7 434.0 -105.9 625.6 -342.3 625.6C-578.7 625.6 -770.3 434.0 -770.3 197.6C-770.3 -38.7 -578.7 -230.3 -342.3 -230.3"/>
+    <path id="unequalHour3" d="M187.6 -124.4C359.9 -124.4 499.6 15.3 499.6 187.6C499.6 359.9 359.9 499.6 187.6 499.6C15.3 499.6 -124.4 359.9 -124.4 187.6C-124.4 15.3 15.3 -124.4 187.6 -124.4"/>
+    <path id="unequalHour9" d="M-187.6 -124.4C-15.3 -124.4 124.4 15.3 124.4 187.6C124.4 359.9 -15.3 499.6 -187.6 499.6C-359.9 499.6 -499.6 359.9 -499.6 187.6C-499.6 15.3 -359.9 -124.4 -187.6 -124.4"/>
+    <path id="unequalHour2" d="M100.5 -85.4C243.7 -85.4 359.9 30.7 359.9 174.0C359.9 317.3 243.7 433.4 100.5 433.4C-42.8 433.4 -159.0 317.3 -159.0 174.0C-159.0 30.7 -42.8 -85.4 100.5 -85.4"/>
+    <path id="unequalHour8" d="M-100.5 -85.4C42.8 -85.4 159.0 30.7 159.0 174.0C159.0 317.3 42.8 433.4 -100.5 433.4C-243.7 433.4 -359.9 317.3 -359.9 174.0C-359.9 30.7 -243.7 -85.4 -100.5 -85.4"/>
+    <path id="unequalHour1" d="M42.1 -73.9C169.8 -73.9 273.2 29.6 273.2 157.2C273.2 284.8 169.8 388.3 42.1 388.3C-85.5 388.3 -189.0 284.8 -189.0 157.2C-189.0 29.6 -85.5 -73.9 42.1 -73.9"/>
+    <path id="unequalHour7" d="M-42.1 -73.9C85.5 -73.9 189.0 29.6 189.0 157.2C189.0 284.8 85.5 388.3 -42.1 388.3C-169.8 388.3 -273.2 284.8 -273.2 157.2C-273.2 29.6 -169.8 -73.9 -42.1 -73.9"/>
 	</defs>
 	<g id="unequalHourAreas" mask="url(#baseArea)">
 		<path d="M0.0 -250.0C138.1 -250.0 250.0 -138.1 250.0 0.0C250.0 138.1 138.1 250.0 0.0 250.0C-138.1 250.0 -250.0 138.1 -250.0 0.0C-250.0 -138.1 -138.1 -250.0 0.0 -250.0" class="unequalHour6"/>
@@ -118,22 +120,22 @@
 		<use xlink:href="#unequalHour8" class="unequalHourArea unequalHour2"/>
 		<use xlink:href="#unequalHour1" class="unequalHourArea unequalHour1"/>
 		<use xlink:href="#unequalHour7" class="unequalHourArea unequalHour1"/>
-		<path id="horizonArea" d="M0.0 -85.4C110.6 -85.4 200.3 4.3 200.3 114.9C200.3 225.6 110.6 315.2 0.0 315.2C-110.6 315.2 -200.3 225.6 -200.3 114.9C-200.3 4.3 -110.6 -85.4 0.0 -85.4" class="horizonArea"/>
-		<path d="M0.0 -54.9C76.4 -54.9 138.3 7.0 138.3 83.4C138.3 159.8 76.4 221.8 0.0 221.8C-76.4 221.8 -138.3 159.8 -138.3 83.4C-138.3 7.0 -76.4 -54.9 0.0 -54.9" class="darkArea"/>
+    <path id="horizonArea" d="M0.0 -76.5C118.3 -76.5 214.2 19.4 214.2 137.7C214.2 256.0 118.3 351.9 0.0 351.9C-118.3 351.9 -214.2 256.0 -214.2 137.7C-214.2 19.4 -118.3 -76.5 0.0 -76.5" class="horizonArea"/>
+    <path d="M0.0 -47.1C80.2 -47.1 145.2 17.9 145.2 98.1C145.2 178.3 80.2 243.3 0.0 243.3C-80.2 243.3 -145.2 178.3 -145.2 98.1C-145.2 17.9 -80.2 -47.1 0.0 -47.1" class="darkArea"/>
 	</g>
 	<g id="unequalHourLabels">
-		<text x="-207.7" y="41.0" class="unequalHourText">1</text>
-		<text x="-206.4" y="-29.1" class="unequalHourText">2</text>
-		<text x="-182.0" y="-94.9" class="unequalHourText">3</text>
-		<text x="-137.3" y="-148.9" class="unequalHourText">4</text>
-		<text x="-77.4" y="-185.3" class="unequalHourText">5</text>
-		<text x="-8.8" y="-199.9" class="unequalHourText">6</text>
-		<text x="55.6" y="-192.6" class="unequalHourText">7</text>
-		<text x="114.6" y="-166.0" class="unequalHourText">8</text>
-		<text x="162.8" y="-122.7" class="unequalHourText">9</text>
-		<text x="195.5" y="-66.8" class="unequalHourText">10</text>
-		<text x="209.6" y="-3.6" class="unequalHourText">11</text>
-		<text x="203.8" y="60.9" class="unequalHourText">12</text>
+    <text x="-209.1" y="29.4" class="unequalHourText">1</text>
+    <text x="-204.4" y="-38.3" class="unequalHourText">2</text>
+    <text x="-178.3" y="-101.0" class="unequalHourText">3</text>
+    <text x="-133.7" y="-152.0" class="unequalHourText">4</text>
+    <text x="-75.0" y="-186.2" class="unequalHourText">5</text>
+    <text x="-8.5" y="-199.9" class="unequalHourText">6</text>
+    <text x="53.8" y="-193.0" class="unequalHourText">7</text>
+    <text x="111.3" y="-168.1" class="unequalHourText">8</text>
+    <text x="158.9" y="-127.3" class="unequalHourText">9</text>
+    <text x="192.4" y="-74.3" class="unequalHourText">10</text>
+    <text x="208.7" y="-13.8" class="unequalHourText">11</text>
+    <text x="206.4" y="48.9" class="unequalHourText">12</text>
 	</g>
 	<g id="time">
 		<path id="timeTextPath" d="M0.0 -221.0C122.0 -221.0 221.0 -122.0 221.0 0.0C221.0 122.0 122.0 221.0 0.0 221.0C-122.0 221.0 -221.0 122.0 -221.0 0.0C-221.0 -122.0 -122.0 -221.0 0.0 -221.0" class="textPath"/>
@@ -228,27 +230,27 @@
 		<path d="M0 0L0 -400" class="unequalHourBorder"/>
 	</g>
 	<g id="horizonBorder" mask="url(#baseArea)" filter="url(#filterRelief)">
-		<path id="horizonBorder" d="M0.0 -85.4C110.6 -85.4 200.3 4.3 200.3 114.9C200.3 225.6 110.6 315.2 0.0 315.2C-110.6 315.2 -200.3 225.6 -200.3 114.9C-200.3 4.3 -110.6 -85.4 0.0 -85.4" class="baseCircle"/>
+    <path id="horizonBorder" d="M0.0 -76.5C118.3 -76.5 214.2 19.4 214.2 137.7C214.2 256.0 118.3 351.9 0.0 351.9C-118.3 351.9 -214.2 256.0 -214.2 137.7C-214.2 19.4 -118.3 -76.5 0.0 -76.5" class="baseCircle"/>
 	</g>
 	<g id="eventLabels">
-		<path id="eventTextPath" d="M0.0 -85.4C110.6 -85.4 200.3 4.3 200.3 114.9C200.3 225.6 110.6 315.2 0.0 315.2C-110.6 315.2 -200.3 225.6 -200.3 114.9C-200.3 4.3 -110.6 -85.4 0.0 -85.4" class="textPath"/>
+    <path id="eventTextPath" d="M0.0 -76.5C118.3 -76.5 214.2 19.4 214.2 137.7C214.2 256.0 118.3 351.9 0.0 351.9C-118.3 351.9 -214.2 256.0 -214.2 137.7C-214.2 19.4 -118.3 -76.5 0.0 -76.5" class="textPath"/>
 		<text>
-			<textPath xlink:href="#eventTextPath" startOffset="82.8%" class="eventTextStart">
+			<textPath xlink:href="#eventTextPath" startOffset="84.3%" class="eventTextStart">
 				<tspan dx="0px" dy="-9px">ɐɑɒɓɔ</tspan>
 			</textPath>
 		</text>
 		<text>
-			<textPath xlink:href="#eventTextPath" startOffset="77.9%" class="eventTextStart">
+			<textPath xlink:href="#eventTextPath" startOffset="80.0%" class="eventTextStart">
 				<tspan dx="0px" dy="35px">ɜɝɞɟɠɡ</tspan>
 			</textPath>
 		</text>
 		<text>
-			<textPath xlink:href="#eventTextPath" startOffset="11.4%" class="eventTextStart">
+			<textPath xlink:href="#eventTextPath" startOffset="10.4%" class="eventTextStart">
 				<tspan dx="0px" dy="-9px">ɕɖɗɘəɚɛ</tspan>
 			</textPath>
 		</text>
 		<text>
-			<textPath xlink:href="#eventTextPath" startOffset="14.0%" class="eventTextStart">
+			<textPath xlink:href="#eventTextPath" startOffset="12.5%" class="eventTextStart">
 				<tspan dx="0px" dy="35px">ɢɣɤɥɦɧɨɩɪɫɬ</tspan>
 			</textPath>
 		</text>
