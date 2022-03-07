@@ -1,3 +1,14 @@
+<tbw-time-editor
+  tai
+  max="2399-12-31"
+  min="1400-01-01"
+  [options]="timeOptions"
+  [timezone]="zone"
+  [(ngModel)]="time"></tbw-time-editor>
+<button class="now-button" (click)="setNow()">Now</button>
+
+<div class="graphics-credit">SVG clock graphics by Jan Tošovský</div>
+
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100%" height="100%" viewBox="0 0 600 600" xml:space="preserve"><defs>
 <filter id="filterHand" x="0" y="0" width="200%" height="200%">
 	<feOffset result="offOut" in="SourceAlpha" dx="8" dy="8"/>
@@ -254,7 +265,7 @@
 	<g filter="url(#filterRelief)">
 		<path id="outerCircle" d="M0.0 -291.5C-161.0 -291.5 -291.5 -161.0 -291.5 0.0C-291.5 161.0 -161.0 291.5 0.0 291.5C161.0 291.5 291.5 161.0 291.5 0.0C291.5 -161.0 161.0 -291.5 0.0 -291.5" class="outerRingBorder"/>
 		<path id="innerCircle" d="M0.0 -258.8C142.9 -258.8 258.8 -142.9 258.8 0.0C258.8 142.9 142.9 258.8 0.0 258.8C-142.9 258.8 -258.8 142.9 -258.8 0.0C-258.8 -142.9 -142.9 -258.8 0.0 -258.8" class="outerRingBorder"/>
-		<g id="outerRingNumbers" [attr.transform]="'rotate(' + outerRingAngle + ')'">
+		<g id="outerRingNumbers" [attr.transform]="rotate(outerRingAngle)">
 			<text>
 				<textPath xlink:href="#outerRingTextPath" startOffset="4.2%" class="outerRingText">ɰ</textPath>
 			</text>
@@ -344,22 +355,22 @@
 	</g>
 	<g filter="url(#filterEcliptic)">
 		<g filter="url(#filterRelief)">
-			<g id="ecliptic_positive_levers" [attr.transform]="rotate(eclipticAngle)">
+			<g id="ecliptic_positive_levers" [attr.transform]="rotate(siderealAngle)">
 				<use xlink:href="#leverSymbol" class="leverSymbol"/>
 			</g>
 		</g>
 		<g filter="url(#filterRelief)">
-			<g id="ecliptic_positive_hourAngleStar" [attr.transform]="rotate(eclipticAngle)">
+			<g id="ecliptic_positive_hourAngleStar" [attr.transform]="rotate(siderealAngle)">
 				<use xlink:href="#hourAngleStarSymbol" class="hourAngleStarSymbol"/>
 			</g>
 		</g>
-		<g id="ecliptic_positive_signsArea" [attr.transform]="rotate(eclipticAngle)">
+		<g id="ecliptic_positive_signsArea" [attr.transform]="rotate(siderealAngle)">
 			<g transform="translate(0, -71.1)">
 				<path d="M0.0 -161.0C88.9 -161.0 161.0 -88.9 161.0 0.0C161.0 88.9 88.9 161.0 0.0 161.0C-88.9 161.0 -161.0 88.9 -161.0 0.0C-161.0 -88.9 -88.9 -161.0 0.0 -161.0M0.0 -116.3C-64.2 -116.3 -116.3 -64.2 -116.3 0.0C-116.3 64.2 -64.2 116.3 0.0 116.3C64.2 116.3 116.3 64.2 116.3 0.0C116.3 -64.2 64.2 -116.3 0.0 -116.3" class="signsArea"/>
 			</g>
 		</g>
 		<g filter="url(#filterRelief)">
-			<g id="ecliptic_positive_ecliptic" [attr.transform]="rotate(eclipticAngle)">
+			<g id="ecliptic_positive_ecliptic" [attr.transform]="rotate(siderealAngle)">
 				<g transform="translate(0, -71.1)">
 					<g id="disc">
 						<path d="M0.0 -178.9C98.8 -178.9 178.9 -98.8 178.9 0.0C178.9 98.8 98.8 178.9 0.0 178.9C-98.8 178.9 -178.9 98.8 -178.9 0.0C-178.9 -98.8 -98.8 -178.9 0.0 -178.9" class="eclipticCircle"/>
@@ -479,7 +490,7 @@
 		</g>
 		<g id="sunGroup">
 			<g filter="url(#filterRelief)">
-				<g id="ecliptic_positive_sunBeamLargeSymbol_A" [attr.transform]="rotate(eclipticAngle)">
+				<g id="ecliptic_positive_sunBeamLargeSymbol_A" [attr.transform]="rotate(siderealAngle)">
 					<g transform="translate(0, -71.1)">
 						<g id="sun_positive_sunBeamLargeSymbol_A" [attr.transform]="rotate(sunAngle)">
 							<g id="sun_translate_sunBeamLargeSymbol_A" transform="translate(0,-161.0)">
@@ -489,12 +500,12 @@
 					</g>
 				</g>
 			</g>
-			<g id="ecliptic_positive_sunBeamLargeSymbol_B0" [attr.transform]="rotate(eclipticAngle)">
+			<g id="ecliptic_positive_sunBeamLargeSymbol_B0" [attr.transform]="rotate(siderealAngle)">
 				<g transform="translate(0, -71.1)">
 					<g id="sun_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(sunAngle)">
 						<g id="sun_translate_sunBeamLargeSymbol_B" transform="translate(0,-161.0)">
 							<g id="sun_negative_sunBeamLargeSymbol_B" [attr.transform]="rotate(-sunAngle)">
-								<g id="ecliptic_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(-eclipticAngle)">
+								<g id="ecliptic_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(-siderealAngle)">
 									<path d="M0.0 -9.6C5.3 -9.6 9.6 -5.3 9.6 0.0C9.6 5.3 5.3 9.6 0.0 9.6C-5.3 9.6 -9.6 5.3 -9.6 0.0C-9.6 -5.3 -5.3 -9.6 0.0 -9.6" class="sunSphere"/>
 								</g>
 							</g>
@@ -503,7 +514,7 @@
 				</g>
 			</g>
 			<g filter="url(#filterRelief)">
-				<g id="ecliptic_positive_sunBeamSmallSymbol_A" [attr.transform]="rotate(eclipticAngle)">
+				<g id="ecliptic_positive_sunBeamSmallSymbol_A" [attr.transform]="rotate(siderealAngle)">
 					<g transform="translate(0, -71.1)">
 						<g id="sun_positive_sunBeamSmallSymbol_A" [attr.transform]="rotate(sunAngle)">
 							<g id="sun_translate_sunBeamSmallSymbol_A" transform="translate(0,-161.0)">
@@ -513,7 +524,7 @@
 					</g>
 				</g>
 			</g>
-			<g id="ecliptic_positive_sunBeamSmallSymbol_B0" [attr.transform]="rotate(eclipticAngle)">
+			<g id="ecliptic_positive_sunBeamSmallSymbol_B0" [attr.transform]="rotate(siderealAngle)">
 				<g transform="translate(0, -71.1)">
 					<g id="sun_positive_sunBeamSmallSymbol_B" [attr.transform]="rotate(sunAngle)">
 						<g id="sun_translate_sunBeamSmallSymbol_B" transform="translate(0,-161.0)">
@@ -528,15 +539,15 @@
 			</g>
 		</g>
 		<g filter="url(#filterRelief)">
-			<g id="ecliptic_positive_moonGroup" [attr.transform]="rotate(eclipticAngle)">
+			<g id="ecliptic_positive_moonGroup" [attr.transform]="rotate(siderealAngle)">
 				<g transform="translate(0, -71.1)">
 					<g id="moon_positive" [attr.transform]="rotate(moonAngle)">
 						<g transform="translate(0,-161.0)">
 							<path d="M0.0 -12.0C6.6 -12.0 12.0 -6.6 12.0 0.0C12.0 6.6 6.6 12.0 0.0 12.0C-6.6 12.0 -12.0 6.6 -12.0 0.0C-12.0 -6.6 -6.6 -12.0 0.0 -12.0" class="moonDark"/>
-							<path id="moonSunlit" d="M0 -12.0A12.0 12.0 0 0 0 0 12.0A10.9 12.0 0 0 1 0 -12.0" class="moonSunlit"/>
+							<path id="moonSunlit" [attr.d]="sunlitMoonPath()" class="moonSunlit"/>
 						</g>
 						<g transform="translate(0,-161.0)">
-							<g id="moon_negative" transform="rotate(moonAngle)">
+							<g id="moon_negative" [attr.transform]="rotate(moonAngle)">
 								<g id="ecliptic_negative_moon" [attr.transform]="rotate(-moonAngle)">
 									<path d="M0.0 -12.0C6.6 -12.0 12.0 -6.6 12.0 0.0C12.0 6.6 6.6 12.0 0.0 12.0C-6.6 12.0 -12.0 6.6 -12.0 0.0C-12.0 -6.6 -6.6 -12.0 0.0 -12.0" class="moonSphere"/>
 								</g>

@@ -9,6 +9,27 @@
   width: 100vw;
 }
 
+tbw-time-editor {
+  font-size: 18px;
+  position: fixed;
+  right: 16px;
+  top: 16px;
+}
+
+.now-button {
+  position: fixed;
+  right: 16px;
+  top: 50px;
+}
+
+.graphics-credit {
+  bottom: 16px;
+  color: #CCC;
+  font: italic 14px sans-serif;
+  left: 16px;
+  position: fixed;
+}
+
 svg {
   height: calc(min(100vw, 100vh) - 16px);
   margin: auto;
