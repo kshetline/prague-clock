@@ -2,7 +2,7 @@
   align-items: center;
   box-sizing: border-box;
   display: flex;
-  font-family: Horologium;
+  font-family: Horologium, sans-serif;
   height: 100vh;
   justify-content: center;
   padding: 8px;
@@ -14,6 +14,7 @@
   display: flex;
   flex-direction: column;
   font-size: 18px;
+  gap: 4px;
   position: fixed;
   right: 16px;
   top: 16px;
@@ -78,7 +79,7 @@ svg {
 
 .signsArea {
   stroke: none;
-  fill: #575652;
+  fill: #276091;
 }
 
 .handSymbol {
@@ -147,8 +148,7 @@ svg {
 
 .outerRingBackground {
   stroke: none;
-  fill: none;
-  /* fill: #575652; */
+  fill: #0e3d64;
 }
 
 .outerRingBorder {
@@ -167,7 +167,7 @@ svg {
   font-size: 30px;
   text-anchor: middle;
   fill: gray;
-  font-family: Horologium;
+  font-family: Horologium, sans-serif;
 }
 
 .eventTextStart,
@@ -196,33 +196,33 @@ svg {
 }
 
 .unequalHour6 {
-  fill: #869494;
+  fill: #0081ae;
 }
 
 .unequalHour5 {
-  fill: #889794;
+  fill: #0082a4;
 }
 
 .unequalHour4 {
-  fill: #959a94;
+  fill: #1992b2;
 }
 
 .unequalHour3 {
-  fill: #a7a594;
+  fill: #4799ae;
 }
 
 .unequalHour2 {
-  fill: #c1b193;
+  fill: #8ca8a7;
 }
 
 .unequalHour1 {
-  fill: #d0bb90;
+  fill: #b0bab1;
 }
 
 .horizonArea {
-  fill: #da9c52;
+  fill: #d3964d;
 }
 
 .darkArea {
-  fill: #41413a;
+  fill: #05304f;
 }

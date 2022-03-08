@@ -18,6 +18,7 @@ export class AppComponent implements OnInit {
   private solarSystem = new SolarSystem();
   private _time = Date.now();
 
+  disableDst = true;
   handAngle = 0;
   moonAngle = 0;
   outerRingAngle = 0;
@@ -56,7 +57,7 @@ export class AppComponent implements OnInit {
     const bohemianHour = (jdu - sunsetA.ut) / dayLength * 24;
     const date = new DateTime(this.time, this.zone);
     const wt = date.wallTime;
-    const hourOfDay = wt.hour + wt.minute / 60 - wt.dstOffset / 3600;
+    const hourOfDay = wt.hour + wt.minute / 60 - (this.disableDst ? wt.dstOffset / 3600 : 0);
 
     this.baseSunAngle = this.solarSystem.getEclipticPosition(SUN, jde).longitude.degrees;
     this.baseMoonAngle = this.solarSystem.getEclipticPosition(MOON, jde).longitude.degrees;

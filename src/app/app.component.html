@@ -6,7 +6,8 @@
     [options]="timeOptions"
     [timezone]="zone"
     [(ngModel)]="time"></tbw-time-editor>
-  <button (click)="setNow()">Now</button>
+  <p-checkbox [(ngModel)]="disableDst" [binary]="true" label="Disable DST" (onChange)="updateTime()"></p-checkbox>
+  <button type="button" pButton (click)="setNow()">Now</button>
 </div>
 
 <div class="graphics-credit">SVG clock graphics by Jan Tošovský</div>
