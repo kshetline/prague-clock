@@ -166,13 +166,12 @@ svg {
 .unequalHourText {
   font-size: 30px;
   text-anchor: middle;
-  fill: gray;
+  fill: rgb(black, 25%);
   font-family: Horologium, sans-serif;
 }
 
 .eventTextStart,
 .eventTextEnd {
-  /* spacing: exact; */
   font-size: 15px;
   fill: black;
 }
