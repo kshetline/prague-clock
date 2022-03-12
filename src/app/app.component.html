@@ -3,10 +3,13 @@
     tai
     max="2399-12-31"
     min="1400-01-01"
-    [options]="timeOptions"
+    [options]="isoFormat ? ISO_OPTS : LOCAL_OPTS"
     [timezone]="zone"
     [(ngModel)]="time"></tbw-time-editor>
-  <p-checkbox [(ngModel)]="disableDst" [binary]="true" label="Disable DST" (onChange)="updateTime()"></p-checkbox>
+  <div class="button-row">
+    <p-checkbox [(ngModel)]="isoFormat" [binary]="true" label="ISO format"></p-checkbox>
+    <p-checkbox [(ngModel)]="disableDst" [binary]="true" label="Disable DST" (onChange)="updateTime()"></p-checkbox>
+  </div>
   <button type="button" pButton (click)="setNow()">Now</button>
 </div>
 
@@ -125,8 +128,10 @@
         <use xlink:href="#unequalHour8" class="unequalHourArea unequalHour2"/>
         <use xlink:href="#unequalHour1" class="unequalHourArea unequalHour1"/>
         <use xlink:href="#unequalHour7" class="unequalHourArea unequalHour1"/>
-        <circle id="horizonArea" r="214.2" cx="0" cy="137.7" class="horizonArea"/>
-        <circle id="darkArea" r="145.2" cx="0" cy="98.1" class="darkArea"/>
+        <circle id="horizonArea" [attr.r]="getAltitudeCircle(0).r" cx="0"
+                [attr.cy]="getAltitudeCircle(0).cy" class="horizonArea"/>
+        <circle id="darkArea" [attr.r]="getAltitudeCircle(-18).r" cx="0"
+                [attr.cy]="getAltitudeCircle(-18).cy" class="darkArea"/>
       </g>
       <g id="unequalHourLabels">
         <text x="-209.1" y="29.4" class="unequalHourText">1</text>
@@ -235,28 +240,29 @@
         <path d="M0 0L0 -400" class="unequalHourBorder"/>
       </g>
       <g id="horizonBorder" mask="url(#baseArea)" filter="url(#filterRelief)">
-        <path id="horizonBorder" d="M0.0 -76.5C118.3 -76.5 214.2 19.4 214.2 137.7C214.2 256.0 118.3 351.9 0.0 351.9C-118.3 351.9 -214.2 256.0 -214.2 137.7C-214.2 19.4 -118.3 -76.5 0.0 -76.5" class="baseCircle"/>
+        <circle id="horizonBorder" [attr.r]="getAltitudeCircle(0).r" cx="0"
+                [attr.cy]="getAltitudeCircle(0).cy" class="baseCircle"/>
       </g>
       <g id="eventLabels">
-        <path id="eventTextPath" d="M0.0 -76.5C118.3 -76.5 214.2 19.4 214.2 137.7C214.2 256.0 118.3 351.9 0.0 351.9C-118.3 351.9 -214.2 256.0 -214.2 137.7C-214.2 19.4 -118.3 -76.5 0.0 -76.5" class="textPath"/>
+        <path id="eventTextPath" [attr.d]="getAltitudeCircle(0, true).d" class="textPath"/>
         <text>
-          <textPath xlink:href="#eventTextPath" startOffset="84.3%" class="eventTextStart">
-            <tspan dx="0px" dy="-9px">ɐɑɒɓɔ</tspan>
+          <textPath xlink:href="#eventTextPath" startOffset="9.3%" class="eventTextStart">
+            <tspan dx="0px" dy="-9px">ɐɑɒɓɔ</tspan><!-- ORTUS -->
           </textPath>
         </text>
         <text>
-          <textPath xlink:href="#eventTextPath" startOffset="80.0%" class="eventTextStart">
-            <tspan dx="0px" dy="35px">ɜɝɞɟɠɡ</tspan>
+          <textPath xlink:href="#eventTextPath" startOffset="5.0%" class="eventTextStart">
+            <tspan dx="0px" dy="35px">ɜɝɞɟɠɡ</tspan><!-- AURORA -->
           </textPath>
         </text>
         <text>
-          <textPath xlink:href="#eventTextPath" startOffset="10.4%" class="eventTextStart">
-            <tspan dx="0px" dy="-9px">ɕɖɗɘəɚɛ</tspan>
+          <textPath xlink:href="#eventTextPath" startOffset="35.4%" class="eventTextStart">
+            <tspan dx="0px" dy="-9px">ɕɖɗɘəɚɛ</tspan><!-- OCCASUS -->
           </textPath>
         </text>
         <text>
-          <textPath xlink:href="#eventTextPath" startOffset="12.5%" class="eventTextStart">
-            <tspan dx="0px" dy="35px">ɢɣɤɥɦɧɨɩɪɫɬ</tspan>
+          <textPath xlink:href="#eventTextPath" startOffset="37.5%" class="eventTextStart">
+            <tspan dx="0px" dy="35px">ɢɣɤɥɦɧɨɩɪɫɬ</tspan><!-- CREPUSCULUM -->
           </textPath>
         </text>
       </g>

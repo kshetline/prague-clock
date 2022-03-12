@@ -20,6 +20,13 @@
   top: 16px;
 }
 
+.button-row {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}
+
 .graphics-credit {
   bottom: 16px;
   color: #CCC;

@@ -1,9 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { abs, cos_deg, floor, mod } from '@tubular/math';
+import { abs, cos_deg, floor, mod, sin_deg, tan_deg } from '@tubular/math';
 import { DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import { EventFinder, MOON, SET_EVENT, SkyObserver, SolarSystem, SUN } from '@tubular/astronomy';
 import ttime, { DateTime, utToTdt } from '@tubular/time';
 import julianDay = ttime.julianDay;
+
+const CLOCK_RADIUS = 250;
+const INCLINATION = 23.5;
+
+interface CircleAttributes {
+  cy: number;
+  d?: string;
+  r: number;
+}
 
 @Component({
   selector: 'app-root',
@@ -11,6 +20,14 @@ import julianDay = ttime.julianDay;
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
+  LOCAL_OPTS: TimeEditorOptions = {
+    dateTimeStyle: DateTimeStyle.DATE_AND_TIME,
+    twoDigitYear: false,
+    showSeconds: false
+  };
+
+  ISO_OPTS = ['ISO', this.LOCAL_OPTS];
+
   private baseMoonAngle: number;
   private baseSunAngle: number;
   private eventFinder = new EventFinder();
@@ -20,16 +37,12 @@ export class AppComponent implements OnInit {
 
   disableDst = true;
   handAngle = 0;
+  isoFormat = false;
   moonAngle = 0;
   outerRingAngle = 0;
   siderealAngle = 0;
   sunAngle = 0;
   zone = 'Europe/Prague';
-
-  timeOptions: TimeEditorOptions = {
-    dateTimeStyle: DateTimeStyle.DATE_AND_TIME,
-    twoDigitYear: false
-  };
 
   ngOnInit(): void {
     this.setNow();
@@ -79,5 +92,26 @@ export class AppComponent implements OnInit {
     const x = (abs(cos_deg(phaseAngle)) * 12).toFixed(1);
 
     return `M0 -12.0A12.0 12.0 0 0 ${largeArcFlag} 0 12.0A${x} 12.0 0 0 ${sweepFlag} 0 -12.0`;
+  }
+
+  getAltitudeCircle(alt: number, doPath = false): CircleAttributes {
+    const lat = this.observer.latitude.degrees;
+    const r0 = CLOCK_RADIUS * tan_deg((90 - INCLINATION) / 2);
+    const theta1 = -lat - (90 + alt);
+    const theta2 = -lat + (90 + alt);
+    const x1 = r0 * sin_deg(theta1);
+    const y1 = r0 * cos_deg(theta1);
+    const x2 = r0 * sin_deg(theta2);
+    const y2 = r0 * cos_deg(theta2);
+    const ya = y1 * (r0 / (r0 - x1));
+    const yb = y2 * (r0 / (r0 - x2));
+    const cy = (ya + yb) / 2;
+    const r = (yb - ya) / 2;
+
+    return {
+      cy,
+      d: doPath && `M 0 ${cy} m ${-r} 0 a ${r},${r} 0 1,1 ${r * 2},0 a ${r},${r} 0 1,1 ${-r * 2},0`,
+      r
+    };
   }
 }
