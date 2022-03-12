@@ -11,6 +11,7 @@
     <p-checkbox [(ngModel)]="disableDst" [binary]="true" label="Disable DST" (onChange)="updateTime()"></p-checkbox>
   </div>
   <button type="button" pButton (click)="setNow()">Now</button>
+  <tbw-angle-editor [(ngModel)]="latitude" [options]="{ angleStyle: DD, compass: true }"></tbw-angle-editor>
 </div>
 
 <div class="graphics-credit">SVG clock graphics by Jan Tošovský</div>
@@ -94,7 +95,7 @@
     </mask>
     <mask id="dayArea">
       <g class="maskWhite">
-        <path d="M214.05415125737062 129.1542501410105A214.22471010966888 214.22471010966888 0 0 0 92.23392664882911 -55.65135534123541 107.72265581751148 107.72265581751148 0 0 0 -92.23392664882911 -55.65135534123541 214.22471010966888 214.22471010966888 0 0 0 -214.05415125737062 129.1542501410105A 249.99999999999997 249.99999999999997 0 1 1 214.05415125737062 129.1542501410105"/>
+        <path [attr.d]="dayAreaMask"/>
       </g>
     </mask>
     <clipPath id="backgroundArea">
@@ -128,10 +129,9 @@
         <use xlink:href="#unequalHour8" class="unequalHourArea unequalHour2"/>
         <use xlink:href="#unequalHour1" class="unequalHourArea unequalHour1"/>
         <use xlink:href="#unequalHour7" class="unequalHourArea unequalHour1"/>
-        <circle id="horizonArea" [attr.r]="getAltitudeCircle(0).r" cx="0"
-                [attr.cy]="getAltitudeCircle(0).cy" class="horizonArea"/>
-        <circle id="darkArea" [attr.r]="getAltitudeCircle(-18).r" cx="0"
-                [attr.cy]="getAltitudeCircle(-18).cy" class="darkArea"/>
+        <path [attr.d]="getHourCircle(1)" stroke="red" stroke-width="3"/>
+        <circle id="horizonArea" [attr.r]="horizonR" cx="0" [attr.cy]="horizonCy" class="horizonArea"/>
+        <circle id="darkArea" [attr.r]="darkR" cx="0" [attr.cy]="darkCy" class="darkArea"/>
       </g>
       <g id="unequalHourLabels">
         <text x="-209.1" y="29.4" class="unequalHourText">1</text>
@@ -240,11 +240,10 @@
         <path d="M0 0L0 -400" class="unequalHourBorder"/>
       </g>
       <g id="horizonBorder" mask="url(#baseArea)" filter="url(#filterRelief)">
-        <circle id="horizonBorder" [attr.r]="getAltitudeCircle(0).r" cx="0"
-                [attr.cy]="getAltitudeCircle(0).cy" class="baseCircle"/>
+        <circle id="horizonBorder" [attr.r]="horizonR" cx="0" [attr.cy]="horizonCy" class="baseCircle"/>
       </g>
       <g id="eventLabels">
-        <path id="eventTextPath" [attr.d]="getAltitudeCircle(0, true).d" class="textPath"/>
+        <path id="eventTextPath" [attr.d]="horizonPath" class="textPath"/>
         <text>
           <textPath xlink:href="#eventTextPath" startOffset="9.3%" class="eventTextStart">
             <tspan dx="0px" dy="-9px">ɐɑɒɓɔ</tspan><!-- ORTUS -->
