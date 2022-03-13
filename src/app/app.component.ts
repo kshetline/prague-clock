@@ -121,21 +121,25 @@ export class AppComponent implements OnInit {
   darkCy: number;
   darkR: number;
   dayAreaMask: string;
+  dawnLabelPath: string;
   disableDst = true;
-  equatorMorningAngle: number = null;
+  duskLabelPath: string;
+  equatorSunriseAngle: number = null;
   handAngle = 0;
   horizonCy: number;
   horizonPath: string;
   horizonR: number;
   hourArcs: string[] = [];
   hourWedges: string[] = [];
-  innerMorningAngle: number = null;
+  innerSunriseAngle: number = null;
   isoFormat = false;
   moonAngle = 0;
-  outerMorningAngle: number = null;
   outerRingAngle = 0;
+  outerSunriseAngle: number = null;
   siderealAngle = 0;
   sunAngle = 0;
+  sunriseLabelPath: string;
+  sunsetLabelPath: string;
   zone = 'Europe/Prague';
 
   ngOnInit(): void {
@@ -170,15 +174,21 @@ export class AppComponent implements OnInit {
     ({ cy: this.darkCy, r: this.darkR } = this.getAltitudeCircle(-18));
     this.createDayAreaMask();
 
-    if (this.outerMorningAngle != null) {
+    if (this.outerSunriseAngle != null) {
       for (let h = 1; h <= 11; ++h) {
         this.hourArcs[h] = this.getHourArc(h);
         this.hourWedges[h] = this.getHourArc(h, true);
       }
+
+      this.dawnLabelPath = this.getHourArc(-0.5 - sin_deg(this._latitude) * 0.65);
+      this.duskLabelPath = this.getHourArc(12.5 + sin_deg(this._latitude) * 0.65, false, true);
+      this.sunriseLabelPath = this.getHourArc(0.5);
+      this.sunsetLabelPath = this.getHourArc(11.5, false, true);
     }
     else {
       this.hourArcs = [];
       this.hourWedges = [];
+      this.dawnLabelPath = this.duskLabelPath = this.sunriseLabelPath = this.sunsetLabelPath = '';
     }
   }
 
@@ -189,7 +199,7 @@ export class AppComponent implements OnInit {
 
     if (!outerPoints || outerPoints.length < 2 || !innerPoints || innerPoints.length < 2) {
       this.dayAreaMask = '';
-      this.outerMorningAngle = null;
+      this.outerSunriseAngle = null;
       return;
     }
 
@@ -208,9 +218,9 @@ export class AppComponent implements OnInit {
 
     this.dayAreaMask = `M${RO(x1)} ${RO(y1)} A${r2} ${r2} 0 0 0 ${RO(x2)} ${RO(y2)}A${r3} ${r3} 0 0 0 ${x3} ${y3} ` +
                        `A${r4} ${r4} 0 0 0 ${x4} ${y4}A${r5} ${r5} 0 1 1 ${x1} ${y1}`;
-    this.outerMorningAngle = atan2_deg(y1, x1);
-    this.innerMorningAngle = atan2_deg(y2, x2);
-    this.equatorMorningAngle = atan2_deg(equatorPoints[0].y, equatorPoints[0].x);
+    this.outerSunriseAngle = atan2_deg(y1, x1);
+    this.innerSunriseAngle = atan2_deg(y2, x2);
+    this.equatorSunriseAngle = atan2_deg(equatorPoints[0].y, equatorPoints[0].x);
   }
 
   updateTime(): void {
@@ -268,30 +278,30 @@ export class AppComponent implements OnInit {
   }
 
   private getHourArc(hour: number, asWedge = false, reverse = false): string {
-    if (this.outerMorningAngle == null)
+    if (this.outerSunriseAngle == null)
       return '';
 
-    const outerSweep = 180 + this.outerMorningAngle * 2;
-    const outerAngle = this.outerMorningAngle - outerSweep / 12 * (12 - hour);
+    const outerSweep = 180 + this.outerSunriseAngle * 2;
+    const outerAngle = this.outerSunriseAngle - outerSweep / 12 * (12 - hour);
     const x1 = CLOCK_RADIUS * cos_deg(outerAngle);
     const y1 = CLOCK_RADIUS * sin_deg(outerAngle);
-    const equatorSweep = 180 + this.equatorMorningAngle * 2;
-    const equatorAngle = this.equatorMorningAngle - equatorSweep / 12 * (12 - hour);
+    const equatorSweep = 180 + this.equatorSunriseAngle * 2;
+    const equatorAngle = this.equatorSunriseAngle - equatorSweep / 12 * (12 - hour);
     const x2 = EQUATOR_RADIUS * cos_deg(equatorAngle);
     const y2 = EQUATOR_RADIUS * sin_deg(equatorAngle);
-    const innerSweep = 180 + this.innerMorningAngle * 2;
-    const innerAngle = this.innerMorningAngle - innerSweep / 12 * (12 - hour);
+    const innerSweep = 180 + this.innerSunriseAngle * 2;
+    const innerAngle = this.innerSunriseAngle - innerSweep / 12 * (12 - hour);
     const x3 = TROPIC_RADIUS * cos_deg(innerAngle);
     const y3 = TROPIC_RADIUS * sin_deg(innerAngle);
     const r = findCircleRadius(x1, y1, x2, y2, x3, y3);
 
     if (reverse)
-      return `L ${RO(x3)} ${RO(y3)} A${RO(r)} ${RO(r)} 0 0 ${hour < 6 ? 0 : 1} ${RO(x1)} ${RO(y1)} `;
+      return `M ${RO(x3)} ${RO(y3)} A${RO(r)} ${RO(r)} 0 0 ${hour < 6 ? 0 : 1} ${RO(x1)} ${RO(y1)} `;
 
     let path = `M ${RO(x1)} ${RO(y1)} A${RO(r)} ${RO(r)} 0 0 ${hour < 6 ? 1 : 0} ${RO(x3)} ${RO(y3)}`;
 
     if (asWedge)
-      path += this.getHourArc(hour + sign(hour - 6), false, true) +
+      path += 'L' + this.getHourArc(hour + sign(hour - 6), false, true).substring(1) +
         `A ${CLOCK_RADIUS} ${CLOCK_RADIUS} 0 0 ${hour < 6 ? 1 : 0} ${RO(x1)} ${RO(y1)} Z`;
 
     return path;

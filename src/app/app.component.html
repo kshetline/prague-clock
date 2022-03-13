@@ -230,25 +230,28 @@
         <circle id="horizonBorder" [attr.r]="horizonR" cx="0" [attr.cy]="horizonCy" class="baseCircle"/>
       </g>
       <g id="eventLabels">
-        <path id="eventTextPath" [attr.d]="horizonPath" class="textPath"/>
+        <path id="dawnPath" [attr.d]="dawnLabelPath" class="textPath"/>
+        <path id="duskPath" [attr.d]="duskLabelPath" class="textPath"/>
+        <path id="sunrisePath" [attr.d]="sunriseLabelPath" class="textPath"/>
+        <path id="sunsetPath" [attr.d]="sunsetLabelPath" class="textPath"/>
         <text>
-          <textPath xlink:href="#eventTextPath" startOffset="11.4%" class="eventText">
-            <tspan dx="0px" dy="-9px">ɐɑɒɓɔ</tspan><!-- ORTUS -->
+          <textPath xlink:href="#sunrisePath" startOffset="50%" class="eventText">
+            <tspan>ɐɑɒɓɔ</tspan><!-- ORTUS -->
           </textPath>
         </text>
         <text>
-          <textPath xlink:href="#eventTextPath" startOffset="8.0%" class="eventText">
-            <tspan dx="0px" dy="35px">ɜɝɞɟɠɡ</tspan><!-- AURORA -->
+          <textPath xlink:href="#dawnPath" startOffset="55%" class="eventText">
+            <tspan>ɜɝɞɟɠɡ</tspan><!-- AURORA -->
           </textPath>
         </text>
         <text>
-         <textPath xlink:href="#eventTextPath" startOffset="38.2%" class="eventText">
-            <tspan dx="0px" dy="-9px">ɕɖɗɘəɚɛ</tspan><!-- OCCASUS -->
+          <textPath xlink:href="#sunsetPath" startOffset="50%" class="eventText">
+            <tspan>ɕɖɗɘəɚɛ</tspan><!-- OCCASUS -->
           </textPath>
         </text>
         <text>
-         <textPath xlink:href="#eventTextPath" startOffset="42%" class="eventText">
-            <tspan dx="0px" dy="35px">ɢɣɤɥɦɧɨɩɪɫɬ</tspan><!-- CREPUSCULUM -->
+          <textPath xlink:href="#duskPath" startOffset="45%" class="eventText">
+            <tspan>ɢɣɤɥɦɧɨɩɪɫɬ</tspan><!-- CREPUSCULUM -->
           </textPath>
         </text>
       </g>

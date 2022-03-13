@@ -181,6 +181,10 @@ svg {
   font-size: 15px;
   fill: black;
   text-anchor: middle;
+
+  tspan {
+    alignment-baseline: central;
+  }
 }
 
 .unequalHourArea {
