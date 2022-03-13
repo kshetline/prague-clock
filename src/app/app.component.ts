@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { abs, atan2_deg, cos_deg, floor, mod, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
+import { abs, atan2_deg, cos_deg, floor, max, mod, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import { EventFinder, MOON, SET_EVENT, SkyObserver, SolarSystem, SUN } from '@tubular/astronomy';
 import ttime, { DateTime, utToTdt } from '@tubular/time';
@@ -137,7 +137,9 @@ export class AppComponent implements OnInit {
   moonAngle = 0;
   outerRingAngle = 0;
   outerSunriseAngle: number = null;
+  rotateSign = 1;
   siderealAngle = 0;
+  southern = false;
   sunAngle = 0;
   sunriseLabelPath: string;
   sunsetLabelPath: string;
@@ -170,6 +172,8 @@ export class AppComponent implements OnInit {
   }
 
   private adjustLatitude(): void {
+    this.southern = (this._latitude < 0);
+    this.rotateSign = (this.southern ? -1 : 1);
     this.observer = new SkyObserver(this._longitude, this._latitude);
     ({ cy: this.horizonCy, d: this.horizonPath, r: this.horizonR } = this.getAltitudeCircle(0, true));
     ({ cy: this.darkCy, r: this.darkR } = this.getAltitudeCircle(-18));
@@ -181,8 +185,8 @@ export class AppComponent implements OnInit {
         this.hourWedges[h] = this.getHourArc(h, true);
       }
 
-      this.dawnLabelPath = this.getHourArc(-0.5 - sin_deg(this._latitude) * 0.65);
-      this.duskLabelPath = this.getHourArc(12.5 + sin_deg(this._latitude) * 0.65, false, true);
+      this.dawnLabelPath = this.getHourArc(-0.5 - sin_deg(abs(this._latitude)) * 0.65);
+      this.duskLabelPath = this.getHourArc(12.5 + sin_deg(abs(this._latitude)) * 0.65, false, true);
       this.sunriseLabelPath = this.getHourArc(0.5);
       this.sunsetLabelPath = this.getHourArc(11.5, false, true);
     }
@@ -214,6 +218,8 @@ export class AppComponent implements OnInit {
 
       hourLabels.innerHTML = html;
     }
+
+    this.updateTime();
   }
 
   private createDayAreaMask(): void {
@@ -272,7 +278,7 @@ export class AppComponent implements OnInit {
   }
 
   sunlitMoonPath(): string {
-    const phaseAngle = mod(this.baseMoonAngle - this.baseSunAngle, 360);
+    const phaseAngle = mod((this.baseMoonAngle - this.baseSunAngle) * this.rotateSign, 360);
     const largeArcFlag = phaseAngle < 180 ? 1 : 0;
     const sweepFlag = floor(phaseAngle / 90) % 2;
     const x = (abs(cos_deg(phaseAngle)) * 12).toFixed(1);
@@ -281,8 +287,7 @@ export class AppComponent implements OnInit {
   }
 
   private getAltitudeCircle(alt: number, doPath = false): CircleAttributes {
-    const l = this.observer.latitude.degrees;
-    const lat = abs(l) > 0.01 ? l : (sign(l) || 1) * 0.01;
+    const lat = max(abs(this.observer.latitude.degrees), 0.01);
     const theta1 = -lat - (90 + alt);
     const theta2 = -lat + (90 + alt);
     const x1 = HORIZON_RADIUS * sin_deg(theta1);
@@ -305,28 +310,32 @@ export class AppComponent implements OnInit {
     if (this.outerSunriseAngle == null)
       return '';
 
+    const h = (this.southern ? hour : 12 - hour);
     const outerSweep = 180 + this.outerSunriseAngle * 2;
-    const outerAngle = this.outerSunriseAngle - outerSweep / 12 * (12 - hour);
+    const outerAngle = this.outerSunriseAngle - outerSweep / 12 * h;
     const x1 = CLOCK_RADIUS * cos_deg(outerAngle);
     const y1 = CLOCK_RADIUS * sin_deg(outerAngle);
     const equatorSweep = 180 + this.equatorSunriseAngle * 2;
-    const equatorAngle = this.equatorSunriseAngle - equatorSweep / 12 * (12 - hour);
+    const equatorAngle = this.equatorSunriseAngle - equatorSweep / 12 * h;
     const x2 = EQUATOR_RADIUS * cos_deg(equatorAngle);
     const y2 = EQUATOR_RADIUS * sin_deg(equatorAngle);
     const innerSweep = 180 + this.innerSunriseAngle * 2;
-    const innerAngle = this.innerSunriseAngle - innerSweep / 12 * (12 - hour);
+    const innerAngle = this.innerSunriseAngle - innerSweep / 12 * h;
     const x3 = TROPIC_RADIUS * cos_deg(innerAngle);
     const y3 = TROPIC_RADIUS * sin_deg(innerAngle);
     const r = findCircleRadius(x1, y1, x2, y2, x3, y3);
 
-    if (reverse)
-      return `M ${RO(x3)} ${RO(y3)} A${RO(r)} ${RO(r)} 0 0 ${hour < 6 ? 0 : 1} ${RO(x1)} ${RO(y1)} `;
+    if (!asWedge && this.southern)
+      reverse = !reverse;
 
-    let path = `M ${RO(x1)} ${RO(y1)} A${RO(r)} ${RO(r)} 0 0 ${hour < 6 ? 1 : 0} ${RO(x3)} ${RO(y3)}`;
+    if (reverse)
+      return `M ${RO(x3)} ${RO(y3)} A${RO(r)} ${RO(r)} 0 0 ${h < 6 ? 1 : 0} ${RO(x1)} ${RO(y1)} `;
+
+    let path = `M ${RO(x1)} ${RO(y1)} A${RO(r)} ${RO(r)} 0 0 ${h < 6 ? 0 : 1} ${RO(x3)} ${RO(y3)}`;
 
     if (asWedge)
-      path += 'L' + this.getHourArc(hour + sign(hour - 6), false, true).substring(1) +
-        `A ${CLOCK_RADIUS} ${CLOCK_RADIUS} 0 0 ${hour < 6 ? 1 : 0} ${RO(x1)} ${RO(y1)} Z`;
+      path += 'L' + this.getHourArc(hour + sign(hour - 6), false, !this.southern).substring(1) +
+        `A ${CLOCK_RADIUS} ${CLOCK_RADIUS} 0 0 ${h < 6 ? 0 : 1} ${RO(x1)} ${RO(y1)} Z`;
 
     return path;
   }
