@@ -7,6 +7,7 @@ import julianDay = ttime.julianDay;
 
 const CLOCK_RADIUS = 250;
 const INCLINATION = 23.5;
+const LABEL_RADIUS = 212;
 const EQUATOR_RADIUS = 164.1;
 const HORIZON_RADIUS = CLOCK_RADIUS * tan_deg((90 - INCLINATION) / 2);
 const TROPIC_RADIUS = HORIZON_RADIUS * tan_deg((90 - INCLINATION) / 2);
@@ -189,6 +190,29 @@ export class AppComponent implements OnInit {
       this.hourArcs = [];
       this.hourWedges = [];
       this.dawnLabelPath = this.duskLabelPath = this.sunriseLabelPath = this.sunsetLabelPath = '';
+    }
+
+    const hourLabels = document.getElementById('unequalHourLabels') as unknown as SVGGElement;
+    const pts = circleIntersections(0, 0, LABEL_RADIUS, 0, this.horizonCy, this.horizonR);
+    const hAdj = [0, 3, -3, -7, -9, -9, -9, -12, -14, -13, -9, -3, 5];
+    const vAdj = [0, 30, 27, 23, 19, 16, 12, 9, 3, -4, -9, -14, -17];
+
+    if (this.outerSunriseAngle == null || !pts || pts.length < 2)
+      hourLabels.innerHTML = '';
+    else {
+      const sunrise = atan2_deg(pts[0].y, pts[0].x);
+      const step = (180 + sunrise * 2) / 12;
+      let angle = -180 - sunrise + step;
+      let html = '';
+
+      for (let h = 1; h <= 12; ++h, angle += step) {
+        const x = RO(cos_deg(angle) * LABEL_RADIUS + hAdj[h]);
+        const y = RO(sin_deg(angle) * LABEL_RADIUS + vAdj[h]);
+
+        html += `<text x="${x}" y="${y}" class="unequalHourText">${h}</text>`;
+      }
+
+      hourLabels.innerHTML = html;
     }
   }
 
