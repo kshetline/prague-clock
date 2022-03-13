@@ -177,18 +177,10 @@ svg {
   font-family: Horologium, sans-serif;
 }
 
-.eventTextStart,
-.eventTextEnd {
+.eventText {
   font-size: 15px;
   fill: black;
-}
-
-.eventTextEnd {
-  text-anchor: end;
-}
-
-.eventTextStart {
-  text-anchor: start;
+  text-anchor: middle;
 }
 
 .unequalHourArea {
@@ -201,12 +193,18 @@ svg {
   fill: none;
 }
 
+.unequalHourBorder2 {
+  stroke: red;
+  stroke-width: 2px;
+  fill: none;
+}
+
 .unequalHour6 {
   fill: #0081ae;
 }
 
 .unequalHour5 {
-  fill: #0082a4;
+  fill: #0D8AB0;
 }
 
 .unequalHour4 {

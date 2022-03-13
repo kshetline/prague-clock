@@ -105,31 +105,18 @@
 
   <g transform="translate(300, 300)" class="content">
     <g id="base">
-      <defs>
-        <circle id="unequalHour5" r="804.2" cx="-760.5" cy="203.8"/>
-        <circle id="unequalHour11" r="804.2" cx="760.5" cy="203.8"/>
-        <circle id="unequalHour4" r="427.9" cx="-342.3" cy="197.6"/>
-        <circle id="unequalHour10" r="427.9" cx="342.3" cy="197.6"/>
-        <circle id="unequalHour3" r="312" cx="-187.6" cy="187.6"/>
-        <circle id="unequalHour9" r="312" cx="187.6" cy="187.6"/>
-        <circle id="unequalHour2" r="259.5" cx="-100.5" cy="174"/>
-        <circle id="unequalHour8" r="259.5" cx="100.5" cy="174"/>
-        <circle id="unequalHour1" r="231.1" cx="-42.1" cy="157.2"/>
-        <circle id="unequalHour7" r="231.1" cx="42.1" cy="157.2"/>
-      </defs>
       <g id="unequalHourAreas" mask="url(#baseArea)">
-        <path d="M0.0 -250.0C138.1 -250.0 250.0 -138.1 250.0 0.0C250.0 138.1 138.1 250.0 0.0 250.0C-138.1 250.0 -250.0 138.1 -250.0 0.0C-250.0 -138.1 -138.1 -250.0 0.0 -250.0" class="unequalHour6"/>
-        <use xlink:href="#unequalHour5" class="unequalHourArea unequalHour5"/>
-        <use xlink:href="#unequalHour11" class="unequalHourArea unequalHour5"/>
-        <use xlink:href="#unequalHour4" class="unequalHourArea unequalHour4"/>
-        <use xlink:href="#unequalHour10" class="unequalHourArea unequalHour4"/>
-        <use xlink:href="#unequalHour3" class="unequalHourArea unequalHour3"/>
-        <use xlink:href="#unequalHour9" class="unequalHourArea unequalHour3"/>
-        <use xlink:href="#unequalHour2" class="unequalHourArea unequalHour2"/>
-        <use xlink:href="#unequalHour8" class="unequalHourArea unequalHour2"/>
-        <use xlink:href="#unequalHour1" class="unequalHourArea unequalHour1"/>
-        <use xlink:href="#unequalHour7" class="unequalHourArea unequalHour1"/>
-        <path [attr.d]="getHourCircle(1)" stroke="red" stroke-width="3"/>
+        <circle cx="0" cy="0" r="250" class="unequalHour6"/>
+        <path [attr.d]="hourWedges[1]"  class="unequalHourArea unequalHour1"/>
+        <path [attr.d]="hourWedges[2]"  class="unequalHourArea unequalHour2"/>
+        <path [attr.d]="hourWedges[3]"  class="unequalHourArea unequalHour3"/>
+        <path [attr.d]="hourWedges[4]"  class="unequalHourArea unequalHour4"/>
+        <path [attr.d]="hourWedges[5]"  class="unequalHourArea unequalHour5"/>
+        <path [attr.d]="hourWedges[7]"  class="unequalHourArea unequalHour5"/>
+        <path [attr.d]="hourWedges[8]"  class="unequalHourArea unequalHour4"/>
+        <path [attr.d]="hourWedges[9]"  class="unequalHourArea unequalHour3"/>
+        <path [attr.d]="hourWedges[10]" class="unequalHourArea unequalHour2"/>
+        <path [attr.d]="hourWedges[11]" class="unequalHourArea unequalHour1"/>
         <circle id="horizonArea" [attr.r]="horizonR" cx="0" [attr.cy]="horizonCy" class="horizonArea"/>
         <circle id="darkArea" [attr.r]="darkR" cx="0" [attr.cy]="darkCy" class="darkArea"/>
       </g>
@@ -227,16 +214,16 @@
         </g>
       </g>
       <g id="unequalHourBorders" mask="url(#dayArea)" filter="url(#filterRelief)">
-        <use xlink:href="#unequalHour5" class="unequalHourBorder"/>
-        <use xlink:href="#unequalHour11" class="unequalHourBorder"/>
-        <use xlink:href="#unequalHour4" class="unequalHourBorder"/>
-        <use xlink:href="#unequalHour10" class="unequalHourBorder"/>
-        <use xlink:href="#unequalHour3" class="unequalHourBorder"/>
-        <use xlink:href="#unequalHour9" class="unequalHourBorder"/>
-        <use xlink:href="#unequalHour2" class="unequalHourBorder"/>
-        <use xlink:href="#unequalHour8" class="unequalHourBorder"/>
-        <use xlink:href="#unequalHour1" class="unequalHourBorder"/>
-        <use xlink:href="#unequalHour7" class="unequalHourBorder"/>
+        <path [attr.d]="hourArcs[1]" class="unequalHourBorder"/>
+        <path [attr.d]="hourArcs[2]" class="unequalHourBorder"/>
+        <path [attr.d]="hourArcs[3]" class="unequalHourBorder"/>
+        <path [attr.d]="hourArcs[4]" class="unequalHourBorder"/>
+        <path [attr.d]="hourArcs[5]" class="unequalHourBorder"/>
+        <path [attr.d]="hourArcs[7]" class="unequalHourBorder"/>
+        <path [attr.d]="hourArcs[8]" class="unequalHourBorder"/>
+        <path [attr.d]="hourArcs[9]" class="unequalHourBorder"/>
+        <path [attr.d]="hourArcs[10]" class="unequalHourBorder"/>
+        <path [attr.d]="hourArcs[11]" class="unequalHourBorder"/>
         <path d="M0 0L0 -400" class="unequalHourBorder"/>
       </g>
       <g id="horizonBorder" mask="url(#baseArea)" filter="url(#filterRelief)">
@@ -245,22 +232,22 @@
       <g id="eventLabels">
         <path id="eventTextPath" [attr.d]="horizonPath" class="textPath"/>
         <text>
-          <textPath xlink:href="#eventTextPath" startOffset="9.3%" class="eventTextStart">
+          <textPath xlink:href="#eventTextPath" startOffset="11.4%" class="eventText">
             <tspan dx="0px" dy="-9px">ɐɑɒɓɔ</tspan><!-- ORTUS -->
           </textPath>
         </text>
         <text>
-          <textPath xlink:href="#eventTextPath" startOffset="5.0%" class="eventTextStart">
+          <textPath xlink:href="#eventTextPath" startOffset="8.0%" class="eventText">
             <tspan dx="0px" dy="35px">ɜɝɞɟɠɡ</tspan><!-- AURORA -->
           </textPath>
         </text>
         <text>
-          <textPath xlink:href="#eventTextPath" startOffset="35.4%" class="eventTextStart">
+         <textPath xlink:href="#eventTextPath" startOffset="38.2%" class="eventText">
             <tspan dx="0px" dy="-9px">ɕɖɗɘəɚɛ</tspan><!-- OCCASUS -->
           </textPath>
         </text>
         <text>
-          <textPath xlink:href="#eventTextPath" startOffset="37.5%" class="eventTextStart">
+         <textPath xlink:href="#eventTextPath" startOffset="42%" class="eventText">
             <tspan dx="0px" dy="35px">ɢɣɤɥɦɧɨɩɪɫɬ</tspan><!-- CREPUSCULUM -->
           </textPath>
         </text>
