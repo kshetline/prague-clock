@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { abs, atan2_deg, cos_deg, floor, max, mod, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
-import { EventFinder, MOON, SET_EVENT, SkyObserver, SolarSystem, SUN } from '@tubular/astronomy';
+import { AstroEvent, EventFinder, MOON, SET_EVENT, SkyObserver, SolarSystem, SUN } from '@tubular/astronomy';
 import ttime, { DateTime, utToTdt } from '@tubular/time';
 import julianDay = ttime.julianDay;
 
@@ -101,10 +101,12 @@ function RO(n: number): string {
 })
 export class AppComponent implements OnInit {
   DD = AngleStyle.DD;
+  DDD = AngleStyle.DDD;
 
   LOCAL_OPTS: TimeEditorOptions = {
     dateTimeStyle: DateTimeStyle.DATE_AND_TIME,
     twoDigitYear: false,
+    showDstSymbol: true,
     showSeconds: false
   };
 
@@ -117,7 +119,10 @@ export class AppComponent implements OnInit {
   private _longitude = 14.4185;
   private observer: SkyObserver;
   private solarSystem = new SolarSystem();
+  private sunsetA: AstroEvent = null;
+  private sunsetB: AstroEvent = null;
   private _time = Date.now();
+  private _zone = 'Europe/Prague';
 
   darkCy: number;
   darkR: number;
@@ -143,7 +148,6 @@ export class AppComponent implements OnInit {
   sunAngle = 0;
   sunriseLabelPath: string;
   sunsetLabelPath: string;
-  zone = 'Europe/Prague';
 
   ngOnInit(): void {
     this.adjustLatitude();
@@ -155,6 +159,23 @@ export class AppComponent implements OnInit {
     if (this._latitude !== newValue) {
       this._latitude = newValue;
       this.adjustLatitude();
+    }
+  }
+
+  get longitude(): number { return this._longitude; }
+  set longitude(newValue: number) {
+    if (this._longitude !== newValue) {
+      this._longitude = newValue;
+      this.observer = new SkyObserver(this._longitude, this._latitude);
+      this.updateTime();
+    }
+  }
+
+  get zone(): string { return this._zone; }
+  set zone(newValue: string) {
+    if (this._zone !== newValue) {
+      this._zone = newValue;
+      this.updateTime();
     }
   }
 
@@ -175,11 +196,12 @@ export class AppComponent implements OnInit {
     this.southern = (this._latitude < 0);
     this.rotateSign = (this.southern ? -1 : 1);
     this.observer = new SkyObserver(this._longitude, this._latitude);
+    this.sunsetA = this.sunsetB = null;
     ({ cy: this.horizonCy, d: this.horizonPath, r: this.horizonR } = this.getAltitudeCircle(0, true));
     ({ cy: this.darkCy, r: this.darkR } = this.getAltitudeCircle(-18));
     this.createDayAreaMask();
 
-    if (this.outerSunriseAngle != null) {
+    if (this.outerSunriseAngle != null && abs(this._latitude) <= 66) {
       for (let h = 1; h <= 11; ++h) {
         this.hourArcs[h] = this.getHourArc(h);
         this.hourWedges[h] = this.getHourArc(h, true);
@@ -213,7 +235,7 @@ export class AppComponent implements OnInit {
         const x = RO(cos_deg(angle) * LABEL_RADIUS + hAdj[h]);
         const y = RO(sin_deg(angle) * LABEL_RADIUS + vAdj[h]);
 
-        html += `<text x="${x}" y="${y}" class="unequalHourText">${h}</text>`;
+        html += `<text x="${x}" y="${y}" class="unequalHourText">${this.southern ? 13 - h : h}</text>`;
       }
 
       hourLabels.innerHTML = html;
@@ -227,7 +249,7 @@ export class AppComponent implements OnInit {
     const equatorPoints = circleIntersections(0, 0, EQUATOR_RADIUS, 0, this.horizonCy, this.horizonR);
     const innerPoints = circleIntersections(0, 0, TROPIC_RADIUS, 0, this.horizonCy, this.horizonR);
 
-    if (!outerPoints || outerPoints.length < 2 || !innerPoints || innerPoints.length < 2) {
+    if (!outerPoints || outerPoints.length < 2 || !innerPoints || innerPoints.length < 2 ||  abs(this._latitude) > 66) {
       this.dayAreaMask = '';
       this.outerSunriseAngle = null;
       return;
@@ -256,10 +278,16 @@ export class AppComponent implements OnInit {
   updateTime(): void {
     const jdu = julianDay(this.time);
     const jde = utToTdt(jdu);
-    const sunsetA = this.eventFinder.findEvent(SUN, SET_EVENT, jdu, this.observer, undefined, undefined, true);
-    const sunsetB = this.eventFinder.findEvent(SUN, SET_EVENT, sunsetA.ut, this.observer, undefined, undefined, false);
-    const dayLength = sunsetB.ut - sunsetA.ut;
-    const bohemianHour = (jdu - sunsetA.ut) / dayLength * 24;
+
+    // Finding sunset events can be slow at high latitudes, so use cached values when possible.
+
+    if (!this.sunsetA || !this.sunsetB || jdu < this.sunsetA.ut || jdu > this.sunsetB.ut) {
+      this.sunsetA = this.eventFinder.findEvent(SUN, SET_EVENT, jdu, this.observer, undefined, undefined, true);
+      this.sunsetB = this.eventFinder.findEvent(SUN, SET_EVENT, this.sunsetA.ut, this.observer, undefined, undefined, false);
+    }
+
+    const dayLength = this.sunsetB.ut - this.sunsetA.ut;
+    const bohemianHour = (jdu - this.sunsetA.ut) / dayLength * 24;
     const date = new DateTime(this.time, this.zone);
     const wt = date.wallTime;
     const hourOfDay = wt.hour + wt.minute / 60 - (this.disableDst ? wt.dstOffset / 3600 : 0);

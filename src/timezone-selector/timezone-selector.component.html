@@ -1,0 +1,47 @@
+<div class="zone-search">
+  <p-autoComplete #autoComplete [(ngModel)]="searchText"
+      placeholder="Search cities/timezone names"
+      [suggestions]="matchZones"
+      [forceSelection]="true"
+      [showEmptyMessage]="true"
+      [emptyMessage]="emptyMessage"
+      (completeMethod)="searchSelect($event)"
+      (onKeyUp)="checkForEnter($event)"
+      [autofocus]="autofocus"
+      appendTo="body"></p-autoComplete>
+  <i class="pi pi-search"></i>
+  <i class="fas fa-spinner fa-pulse fa-fw" [style.display]="searching ? 'block' : 'none'"></i>
+</div>
+
+<div class="mode-selector">
+  <p-radioButton [value]="true" [(ngModel)]="selectByOffset" label="By UTC offset"></p-radioButton>
+  &nbsp;&nbsp;
+  <p-radioButton [value]="false" [(ngModel)]="selectByOffset" label="By region"></p-radioButton>
+</div>
+
+<div class="zone-selector">
+  <div class="by-region" [style.opacity]="+!selectByOffset" [style.pointer-events]="selectByOffset ? 'none' : 'auto'">
+    <p-dropdown tzeDropdownFix [autoDisplayFirst]="false"
+         [options]="regions" [(ngModel)]="region"  [disabled]="disabled || selectByOffset" (focus)="onDropdownFocus($event)"
+         appendTo="body" (blur)="onDropdownBlur($event)"></p-dropdown>
+    <div class="caption">Timezone region/category</div>
+
+    <p-dropdown tzeDropdownFix [autoDisplayFirst]="false"
+         [options]="subzones" [(ngModel)]="subzone" [disabled]="disabled || selectByOffset" (focus)="onDropdownFocus($event)"
+         appendTo="body" (blur)="onDropdownBlur($event)"></p-dropdown>
+    <div class="caption">Specific timezone</div>
+  </div>
+
+  <div class="by-offset" [style.opacity]="+selectByOffset" [style.pointer-events]="selectByOffset ? 'auto' : 'none'">
+    <p-dropdown tzeDropdownFix [autoDisplayFirst]="false"
+         [options]="offsets"  [(ngModel)]="offset"  [disabled]="disabled || !selectByOffset" (focus)="onDropdownFocus($event)"
+         appendTo="body" (blur)="onDropdownBlur($event)"></p-dropdown>
+    <div class="caption">UTC offset/DST</div>
+
+    <p-dropdown tzeDropdownFix [autoDisplayFirst]="false"
+         [options]="zones" [(ngModel)]="zone" [disabled]="disabled || !selectByOffset" (focus)="onDropdownFocus($event)"
+         appendTo="body" (blur)="onDropdownBlur($event)"></p-dropdown>
+    <div class="caption">Specific timezone</div>
+  </div>
+  <p [hidden]="!error" class="error">{{error}}</p>
+</div>

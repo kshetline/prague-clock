@@ -2,7 +2,9 @@
   align-items: center;
   box-sizing: border-box;
   display: flex;
+  flex-direction: row-reverse;
   font-family: Horologium, sans-serif;
+  gap: 12px;
   height: 100vh;
   justify-content: center;
   padding: 8px;
@@ -11,20 +13,28 @@
 
 .controls {
   align-items: flex-end;
+  align-self: start;
+  background-color: white;
   display: flex;
   flex-direction: column;
-  font-size: 18px;
+  font: 14px sans-serif;
+  padding: 1em;
   gap: 4px;
-  position: fixed;
-  right: 16px;
-  top: 16px;
+
+  tbw-angle-editor, tbw-time-editor {
+    font-size: 18px;
+  }
+
+  tze-zone-selector {
+    margin: 0.5em 0;
+  }
 }
 
 .button-row {
   align-items: center;
   display: flex;
   flex-direction: row;
-  gap: 4px;
+  gap: 12px;
 }
 
 .graphics-credit {

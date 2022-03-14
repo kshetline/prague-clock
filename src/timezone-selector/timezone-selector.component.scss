@@ -1,0 +1,83 @@
+:host {
+  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+  width: 20em;
+
+  ::ng-deep select {
+    width: 12em;
+  }
+}
+
+::ng-deep .p-dropdown {
+  width: 100%;
+}
+
+.caption {
+  color: #06F;
+  font-size: 0.8em;
+  padding: 0.25em 0 0.5em;
+  text-align: center;
+  vertical-align: top;
+}
+
+.error {
+  color: red;
+}
+
+.zone-search {
+  padding-bottom: 1em;
+  position: relative;
+
+  p-autoComplete ::ng-deep {
+    span, input {
+      width: 100%;
+    }
+  }
+
+  i.pi-search {
+    position: absolute;
+    right: 0.5em;
+    top: 0.65em;
+  }
+
+  i.fa-spinner {
+    display: none;
+    position: absolute;
+    right: -1.5em;
+    top: 0.65em;
+  }
+}
+
+.mode-selector {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 0.5em;
+
+  ::ng-deep .p-radiobutton-label {
+    font-size: 0.9em;
+    margin-left: 0.25em;
+  }
+}
+
+.zone-selector {
+  position: relative;
+  width: 100%;
+}
+
+.zone-selector-row {
+  display: table-row;
+}
+
+.by-offset, .by-region {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.by-offset {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+}

@@ -10,11 +10,15 @@
     <p-checkbox [(ngModel)]="isoFormat" [binary]="true" label="ISO format"></p-checkbox>
     <p-checkbox [(ngModel)]="disableDst" [binary]="true" label="Disable DST" (onChange)="updateTime()"></p-checkbox>
   </div>
+  <tze-zone-selector [(ngModel)]="zone" [autofocus]="false"></tze-zone-selector>
   <button type="button" pButton (click)="setNow()">Now</button>
-  <tbw-angle-editor [(ngModel)]="latitude" [options]="{ angleStyle: DD, compass: true }"></tbw-angle-editor>
+  <div class="button-row">
+    <tbw-angle-editor [(ngModel)]="latitude" [options]="{ angleStyle: DD, compass: true, decimalPrecision: 1 }"></tbw-angle-editor>
+    <tbw-angle-editor [(ngModel)]="longitude" [options]="{ angleStyle: DDD, compass: true, decimalPrecision: 1 }"></tbw-angle-editor>
+  </div>
 </div>
 
-<div class="graphics-credit">SVG clock graphics by Jan Tošovský</div>
+<div class="graphics-credit">Original SVG clock graphics by Jan Tošovský</div>
 
 <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 600 600" xml:space="preserve">
   <defs>
