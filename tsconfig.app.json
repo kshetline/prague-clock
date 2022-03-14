@@ -10,6 +10,7 @@
     "src/polyfills.ts"
   ],
   "include": [
+    "./ambient.d.ts",
     "src/**/*.d.ts"
   ]
 }

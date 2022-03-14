@@ -142,11 +142,13 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
   private hasFocus = false;
   private knownIanaZones = new Set<string>();
   private lastRemoteSearch: Subscription;
+  private lastSearch: string;
   private lastSubzones: Record<string, string> = {};
   private lastZones: Record<string, string> = {};
   private offsetByZone = new Map<string, string>();
   private onChangeCallback: (_: any) => void = noop;
   private onTouchedCallback: () => void = noop;
+  private searchCheck: any;
   private searches = new Subject<string>();
   private subzonesByRegion: Record<string, string[]> = {};
   private zonesByOffset = new Map<string, string[]>();
@@ -182,21 +184,24 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
       const timer = setTimeout(() => this.searching = true, 500);
 
       this.lastRemoteSearch = this.http.jsonp<AtlasResults>('https://skyviewcafe.com/atlas/?' + params, 'callback')
-        .subscribe(results => {
-          clearTimeout(timer);
-          this.searching = false;
+        .subscribe({
+          next: results => {
+            clearTimeout(timer);
+            this.searching = false;
 
-          if (!results.error) {
-            const matches = results.matches.filter(match => !match.matchedBySound &&
-                /^(A.ADM|P.PPL)/.test(match.placeType));
-            const newMatches: string[] = [];
+            if (!results.error) {
+              const matches = results.matches.filter(match => !match.matchedBySound &&
+                  /^(A.ADM|P.PPL)/.test(match.placeType));
+              const newMatches: string[] = [];
 
-            newMatches.push(...this.matchZones, ...matches.map(match => formatSearchResult(match)));
-            this.autoComplete.loading = true;
-            this.matchZones = newMatches;
-            this.emptyMessage = 'No matching cites/timezones';
-          }
-        }, err => { this.searching = false; console.error(err); });
+              newMatches.push(...this.matchZones, ...matches.map(match => formatSearchResult(match)));
+              this.autoComplete.loading = true;
+              this.matchZones = newMatches;
+              this.emptyMessage = 'No matching cites/timezones';
+            }
+          },
+          error: err => { this.searching = false; console.error(err); }
+        });
     });
   }
 
@@ -397,9 +402,27 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
     if (this._searchText !== newValue) {
       this._searchText = newValue;
 
-      if (newValue)
+      if (newValue) {
+        if (this.searchCheck)
+          clearTimeout(this.searchCheck);
+
+        this.lastSearch = newValue;
         this.value = newValue;
-      else
+
+        let checkCount = 0;
+        const check = (): void => {
+          if (this.lastSearch && this.searchText === this.lastSearch)
+            this.searchText = '';
+
+          if (++checkCount < 10)
+            this.searchCheck = setTimeout(check, 100);
+          else
+            this.searchCheck = undefined;
+        };
+
+        this.searchCheck = setTimeout(check, 100);
+      }
+      else if (this.searchText !== '')
         setTimeout(() => this.searchText = '', 100);
     }
   }

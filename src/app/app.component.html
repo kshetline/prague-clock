@@ -9,7 +9,7 @@
     [(ngModel)]="time"></tbw-time-editor>
   <div class="button-row">
     <p-checkbox [(ngModel)]="isoFormat" [binary]="true" label="ISO input format"></p-checkbox>
-    <p-checkbox [(ngModel)]="disableDst" [binary]="true" label="Disable DST on clock" (onChange)="updateTime()"></p-checkbox>
+    <p-checkbox [(ngModel)]="disableDst" [binary]="true" label="Disable DST on clock" (onChange)="updateTime(true)"></p-checkbox>
   </div>
   <tze-zone-selector [(ngModel)]="zone" [autofocus]="false" (location)="changeLocation($event)"></tze-zone-selector>
   <div class="button-row">

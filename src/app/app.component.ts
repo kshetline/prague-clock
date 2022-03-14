@@ -174,7 +174,7 @@ export class AppComponent implements OnInit {
       this._longitude = newValue;
       this.placeName = '\xA0';
       this.observer = new SkyObserver(this._longitude, this._latitude);
-      this.updateTime();
+      this.updateTime(true);
     }
   }
 
@@ -182,7 +182,7 @@ export class AppComponent implements OnInit {
   set zone(newValue: string) {
     if (this._zone !== newValue) {
       this._zone = newValue;
-      this.updateTime();
+      this.updateTime(true);
     }
   }
 
@@ -232,7 +232,6 @@ export class AppComponent implements OnInit {
     this.rotateSign = (this.southern ? -1 : 1);
     this.observer = new SkyObserver(this._longitude, this._latitude);
     this.placeName = '\xA0';
-    this.sunsetA = this.sunsetB = null;
     ({ cy: this.horizonCy, d: this.horizonPath, r: this.horizonR } = this.getAltitudeCircle(0, true));
     ({ cy: this.darkCy, r: this.darkR } = this.getAltitudeCircle(-18));
     this.createDayAreaMask();
@@ -277,7 +276,7 @@ export class AppComponent implements OnInit {
       hourLabels.innerHTML = html;
     }
 
-    this.updateTime();
+    this.updateTime(true);
   }
 
   private createDayAreaMask(): void {
@@ -311,12 +310,12 @@ export class AppComponent implements OnInit {
     this.equatorSunriseAngle = atan2_deg(equatorPoints[0].y, equatorPoints[0].x);
   }
 
-  updateTime(): void {
+  updateTime(forceUpdate = false): void {
     const jdu = julianDay(this.time);
     const jde = utToTdt(jdu);
 
     // Finding sunset events can be slow at high latitudes, so use cached values when possible.
-    if (!this.sunsetA || !this.sunsetB || jdu < this.sunsetA.ut || jdu > this.sunsetB.ut) {
+    if (forceUpdate || !this.sunsetA || !this.sunsetB || jdu < this.sunsetA.ut || jdu > this.sunsetB.ut) {
       this.sunsetA = this.eventFinder.findEvent(SUN, SET_EVENT, jdu, this.observer, undefined, undefined, true);
       this.sunsetB = this.eventFinder.findEvent(SUN, SET_EVENT, this.sunsetA.ut, this.observer, undefined, undefined, false);
     }
