@@ -110,7 +110,7 @@ export class AppComponent implements OnInit {
     showSeconds: false
   };
 
-  ISO_OPTS = ['ISO', this.LOCAL_OPTS];
+  ISO_OPTS = ['ISO', this.LOCAL_OPTS, { showUtcOffset: true }];
 
   private baseMoonAngle: number;
   private baseSunAngle: number;
@@ -122,6 +122,8 @@ export class AppComponent implements OnInit {
   private sunsetA: AstroEvent = null;
   private sunsetB: AstroEvent = null;
   private _time = Date.now();
+  private timeCheck: any;
+  private _trackTime = false;
   private _zone = 'Europe/Prague';
 
   darkCy: number;
@@ -152,6 +154,7 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.adjustLatitude();
     this.setNow();
+    this.trackTime = true;
   }
 
   get latitude(): number { return this._latitude; }
@@ -187,9 +190,31 @@ export class AppComponent implements OnInit {
     }
   }
 
+  get trackTime(): boolean { return this._trackTime; }
+  set trackTime(newValue: boolean) {
+    if (this._trackTime !== newValue) {
+      this._trackTime = newValue;
+
+      if (newValue) {
+        const timeStep = (): void => {
+          this.setNow();
+          this.timeCheck = setTimeout(timeStep, 59999 - Date.now() % 60000);
+        };
+
+        timeStep();
+      }
+      else if (this.timeCheck) {
+        clearTimeout(this.timeCheck);
+        this.timeCheck = undefined;
+      }
+    }
+  }
+
   setNow(): void {
-    this.time = floor(Date.now() / 60000) * 60000;
-    this.updateTime();
+    const newTime = floor(Date.now() / 60000) * 60000;
+
+    if (this.time !== newTime)
+      this.time = newTime;
   }
 
   private adjustLatitude(): void {

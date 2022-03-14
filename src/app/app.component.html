@@ -1,17 +1,20 @@
 <div class="controls">
   <tbw-time-editor
-    tai
     max="2399-12-31"
     min="1400-01-01"
     [options]="isoFormat ? ISO_OPTS : LOCAL_OPTS"
+    [viewOnly]="trackTime"
     [timezone]="zone"
     [(ngModel)]="time"></tbw-time-editor>
   <div class="button-row">
-    <p-checkbox [(ngModel)]="isoFormat" [binary]="true" label="ISO format"></p-checkbox>
-    <p-checkbox [(ngModel)]="disableDst" [binary]="true" label="Disable DST" (onChange)="updateTime()"></p-checkbox>
+    <p-checkbox [(ngModel)]="isoFormat" [binary]="true" label="ISO input format"></p-checkbox>
+    <p-checkbox [(ngModel)]="disableDst" [binary]="true" label="Disable DST on clock" (onChange)="updateTime()"></p-checkbox>
   </div>
   <tze-zone-selector [(ngModel)]="zone" [autofocus]="false"></tze-zone-selector>
-  <button type="button" pButton (click)="setNow()">Now</button>
+  <div class="button-row">
+    <p-checkbox [(ngModel)]="trackTime" [binary]="true" label="Track current time"></p-checkbox>
+    <button type="button" pButton (click)="setNow()" [disabled]="trackTime">Now</button>
+  </div>
   <div class="button-row">
     <tbw-angle-editor [(ngModel)]="latitude" [options]="{ angleStyle: DD, compass: true, decimalPrecision: 1 }"></tbw-angle-editor>
     <tbw-angle-editor [(ngModel)]="longitude" [options]="{ angleStyle: DDD, compass: true, decimalPrecision: 1 }"></tbw-angle-editor>
