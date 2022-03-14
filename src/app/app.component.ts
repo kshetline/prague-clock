@@ -4,6 +4,7 @@ import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widget
 import { AstroEvent, EventFinder, MOON, SET_EVENT, SkyObserver, SolarSystem, SUN } from '@tubular/astronomy';
 import ttime, { DateTime, utToTdt } from '@tubular/time';
 import julianDay = ttime.julianDay;
+import { TzsLocation } from '../timezone-selector/timezone-selector.component';
 
 const CLOCK_RADIUS = 250;
 const INCLINATION = 23.5;
@@ -144,6 +145,7 @@ export class AppComponent implements OnInit {
   moonAngle = 0;
   outerRingAngle = 0;
   outerSunriseAngle: number = null;
+  placeName = '\xA0';
   rotateSign = 1;
   siderealAngle = 0;
   southern = false;
@@ -155,6 +157,7 @@ export class AppComponent implements OnInit {
     this.adjustLatitude();
     this.setNow();
     this.trackTime = true;
+    this.placeName = 'Prague, CZE';
   }
 
   get latitude(): number { return this._latitude; }
@@ -169,6 +172,7 @@ export class AppComponent implements OnInit {
   set longitude(newValue: number) {
     if (this._longitude !== newValue) {
       this._longitude = newValue;
+      this.placeName = '\xA0';
       this.observer = new SkyObserver(this._longitude, this._latitude);
       this.updateTime();
     }
@@ -210,6 +214,12 @@ export class AppComponent implements OnInit {
     }
   }
 
+  changeLocation(location: TzsLocation): void {
+    this.latitude = location.latitude;
+    this.longitude = location.longitude;
+    this.placeName = location.name;
+  }
+
   setNow(): void {
     const newTime = floor(Date.now() / 60000) * 60000;
 
@@ -221,6 +231,7 @@ export class AppComponent implements OnInit {
     this.southern = (this._latitude < 0);
     this.rotateSign = (this.southern ? -1 : 1);
     this.observer = new SkyObserver(this._longitude, this._latitude);
+    this.placeName = '\xA0';
     this.sunsetA = this.sunsetB = null;
     ({ cy: this.horizonCy, d: this.horizonPath, r: this.horizonR } = this.getAltitudeCircle(0, true));
     ({ cy: this.darkCy, r: this.darkR } = this.getAltitudeCircle(-18));
@@ -305,7 +316,6 @@ export class AppComponent implements OnInit {
     const jde = utToTdt(jdu);
 
     // Finding sunset events can be slow at high latitudes, so use cached values when possible.
-
     if (!this.sunsetA || !this.sunsetB || jdu < this.sunsetA.ut || jdu > this.sunsetB.ut) {
       this.sunsetA = this.eventFinder.findEvent(SUN, SET_EVENT, jdu, this.observer, undefined, undefined, true);
       this.sunsetB = this.eventFinder.findEvent(SUN, SET_EVENT, this.sunsetA.ut, this.observer, undefined, undefined, false);
@@ -340,7 +350,7 @@ export class AppComponent implements OnInit {
   }
 
   private getAltitudeCircle(alt: number, doPath = false): CircleAttributes {
-    const lat = max(abs(this.observer.latitude.degrees), 0.01);
+    const lat = max(abs(this.observer.latitude.degrees), 0.5);
     const theta1 = -lat - (90 + alt);
     const theta2 = -lat + (90 + alt);
     const x1 = HORIZON_RADIUS * sin_deg(theta1);
@@ -354,7 +364,7 @@ export class AppComponent implements OnInit {
 
     return {
       cy,
-      d: doPath && `M 0 ${cy} m ${-r} 0 a ${r},${r} 0 1,1 ${r * 2},0 a ${r},${r} 0 1,1 ${-r * 2},0`,
+      d: doPath && `M 0 ${RO(cy)} m ${RO(-r)} 0 a ${RO(r)},${RO(r)} 0 1,1 ${RO(r * 2)},0 a ${RO(r)},${RO(r)} 0 1,1 ${RO(-r * 2)},0`,
       r
     };
   }

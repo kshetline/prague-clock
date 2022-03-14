@@ -2,7 +2,7 @@ import { Component, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild }
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { abs, max, sign } from '@tubular/math';
 import { Timezone, RegionAndSubzones } from '@tubular/time';
-import { noop, urlEncodeParams } from '@tubular/util';
+import { noop, toNumber, urlEncodeParams } from '@tubular/util';
 import { Subject, Subscription, timer } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
@@ -26,14 +26,22 @@ const LMT  = 'LMT';
 
 interface AtlasLocation {
   displayName: string;
-  zone: string;
-  placeType: string;
+  latitude: number;
+  longitude: number;
   matchedBySound: boolean;
+  placeType: string;
+  zone: string;
 }
 
 interface AtlasResults {
   error: string;
   matches: AtlasLocation[];
+}
+
+export interface TzsLocation {
+  latitude: number;
+  longitude: number;
+  name: string;
 }
 
 function toCanonicalOffset(offset: string): string {
@@ -61,7 +69,7 @@ function toCanonicalOffset(offset: string): string {
 }
 
 function toCanonicalZone(zone: string): string {
-  return zone?.replace(/^.+:\xA0/, '').replace(/ /g, '_').replace(/\bKyiv\b/, 'Kiev');
+  return zone?.replace(/^.+:\xA0/, '').replace(/\s+\([^)]+\)$/, '').replace(/ /g, '_').replace(/\bKyiv\b/, 'Kiev');
 }
 
 function toDisplayOffset(offset: string): string {
@@ -103,6 +111,9 @@ function formatSearchResult(location: AtlasLocation): string {
 
   if (s.length > 40)
     s = s.replace(/^[^,]+/, match => match.substr(0, max(match.length - s.length + 39, 8)) + '…');
+
+  s += ` (${abs(location.latitude).toFixed(1)}°${location.latitude < 0 ? 'S' : 'N'},` +
+       ` ${abs(location.longitude).toFixed(1)}°${location.longitude < 0 ? 'W' : 'E'})`;
 
   return s;
 }
@@ -151,6 +162,7 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
   @Output() focus: EventEmitter<any> = new EventEmitter();
   // eslint-disable-next-line @angular-eslint/no-output-native
   @Output() blur: EventEmitter<any> = new EventEmitter();
+  @Output() location: EventEmitter<TzsLocation> = new EventEmitter();
 
   @ViewChild('autoComplete', { static: true }) autoComplete: AutoComplete;
 
@@ -204,12 +216,21 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
   }
 
   set value(newValue: string) {
+    let $ = /\s+\([^)]+\)$/.exec(newValue);
+
+    if ($ && ($ = /^(.+?):\xA0.*?([0-9.]+).([NS]).+?([0-9.]+).([EW])/.exec(newValue)))
+      this.location.emit({
+        latitude: toNumber($[2]) * ($[3] === 'S' ? -1 : 1),
+        longitude: toNumber($[4]) * ($[5] === 'W' ? -1 : 1),
+        name: $[1]
+      });
+
     newValue = toCanonicalZone(newValue);
 
     if (this._value !== newValue) {
       this._value = newValue;
       this.updateValue(newValue);
-      this.onChangeCallback(newValue);
+      setTimeout(() => this.onChangeCallback(newValue));
     }
   }
 

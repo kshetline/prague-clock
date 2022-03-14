@@ -13,7 +13,7 @@
 }
 
 .controls {
-  align-items: flex-end;
+  align-items: center;
   align-self: start;
   background-color: white;
   display: flex;
@@ -21,6 +21,15 @@
   font: 14px sans-serif;
   padding: 1em;
   gap: 4px;
+
+  .place-name {
+    font-weight: bold;
+    padding-bottom: 0.5em;
+  }
+
+  ::ng-deep .p-checkbox-label {
+    white-space: nowrap;
+  }
 
   tbw-angle-editor, tbw-time-editor {
     font-size: 18px;
