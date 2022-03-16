@@ -58,20 +58,20 @@ export class Globe {
 
       context.drawImage(image, 0, 0, MAP_WIDTH, MAP_HEIGHT);
       context.strokeStyle = '#6A6A6A';
-      context.lineWidth = 2;
+      context.lineWidth = 3;
 
       // Draw lines of latitude
       for (let lat = -75; lat < 90; lat += 15) {
         const y = (lat + 90) / 180 * MAP_HEIGHT;
 
-        strokeLine(context, 0, y, MAP_WIDTH, y);
+        strokeLine(context, 0, y - 1, MAP_WIDTH, y - 1);
       }
 
       // Draw lines of longitude
       for (let lon = 0; lon < 360; lon += 15) {
         const x = lon / 360 * MAP_WIDTH;
 
-        strokeLine(context, x, 0, x, MAP_HEIGHT);
+        strokeLine(context, x - 1, 0, x - 1, MAP_HEIGHT);
       }
 
       const canvas2 = document.createElement('canvas');
@@ -81,6 +81,8 @@ export class Globe {
 
       const context2 = canvas2.getContext('2d');
 
+      context2.drawImage(canvas, 0, 0, MAP_WIDTH * AA_SCALE, MAP_HEIGHT * AA_SCALE);
+      context2.filter = 'opacity(50%) blur(3px)';
       context2.drawImage(canvas, 0, 0, MAP_WIDTH * AA_SCALE, MAP_HEIGHT * AA_SCALE);
 
       this.mapPixels = context2.getImageData(0, 0, MAP_WIDTH * AA_SCALE, MAP_HEIGHT * AA_SCALE);
