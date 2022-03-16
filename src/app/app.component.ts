@@ -159,8 +159,7 @@ export class AppComponent implements OnInit {
     this.setNow();
     this.trackTime = true;
     this.placeName = 'Prague, CZE';
-//    new Globe().draw(this._latitude, this._longitude).finally();
-    new Globe().draw(0, 0).finally();
+    new Globe().draw(this._longitude, this._latitude).finally();
   }
 
   get latitude(): number { return this._latitude; }

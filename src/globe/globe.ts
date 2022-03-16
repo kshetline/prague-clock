@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { getPixel, strokeLine } from '@tubular/util';
-import { abs, atan, atan2, ceil, cos, cos_deg, floor, max, min, mod, PI, round, sin, sin_deg, SphericalPosition3D, sqrt } from '@tubular/math';
+import { abs, atan, atan2, ceil, cos, cos_deg, floor, max, min, mod, PI, round, sin, sin_deg, SphericalPosition3D, sqrt, to_radian } from '@tubular/math';
 
 const MAP_HEIGHT = 500;
 const MAP_WIDTH = 1000;
 const AA_SCALE = 3;
 const GLOBE_SIZE = 500;
-const VIEW_DISTANCE = 2; // Earth radii
+const VIEW_DISTANCE = 100; // Earth radii
 const VIEW_ANGLE = atan(sqrt(VIEW_DISTANCE ** 2 + 2 * VIEW_DISTANCE));
 const VIEW_RADIUS = sin(VIEW_ANGLE);
 const VIEW_PLANE = cos(VIEW_ANGLE);
@@ -102,7 +102,7 @@ export class Globe {
       this.generateRotatedGlobe(lat, lon);
   }
 
-  private generateRotatedGlobe(lat: number, lon: number): void {
+  private generateRotatedGlobe(lon: number, lat: number): void {
     const context = this.canvas.getContext('2d');
 
     this.lat = lat;
@@ -110,11 +110,27 @@ export class Globe {
     context.clearRect(0, 0, GLOBE_SIZE, GLOBE_SIZE);
 
     const rt = GLOBE_SIZE / 2;
-    const eye = new SphericalPosition3D(this.lon, this.lat, VIEW_DISTANCE + 1).xyz;
-    const cos_xz = cos_deg(this.lat);
-    const sin_xz = sin_deg(this.lat);
-    const cos_yz = cos_deg(this.lon);
-    const sin_yz = sin_deg(this.lon);
+    const eye = new SphericalPosition3D(0, 0, VIEW_DISTANCE + 1).xyz;
+    const yaw = to_radian(this.lon);
+    const pitch = to_radian(-this.lat);
+    const roll = Math.PI;
+
+    const cose = Math.cos(yaw);
+    const sina = Math.sin(yaw);
+    const cosb = Math.cos(pitch);
+    const sinb = Math.sin(pitch);
+    const cosc = Math.cos(roll);
+    const sinc = Math.sin(roll);
+
+    const Axx = cose * cosb;
+    const Axy = cose * sinb * sinc - sina * cosc;
+    const Axz = cose * sinb * cosc + sina * sinc;
+    const Ayx = sina * cosb;
+    const Ayy = sina * sinb * sinc + cose * cosc;
+    const Ayz = sina * sinb * cosc - cose * sinc;
+    const Azx = -sinb;
+    const Azy = cosb * sinc;
+    const Azz = cosb * cosc;
 
     for (let yt = 0; yt < GLOBE_SIZE; ++yt) {
       for (let xt = 0; xt < GLOBE_SIZE; ++xt) {
@@ -129,13 +145,9 @@ export class Globe {
         const x0 = VIEW_PLANE;
         const y0 = (xt - rt) / GLOBE_SIZE * VIEW_RADIUS * 2;
         const z0 = (rt - yt) / GLOBE_SIZE * VIEW_RADIUS * 2;
-        const x1 = x0 * cos_xz - z0 * sin_xz;
-        const zz = z0 * cos_xz + x0 * sin_xz;
-        const y1 = y0 * cos_yz + zz * sin_yz;
-        const z1 = zz * cos_yz - y0 * sin_yz;
-        const dx = eye.x - x1;
-        const dy = eye.y - y1;
-        const dz = eye.z - z1;
+        const dx = eye.x - x0;
+        const dy = eye.y - y0;
+        const dz = eye.z - z0;
         // Unit vector for line-of-sight
         const mag = sqrt(dx ** 2 + dy ** 2 + dz ** 2);
         const xu = dx / mag;
@@ -150,7 +162,11 @@ export class Globe {
         const xi = eye.x + di * xu;
         const yi = eye.y + di * yu;
         const zi = eye.z + di * zu;
-        const i = SphericalPosition3D.convertRectangular(xi, yi, zi);
+        // Rotate to match lat/long
+        const x1 = Axx * xi + Axy * yi + Axz * zi;
+        const y1 = Ayx * xi + Ayy * yi + Ayz * zi;
+        const z1 = Azx * xi + Azy * yi + Azz * zi;
+        const i = SphericalPosition3D.convertRectangular(x1, y1, z1);
         const xs = mod(i.longitude.degrees + 180, 360) / 360 * MAP_WIDTH * AA_SCALE;
         const ys = (90 - i.latitude.degrees) / 180 * MAP_HEIGHT * AA_SCALE;
         const pixel = getPixel(Globe.mapPixels, round(xs), round(ys)) & 0xFF;
