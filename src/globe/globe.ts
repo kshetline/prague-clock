@@ -113,9 +113,10 @@ export class Globe {
       this.lastGlobeResolve = undefined;
     }
 
-    let doDraw = false;
+    let doDraw = true;
 
     if (this.lat !== lat || this.lon !== lon) {
+      doDraw = false;
       const generator = this.generateRotatedGlobe(lon, lat);
 
       await new Promise<void>(resolve => {
