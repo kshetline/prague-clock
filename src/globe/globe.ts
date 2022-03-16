@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { getPixel, strokeLine } from '@tubular/util';
-import { abs, atan, atan2, ceil, cos, cos_deg, floor, max, min, mod, PI, round, sin, sin_deg, SphericalPosition3D, sqrt, to_radian } from '@tubular/math';
+import { getPixel, parseColor, strokeLine } from '@tubular/util';
+import { atan, cos, max, mod, PI, round, sin, SphericalPosition3D, sqrt, to_radian } from '@tubular/math';
 
 const MAP_HEIGHT = 500;
 const MAP_WIDTH = 1000;
@@ -10,6 +9,13 @@ const VIEW_DISTANCE = 100; // Earth radii
 const VIEW_ANGLE = atan(sqrt(VIEW_DISTANCE ** 2 + 2 * VIEW_DISTANCE));
 const VIEW_RADIUS = sin(VIEW_ANGLE);
 const VIEW_PLANE = cos(VIEW_ANGLE);
+
+const MAP_COLOR = '#6A6A6A';
+const MAP_SHADE = parseColor(MAP_COLOR).g;
+const LAND_COLOR = '#262F36';
+const LAND_RGB = parseColor(LAND_COLOR);
+const OCEAN_COLOR = '#597576'; // 4C8388
+const OCEAN_RGB = parseColor(OCEAN_COLOR);
 
 export class Globe {
   private static mapFailed = false;
@@ -51,6 +57,7 @@ export class Globe {
 
       context.drawImage(image, 0, 0, MAP_WIDTH, MAP_HEIGHT);
       context.strokeStyle = '#6A6A6A';
+      context.lineWidth = 2;
 
       // Draw lines of latitude
       for (let lat = -75; lat < 90; lat += 15) {
@@ -92,14 +99,16 @@ export class Globe {
       Globe.loadMap();
   }
 
-  async draw(lat: number, lon: number): Promise<void> {
+  async draw(target: HTMLCanvasElement, lon: number, lat: number): Promise<void> {
     if (Globe.mapFailed)
       throw new Error('Map not available');
     else if (!Globe.mapImage)
       await new Promise<void>((resolve, reject) => Globe.waitList.push({ resolve, reject }));
 
     if (this.lat !== lat || this.lon !== lon)
-      this.generateRotatedGlobe(lat, lon);
+      this.generateRotatedGlobe(lon, lat);
+
+    target.getContext('2d').drawImage(this.canvas, 0, 0, target.width, target.height);
   }
 
   private generateRotatedGlobe(lon: number, lat: number): void {
@@ -109,11 +118,15 @@ export class Globe {
     this.lon = lon;
     context.clearRect(0, 0, GLOBE_SIZE, GLOBE_SIZE);
 
+    const red_range = OCEAN_RGB.r - LAND_RGB.r;
+    const green_range = OCEAN_RGB.g - LAND_RGB.g;
+    const blue_range = OCEAN_RGB.b - LAND_RGB.b;
+
     const rt = GLOBE_SIZE / 2;
     const eye = new SphericalPosition3D(0, 0, VIEW_DISTANCE + 1).xyz;
     const yaw = to_radian(this.lon);
     const pitch = to_radian(-this.lat);
-    const roll = Math.PI;
+    const roll = (lat >= 0 ? PI : 0);
 
     const cose = Math.cos(yaw);
     const sina = Math.sin(yaw);
@@ -169,13 +182,11 @@ export class Globe {
         const i = SphericalPosition3D.convertRectangular(x1, y1, z1);
         const xs = mod(i.longitude.degrees + 180, 360) / 360 * MAP_WIDTH * AA_SCALE;
         const ys = (90 - i.latitude.degrees) / 180 * MAP_HEIGHT * AA_SCALE;
-        const pixel = getPixel(Globe.mapPixels, round(xs), round(ys)) & 0xFF;
+        const pixel = (getPixel(Globe.mapPixels, round(xs), round(ys)) & 0xFF - MAP_SHADE) / (255 - MAP_SHADE);
 
-        context.fillStyle = `rgba(${pixel}, ${pixel}, ${pixel}, ${alpha})`;
+        context.fillStyle = `rgba(${LAND_RGB.r + pixel * red_range}, ${LAND_RGB.g + pixel * green_range}, ${LAND_RGB.b + pixel * blue_range}, ${alpha})`;
         context.fillRect(xt, yt, 1, 1);
       }
     }
-
-    document.getElementById('temp-image').appendChild(this.canvas);
   }
 }

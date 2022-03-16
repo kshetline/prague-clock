@@ -117,6 +117,8 @@ export class AppComponent implements OnInit {
   private baseMoonAngle: number;
   private baseSunAngle: number;
   private eventFinder = new EventFinder();
+  private globe = new Globe();
+  private globeCanvas: HTMLCanvasElement;
   private _latitude = 50.0870;
   private _longitude = 14.4185;
   private observer: SkyObserver;
@@ -155,11 +157,11 @@ export class AppComponent implements OnInit {
   sunsetLabelPath: string;
 
   ngOnInit(): void {
+    this.globeCanvas = document.getElementById('globe-canvas') as HTMLCanvasElement;
     this.adjustLatitude();
     this.setNow();
     this.trackTime = true;
     this.placeName = 'Prague, CZE';
-    new Globe().draw(this._longitude, this._latitude).finally();
   }
 
   get latitude(): number { return this._latitude; }
@@ -177,6 +179,7 @@ export class AppComponent implements OnInit {
       this.placeName = '\xA0';
       this.observer = new SkyObserver(this._longitude, this._latitude);
       this.updateTime(true);
+      this.updateGlobe();
     }
   }
 
@@ -279,6 +282,11 @@ export class AppComponent implements OnInit {
     }
 
     this.updateTime(true);
+    this.updateGlobe();
+  }
+
+  private updateGlobe(): void {
+    this.globe.draw(this.globeCanvas, this._longitude, this.latitude).finally();
   }
 
   private createDayAreaMask(): void {
