@@ -119,6 +119,7 @@ export class AppComponent implements OnInit {
   private eventFinder = new EventFinder();
   private globe = new Globe();
   private globeCanvas: HTMLCanvasElement;
+  private globeDrawTimer: any;
   private _latitude = 50.0870;
   private _longitude = 14.4185;
   private observer: SkyObserver;
@@ -220,8 +221,8 @@ export class AppComponent implements OnInit {
   }
 
   changeLocation(location: TzsLocation): void {
+    this._longitude = location.longitude;
     this.latitude = location.latitude;
-    this.longitude = location.longitude;
     this.placeName = location.name;
   }
 
@@ -286,7 +287,22 @@ export class AppComponent implements OnInit {
   }
 
   private updateGlobe(): void {
-    this.globe.draw(this.globeCanvas, this._longitude, this.latitude).finally();
+    if (!this.globeDrawTimer) {
+      this.globeDrawTimer = setTimeout(() => {
+        this.globeCanvas.style.opacity = '0.25';
+      }, 1000);
+    }
+
+    this.globe.draw(this.globeCanvas, this._longitude, this.latitude).then(drawn => {
+      if (drawn) {
+        this.globeCanvas.style.opacity = '1';
+
+        if (this.globeDrawTimer) {
+          clearTimeout(this.globeDrawTimer);
+          this.globeDrawTimer = undefined;
+        }
+      }
+    });
   }
 
   private createDayAreaMask(): void {

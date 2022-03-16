@@ -1,4 +1,4 @@
-import { getPixel, parseColor, strokeLine } from '@tubular/util';
+import { getPixel, parseColor, processMillis, strokeLine } from '@tubular/util';
 import { atan, cos, max, mod, PI, round, sin, SphericalPosition3D, sqrt, to_radian } from '@tubular/math';
 
 const MAP_HEIGHT = 500;
@@ -25,6 +25,7 @@ export class Globe {
   private static waitList: { resolve: () => void, reject: (reason: any) => void }[] = [];
 
   private canvas = document.createElement('canvas');
+  private lastGlobeResolve: () => void;
   private lat: number;
   private lon: number;
 
@@ -99,20 +100,47 @@ export class Globe {
       Globe.loadMap();
   }
 
-  async draw(target: HTMLCanvasElement, lon: number, lat: number): Promise<void> {
+  async draw(target: HTMLCanvasElement, lon: number, lat: number): Promise<boolean> {
     if (Globe.mapFailed)
       throw new Error('Map not available');
     else if (!Globe.mapImage)
       await new Promise<void>((resolve, reject) => Globe.waitList.push({ resolve, reject }));
 
-    if (this.lat !== lat || this.lon !== lon)
-      this.generateRotatedGlobe(lon, lat);
+    if (this.lastGlobeResolve) {
+      this.lastGlobeResolve();
+      this.lastGlobeResolve = undefined;
+    }
 
-    target.getContext('2d').drawImage(this.canvas, 0, 0, target.width, target.height);
+    let doDraw = false;
+
+    if (this.lat !== lat || this.lon !== lon) {
+      const generator = this.generateRotatedGlobe(lon, lat);
+
+      await new Promise<void>(resolve => {
+        this.lastGlobeResolve = resolve;
+
+        const renderSome = (): void => {
+          if (generator.next().done) {
+            doDraw = true;
+            resolve();
+          }
+          else
+            setTimeout(renderSome);
+        };
+
+        renderSome();
+      });
+    }
+
+    if (doDraw)
+      target.getContext('2d').drawImage(this.canvas, 0, 0, target.width, target.height);
+
+    return doDraw;
   }
 
-  private generateRotatedGlobe(lon: number, lat: number): void {
+  * generateRotatedGlobe(lon: number, lat: number): Generator<void> {
     const context = this.canvas.getContext('2d');
+    let time = processMillis();
 
     this.lat = lat;
     this.lon = lon;
@@ -146,6 +174,11 @@ export class Globe {
     const Azz = cosb * cosc;
 
     for (let yt = 0; yt < GLOBE_SIZE; ++yt) {
+      if (processMillis() > time + 100) {
+        yield;
+        time = processMillis();
+      }
+
       for (let xt = 0; xt < GLOBE_SIZE; ++xt) {
         const d = sqrt((xt - rt) ** 2 + (yt - rt) ** 2);
         let alpha = 1;
