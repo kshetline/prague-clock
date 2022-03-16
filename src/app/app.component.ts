@@ -5,7 +5,7 @@ import { AstroEvent, EventFinder, MOON, SET_EVENT, SkyObserver, SolarSystem, SUN
 import ttime, { DateTime, utToTdt } from '@tubular/time';
 import julianDay = ttime.julianDay;
 import { TzsLocation } from '../timezone-selector/timezone-selector.component';
-// import { Globe } from '../globe/globe';
+import { Globe } from '../globe/globe';
 
 const CLOCK_RADIUS = 250;
 const INCLINATION = 23.5;
@@ -160,7 +160,7 @@ export class AppComponent implements OnInit {
     this.trackTime = true;
     this.placeName = 'Prague, CZE';
 //    new Globe().draw(this._latitude, this._longitude).finally();
-//    new Globe().draw(0, 0).finally();
+    new Globe().draw(0, 0).finally();
   }
 
   get latitude(): number { return this._latitude; }

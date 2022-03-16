@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { getPixel, strokeLine } from '@tubular/util';
-import { abs, atan, atan2, cos, max, min, mod, PI, round, sin, SphericalPosition3D, sqrt, to_degree } from '@tubular/math';
+import { abs, atan, atan2, ceil, cos, cos_deg, floor, max, min, mod, PI, round, sin, sin_deg, SphericalPosition3D, sqrt } from '@tubular/math';
 
 const MAP_HEIGHT = 500;
 const MAP_WIDTH = 1000;
+const AA_SCALE = 3;
 const GLOBE_SIZE = 500;
-const VIEW_DISTANCE = 3; // Earth radii
+const VIEW_DISTANCE = 2; // Earth radii
 const VIEW_ANGLE = atan(sqrt(VIEW_DISTANCE ** 2 + 2 * VIEW_DISTANCE));
 const VIEW_RADIUS = sin(VIEW_ANGLE);
 const VIEW_PLANE = cos(VIEW_ANGLE);
@@ -49,7 +50,7 @@ export class Globe {
       const context = canvas.getContext('2d');
 
       context.drawImage(image, 0, 0, MAP_WIDTH, MAP_HEIGHT);
-      context.strokeStyle = '#666';
+      context.strokeStyle = '#6A6A6A';
 
       // Draw lines of latitude
       for (let lat = -75; lat < 90; lat += 15) {
@@ -65,7 +66,16 @@ export class Globe {
         strokeLine(context, x, 0, x, MAP_HEIGHT);
       }
 
-      this.mapPixels = context.getImageData(0, 0, MAP_WIDTH, MAP_HEIGHT);
+      const canvas2 = document.createElement('canvas');
+
+      canvas2.width = MAP_WIDTH * AA_SCALE;
+      canvas2.height = MAP_HEIGHT * AA_SCALE;
+
+      const context2 = canvas2.getContext('2d');
+
+      context2.drawImage(canvas, 0, 0, MAP_WIDTH * AA_SCALE, MAP_HEIGHT * AA_SCALE);
+
+      this.mapPixels = context2.getImageData(0, 0, MAP_WIDTH * AA_SCALE, MAP_HEIGHT * AA_SCALE);
       this.waitList.forEach(cb => cb.resolve());
     }, reason => {
       this.mapLoading = false;
@@ -101,8 +111,10 @@ export class Globe {
 
     const rt = GLOBE_SIZE / 2;
     const eye = new SphericalPosition3D(this.lon, this.lat, VIEW_DISTANCE + 1).xyz;
-    let minDi = Number.MAX_SAFE_INTEGER;
-    let maxDi = Number.MIN_SAFE_INTEGER;
+    const cos_xz = cos_deg(this.lat);
+    const sin_xz = sin_deg(this.lat);
+    const cos_yz = cos_deg(this.lon);
+    const sin_yz = sin_deg(this.lon);
 
     for (let yt = 0; yt < GLOBE_SIZE; ++yt) {
       for (let xt = 0; xt < GLOBE_SIZE; ++xt) {
@@ -115,11 +127,15 @@ export class Globe {
           alpha = rt - d + 0.5;
 
         const x0 = VIEW_PLANE;
-        const y0 = (xt - rt) / GLOBE_SIZE * VIEW_RADIUS;
-        const z0 = (rt - yt) / GLOBE_SIZE * VIEW_RADIUS;
-        const dx = eye.x - x0;
-        const dy = eye.y - y0;
-        const dz = eye.z - z0;
+        const y0 = (xt - rt) / GLOBE_SIZE * VIEW_RADIUS * 2;
+        const z0 = (rt - yt) / GLOBE_SIZE * VIEW_RADIUS * 2;
+        const x1 = x0 * cos_xz - z0 * sin_xz;
+        const zz = z0 * cos_xz + x0 * sin_xz;
+        const y1 = y0 * cos_yz + zz * sin_yz;
+        const z1 = zz * cos_yz - y0 * sin_yz;
+        const dx = eye.x - x1;
+        const dy = eye.y - y1;
+        const dz = eye.z - z1;
         // Unit vector for line-of-sight
         const mag = sqrt(dx ** 2 + dy ** 2 + dz ** 2);
         const xu = dx / mag;
@@ -135,17 +151,14 @@ export class Globe {
         const yi = eye.y + di * yu;
         const zi = eye.z + di * zu;
         const i = SphericalPosition3D.convertRectangular(xi, yi, zi);
-        const xs = mod(i.longitude.degrees + 180, 360) / 360 * MAP_WIDTH;
-        const ys = (90 - i.latitude.degrees) / 180 * MAP_HEIGHT;
-        const pixel = mod(getPixel(Globe.mapPixels, round(xs), round(ys)), 255);
-        minDi = min(di, minDi);
-        maxDi = max(di, maxDi);
+        const xs = mod(i.longitude.degrees + 180, 360) / 360 * MAP_WIDTH * AA_SCALE;
+        const ys = (90 - i.latitude.degrees) / 180 * MAP_HEIGHT * AA_SCALE;
+        const pixel = getPixel(Globe.mapPixels, round(xs), round(ys)) & 0xFF;
 
         context.fillStyle = `rgba(${pixel}, ${pixel}, ${pixel}, ${alpha})`;
         context.fillRect(xt, yt, 1, 1);
       }
     }
-    console.log(minDi, maxDi);
 
     document.getElementById('temp-image').appendChild(this.canvas);
   }
