@@ -90,16 +90,6 @@ svg {
   fill: #4C8388;
 }
 
-#globe-canvas {
-  height: 100%;
-  left: 0;
-  opacity: 1;
-  position: absolute;
-  top: 0;
-  transition: opacity 0.5s ease-in-out;
-  width: 100%;
-}
-
 .eclipticDial {
   stroke: #ffe696;
   stroke-width: 3px;

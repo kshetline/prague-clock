@@ -24,3 +24,19 @@ body {
   fill: rgb(black, 25%);
   font-family: Horologium, sans-serif;
 }
+
+#globe-host {
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+
+  canvas {
+    height: 100% !important;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100% !important;
+  }
+}
