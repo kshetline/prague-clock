@@ -1,13 +1,17 @@
-import { CanvasTexture, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, SphereGeometry, WebGLRenderer } from 'three';
-import { isString, strokeLine } from '@tubular/util';
-import { PI, to_radian } from '@tubular/math';
+import {
+  CanvasTexture, CylinderGeometry, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, SphereGeometry, WebGLRenderer
+} from 'three';
+import { isString } from '@tubular/util';
+import { cos, PI, sin, to_radian } from '@tubular/math';
 
 const MAP_HEIGHT = 500;
 const MAP_WIDTH = 1000;
 const GLOBE_PIXEL_SIZE = 500;
 const GLOBE_RADIUS = 5;
-const FIELD_OF_VIEW = 40;
-const VIEW_DISTANCE = 15;
+const FIELD_OF_VIEW = 19.3;
+const VIEW_DISTANCE = 30;
+const LINE_THICKNESS = 0.03;
+const HAG = 0.01; // Sleight above globe that longitude/latitude lines are drawn.
 
 const GRID_COLOR = '#262F36';
 
@@ -19,7 +23,6 @@ export class Globe {
   private static waitList: { resolve: () => void, reject: (reason: any) => void }[] = [];
 
   private camera: PerspectiveCamera;
-  private globe: SphereGeometry;
   private globeMesh: Mesh;
   private initialized = false;
   private renderer: WebGLRenderer;
@@ -45,32 +48,10 @@ export class Globe {
     imagePromise.then(image => {
       this.mapLoading = false;
       this.mapImage = image;
-
       this.mapCanvas = document.createElement('canvas');
-
       this.mapCanvas.width = MAP_WIDTH;
       this.mapCanvas.height = MAP_HEIGHT;
-
-      const context = this.mapCanvas.getContext('2d');
-
-      context.drawImage(image, 0, 0, MAP_WIDTH, MAP_HEIGHT);
-      context.strokeStyle = GRID_COLOR;
-      context.lineWidth = 1.5;
-
-      // Draw lines of latitude
-      for (let lat = -75; lat < 90; lat += 15) {
-        const y = (lat + 90) / 180 * MAP_HEIGHT;
-
-        strokeLine(context, 0, y - 1, MAP_WIDTH, y - 1);
-      }
-
-      // Draw lines of longitude
-      for (let lon = 0; lon < 360; lon += 15) {
-        const x = lon / 360 * MAP_WIDTH;
-
-        strokeLine(context, x - 1, 0, x - 1, MAP_HEIGHT);
-      }
-
+      this.mapCanvas.getContext('2d').drawImage(image, 0, 0, MAP_WIDTH, MAP_HEIGHT);
       this.waitList.forEach(cb => cb.resolve());
     }, reason => {
       this.mapLoading = false;
@@ -99,19 +80,37 @@ export class Globe {
     if (!this.initialized) {
       this.camera = new PerspectiveCamera(FIELD_OF_VIEW, 1);
       this.scene = new Scene();
-      this.globe = new SphereGeometry(GLOBE_RADIUS, 50, 50);
-      this.globe.rotateY(-PI / 2);
-      this.globeMesh = new Mesh(
-        this.globe,
-        new MeshBasicMaterial({
-          map: new CanvasTexture(Globe.mapCanvas)
-        })
-      );
-
+      const globe = new SphereGeometry(GLOBE_RADIUS, 50, 50);
+      globe.rotateY(-PI / 2);
+      this.globeMesh = new Mesh(globe, new MeshBasicMaterial({ map: new CanvasTexture(Globe.mapCanvas) }));
       this.renderer = new WebGLRenderer({ alpha: true });
       this.renderer.setSize(GLOBE_PIXEL_SIZE, GLOBE_PIXEL_SIZE);
       this.rendererHost.appendChild(this.renderer.domElement);
       this.scene.add(this.globeMesh);
+
+      // Lines of longitude
+      for (let n = 0; n < 24; ++n) {
+        const tube = new CylinderGeometry(GLOBE_RADIUS + HAG, GLOBE_RADIUS + HAG, LINE_THICKNESS, 50, 1, true);
+        tube.translate(0, -LINE_THICKNESS / 2, 0);
+        tube.rotateX(PI / 2);
+        tube.rotateY(n * PI / 12);
+        const tubeMesh = new Mesh(tube, new MeshBasicMaterial({ color: GRID_COLOR }));
+        this.globeMesh.add(tubeMesh);
+      }
+
+      // Lines of latitude
+      for (let n = 1; n < 12; ++n) {
+        const lat = (n - 6) * PI / 12;
+        const r = GLOBE_RADIUS * cos(lat);
+        const y = GLOBE_RADIUS * sin(lat);
+        const r1 = r - LINE_THICKNESS * sin(lat) / 2;
+        const r2 = r + LINE_THICKNESS * sin(lat) / 2;
+        const tube = new CylinderGeometry(r1 + HAG, r2 + HAG, cos(lat) * LINE_THICKNESS, 50, 8, true);
+        tube.translate(0, -cos(lat) * LINE_THICKNESS / 2 + y, 0);
+        const tubeMesh = new Mesh(tube, new MeshBasicMaterial({ color: GRID_COLOR }));
+        this.globeMesh.add(tubeMesh);
+      }
+
       this.camera.position.z = VIEW_DISTANCE;
       this.initialized = true;
     }
