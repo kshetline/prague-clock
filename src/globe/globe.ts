@@ -1,7 +1,7 @@
 import {
   CanvasTexture, CylinderGeometry, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, SphereGeometry, WebGLRenderer
 } from 'three';
-import { isString } from '@tubular/util';
+import { isSafari, isString } from '@tubular/util';
 import { cos, floor, PI, sin, to_radian } from '@tubular/math';
 
 const MAP_HEIGHT = 500;
@@ -11,9 +11,11 @@ const GLOBE_RADIUS = 5;
 const FIELD_OF_VIEW = 19.3;
 const VIEW_DISTANCE = 30;
 const LINE_THICKNESS = 0.03;
-const HAG = 0.01; // Sleight above globe that longitude/latitude lines are drawn.
+const HAG = 0.01; // Sleight distance above globe that longitude/latitude lines are drawn.
 
 const GRID_COLOR = '#262F36';
+
+const SAFARI = isSafari();
 
 export class Globe {
   private static mapCanvas: HTMLCanvasElement;
@@ -24,8 +26,10 @@ export class Globe {
 
   private camera: PerspectiveCamera;
   private globeMesh: Mesh;
+  private imageHost: SVGImageElement;
   private initialized = false;
   private lastPixelSize = DEFAULT_GLOBE_PIXEL_SIZE;
+  private offscreen: HTMLDivElement;
   private renderer: WebGLRenderer;
   private rendererHost: HTMLElement;
   private scene: Scene;
@@ -111,10 +115,20 @@ export class Globe {
 
       this.camera.position.z = VIEW_DISTANCE;
       this.renderer = new WebGLRenderer({ alpha: true, antialias: true });
-      this.rendererHost.appendChild(this.renderer.domElement);
+
+      if (SAFARI) {
+        this.offscreen = document.createElement('div');
+        this.offscreen.style.height = '100%';
+        this.offscreen.style.width = '100%';
+        this.imageHost = document.getElementById(this.rendererHost.id + '-image') as any;
+        this.offscreen.appendChild(this.renderer.domElement);
+      }
+      else
+        this.rendererHost.appendChild(this.renderer.domElement);
     }
 
-    const currentPixelSize = floor(this.renderer.domElement.getBoundingClientRect().width * 2);
+    const currentPixelSize = floor(
+      (SAFARI ? this.imageHost : this.renderer.domElement).getBoundingClientRect().width * 2) || DEFAULT_GLOBE_PIXEL_SIZE;
 
     if (!this.initialized || this.lastPixelSize !== currentPixelSize) {
       this.renderer.setSize(currentPixelSize, currentPixelSize);
@@ -124,8 +138,14 @@ export class Globe {
 
     this.globeMesh.rotation.y = -to_radian(lon);
     this.globeMesh.rotation.x = to_radian(lat);
-
     this.camera.rotation.z = (lat >= 0 ? PI : 0);
-    requestAnimationFrame(() => this.renderer.render(this.scene, this.camera));
+
+    requestAnimationFrame(() => {
+      this.renderer.render(this.scene, this.camera);
+
+      // Much slower rendering on Safari due to the need to convert the image to a data URL.
+      if (SAFARI)
+        this.imageHost.setAttribute('href', this.offscreen.querySelector('canvas').toDataURL());
+    });
   }
 }
