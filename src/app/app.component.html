@@ -3,6 +3,7 @@
   <tbw-time-editor
     max="2399-12-31"
     min="1400-01-01"
+    wideSpinner
     [options]="isoFormat ? ISO_OPTS : LOCAL_OPTS"
     [viewOnly]="trackTime"
     [timezone]="zone"
@@ -17,14 +18,14 @@
     <button type="button" pButton (click)="setNow()" [disabled]="trackTime">Now</button>
   </div>
   <div class="button-row">
-    <tbw-angle-editor [(ngModel)]="latitude" [options]="{ angleStyle: DD, compass: true, decimalPrecision: 1 }"></tbw-angle-editor>
-    <tbw-angle-editor [(ngModel)]="longitude" [options]="{ angleStyle: DDD, compass: true, decimalPrecision: 1 }"></tbw-angle-editor>
+    <tbw-angle-editor wideSpinner [(ngModel)]="latitude" [options]="{ angleStyle: DD, compass: true, decimalPrecision: 1 }"></tbw-angle-editor>
+    <tbw-angle-editor wideSpinner [(ngModel)]="longitude" [options]="{ angleStyle: DDD, compass: true, decimalPrecision: 1 }"></tbw-angle-editor>
   </div>
 </div>
 
 <div class="graphics-credit">Original SVG clock graphics by Jan Tošovský</div>
 
-<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 600 600" xml:space="preserve" class="clock-view">
+<svg width="100%" height="100%" viewBox="0 0 600 600" xml:space="preserve">
   <defs>
     <filter id="filterHand" x="0" y="0" width="200%" height="200%">
       <feOffset result="offOut" in="SourceAlpha" dx="8" dy="8"/>

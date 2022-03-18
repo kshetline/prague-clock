@@ -1,7 +1,7 @@
 import {
   CanvasTexture, CylinderGeometry, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, SphereGeometry, WebGLRenderer
 } from 'three';
-import { isSafari, isString } from '@tubular/util';
+import { isChromeOS, isSafari, isString } from '@tubular/util';
 import { cos, floor, PI, sin, to_radian } from '@tubular/math';
 
 const MAP_HEIGHT = 500;
@@ -15,7 +15,7 @@ const HAG = 0.01; // Sleight distance above globe that longitude/latitude lines 
 
 const GRID_COLOR = '#262F36';
 
-const SAFARI = isSafari();
+const BUGGY_FOREIGN_OBJECT = isChromeOS() || isSafari();
 
 export class Globe {
   private static mapCanvas: HTMLCanvasElement;
@@ -116,7 +116,7 @@ export class Globe {
       this.camera.position.z = VIEW_DISTANCE;
       this.renderer = new WebGLRenderer({ alpha: true, antialias: true });
 
-      if (SAFARI) {
+      if (BUGGY_FOREIGN_OBJECT) {
         this.offscreen = document.createElement('div');
         this.offscreen.style.height = '100%';
         this.offscreen.style.width = '100%';
@@ -128,7 +128,7 @@ export class Globe {
     }
 
     const currentPixelSize = floor(
-      (SAFARI ? this.imageHost : this.renderer.domElement).getBoundingClientRect().width * 2) || DEFAULT_GLOBE_PIXEL_SIZE;
+      (BUGGY_FOREIGN_OBJECT ? this.imageHost : this.renderer.domElement).getBoundingClientRect().width * 2) || DEFAULT_GLOBE_PIXEL_SIZE;
 
     if (!this.initialized || this.lastPixelSize !== currentPixelSize) {
       this.renderer.setSize(currentPixelSize, currentPixelSize);
@@ -140,10 +140,10 @@ export class Globe {
     this.globeMesh.rotation.x = to_radian(lat);
     this.camera.rotation.z = (lat >= 0 ? PI : 0);
 
-    if (SAFARI)
+    if (BUGGY_FOREIGN_OBJECT)
       setTimeout(() => {
         this.renderer.render(this.scene, this.camera);
-        // Much slower rendering on Safari due to the need to convert the image to a data URL.
+        // Much slower rendering due to the need to convert the image to a data URL.
         this.imageHost.setAttribute('href', this.offscreen.querySelector('canvas').toDataURL());
       });
     else
