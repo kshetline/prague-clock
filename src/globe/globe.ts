@@ -2,11 +2,11 @@ import {
   CanvasTexture, CylinderGeometry, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, SphereGeometry, WebGLRenderer
 } from 'three';
 import { isString } from '@tubular/util';
-import { cos, PI, sin, to_radian } from '@tubular/math';
+import { cos, floor, PI, sin, to_radian } from '@tubular/math';
 
 const MAP_HEIGHT = 500;
 const MAP_WIDTH = 1000;
-const GLOBE_PIXEL_SIZE = 500;
+const DEFAULT_GLOBE_PIXEL_SIZE = 500;
 const GLOBE_RADIUS = 5;
 const FIELD_OF_VIEW = 19.3;
 const VIEW_DISTANCE = 30;
@@ -25,6 +25,7 @@ export class Globe {
   private camera: PerspectiveCamera;
   private globeMesh: Mesh;
   private initialized = false;
+  private lastPixelSize = DEFAULT_GLOBE_PIXEL_SIZE;
   private renderer: WebGLRenderer;
   private rendererHost: HTMLElement;
   private scene: Scene;
@@ -83,19 +84,16 @@ export class Globe {
       const globe = new SphereGeometry(GLOBE_RADIUS, 50, 50);
       globe.rotateY(-PI / 2);
       this.globeMesh = new Mesh(globe, new MeshBasicMaterial({ map: new CanvasTexture(Globe.mapCanvas) }));
-      this.renderer = new WebGLRenderer({ alpha: true });
-      this.renderer.setSize(GLOBE_PIXEL_SIZE, GLOBE_PIXEL_SIZE);
-      this.rendererHost.appendChild(this.renderer.domElement);
       this.scene.add(this.globeMesh);
 
       // Lines of longitude
       for (let n = 0; n < 24; ++n) {
-        const tube = new CylinderGeometry(GLOBE_RADIUS + HAG, GLOBE_RADIUS + HAG, LINE_THICKNESS, 50, 1, true);
-        tube.translate(0, -LINE_THICKNESS / 2, 0);
-        tube.rotateX(PI / 2);
-        tube.rotateY(n * PI / 12);
-        const tubeMesh = new Mesh(tube, new MeshBasicMaterial({ color: GRID_COLOR }));
-        this.globeMesh.add(tubeMesh);
+        const line = new CylinderGeometry(GLOBE_RADIUS + HAG, GLOBE_RADIUS + HAG, LINE_THICKNESS, 50, 1, true);
+        line.translate(0, -LINE_THICKNESS / 2, 0);
+        line.rotateX(PI / 2);
+        line.rotateY(n * PI / 12);
+        const mesh = new Mesh(line, new MeshBasicMaterial({ color: GRID_COLOR }));
+        this.globeMesh.add(mesh);
       }
 
       // Lines of latitude
@@ -105,13 +103,22 @@ export class Globe {
         const y = GLOBE_RADIUS * sin(lat);
         const r1 = r - LINE_THICKNESS * sin(lat) / 2;
         const r2 = r + LINE_THICKNESS * sin(lat) / 2;
-        const tube = new CylinderGeometry(r1 + HAG, r2 + HAG, cos(lat) * LINE_THICKNESS, 50, 8, true);
-        tube.translate(0, -cos(lat) * LINE_THICKNESS / 2 + y, 0);
-        const tubeMesh = new Mesh(tube, new MeshBasicMaterial({ color: GRID_COLOR }));
-        this.globeMesh.add(tubeMesh);
+        const line = new CylinderGeometry(r1 + HAG, r2 + HAG, cos(lat) * LINE_THICKNESS, 50, 8, true);
+        line.translate(0, -cos(lat) * LINE_THICKNESS / 2 + y, 0);
+        const mesh = new Mesh(line, new MeshBasicMaterial({ color: GRID_COLOR }));
+        this.globeMesh.add(mesh);
       }
 
       this.camera.position.z = VIEW_DISTANCE;
+      this.renderer = new WebGLRenderer({ alpha: true, antialias: true });
+      this.rendererHost.appendChild(this.renderer.domElement);
+    }
+
+    const currentPixelSize = floor(this.renderer.domElement.getBoundingClientRect().width * 2);
+
+    if (!this.initialized || this.lastPixelSize !== currentPixelSize) {
+      this.renderer.setSize(currentPixelSize, currentPixelSize);
+      this.lastPixelSize = currentPixelSize;
       this.initialized = true;
     }
 

@@ -6,6 +6,7 @@ import ttime, { DateTime, utToTdt } from '@tubular/time';
 import julianDay = ttime.julianDay;
 import { TzsLocation } from '../timezone-selector/timezone-selector.component';
 import { Globe } from '../globe/globe';
+import { debounce, fromEvent, interval } from 'rxjs';
 
 const CLOCK_RADIUS = 250;
 const INCLINATION = 23.5;
@@ -161,6 +162,8 @@ export class AppComponent implements OnInit {
     this.setNow();
     this.trackTime = true;
     this.placeName = 'Prague, CZE';
+
+    fromEvent(window, 'resize').pipe(debounce(() => interval(500))).subscribe({ next: () => this.updateGlobe() });
   }
 
   get latitude(): number { return this._latitude; }
