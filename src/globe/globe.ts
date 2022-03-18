@@ -140,12 +140,13 @@ export class Globe {
     this.globeMesh.rotation.x = to_radian(lat);
     this.camera.rotation.z = (lat >= 0 ? PI : 0);
 
-    requestAnimationFrame(() => {
-      this.renderer.render(this.scene, this.camera);
-
-      // Much slower rendering on Safari due to the need to convert the image to a data URL.
-      if (SAFARI)
+    if (SAFARI)
+      setTimeout(() => {
+        this.renderer.render(this.scene, this.camera);
+        // Much slower rendering on Safari due to the need to convert the image to a data URL.
         this.imageHost.setAttribute('href', this.offscreen.querySelector('canvas').toDataURL());
-    });
+      });
+    else
+      requestAnimationFrame(() => this.renderer.render(this.scene, this.camera));
   }
 }
