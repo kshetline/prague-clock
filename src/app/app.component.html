@@ -25,7 +25,7 @@
 
 <div class="graphics-credit">Original SVG clock graphics by Jan Tošovský</div>
 
-<svg width="100%" height="100%" viewBox="0 0 600 600" xml:space="preserve">
+<svg viewBox="0 0 600 600" xml:space="preserve">
   <defs>
     <filter id="filterHand" x="0" y="0" width="200%" height="200%">
       <feOffset result="offOut" in="SourceAlpha" dx="8" dy="8"/>
@@ -238,7 +238,7 @@
         <foreignObject x="-90" y="-90" width="180" height="180">
           <div id="globe-host"></div>
         </foreignObject>
-        <image *ngIf="isSafari" id="globe-host-image" x="-90" y="-90" width="180" height="180"/>
+        <image *ngIf="buggyForeignObject" id="globe-host-image" x="-90" y="-90" width="180" height="180"/>
       </g>
     </g>
     <g id="outerRing">

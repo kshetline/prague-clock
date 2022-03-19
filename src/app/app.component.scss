@@ -1,23 +1,24 @@
 :host {
-  align-items: start;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: row-reverse;
+  display: grid;
   font-family: Horologium, sans-serif;
+  grid-template-columns: 1fr auto;
   gap: 12px;
-  justify-content: center;
   min-height: 100vh;
-  min-width: 100vw;
+  place-items: center;
   overflow: inherit;
   padding: 8px;
 }
 
 .controls {
-  align-items: start;
+  align-items: center;
+  align-self: start;
   background-color: white;
   display: flex;
   flex-direction: column;
   font: 14px sans-serif;
+  grid-area: 1 / 2;
+  min-width: 340px;
   padding: 1em;
   gap: 4px;
 
@@ -30,6 +31,10 @@
     white-space: nowrap;
   }
 
+  tbw-time-editor {
+    min-height: 34px;
+  }
+
   tbw-angle-editor, tbw-time-editor {
     font-size: 18px;
   }
@@ -40,11 +45,12 @@
 }
 
 svg {
-  height: calc(max(min(100vw, 100vh) - 16px, 320px));
+  height: calc(max(min(calc(100vw - 356px), 100vh) - 16px, 320px));
+  grid-area: 1 / 1;
   min-height: 320px;
   min-width: 320px;
-  margin: auto;
-  width: calc(max(min(100vw, 100vh) - 16px, 320px));
+  margin: 0;
+  width: calc(max(min(calc(100vw - 356px), 100vh) - 16px, 320px));
 }
 
 @media screen and (max-height: 410px) {
@@ -63,11 +69,19 @@ svg {
 
 @media screen and (orientation:portrait) {
   :host {
-    align-items: center;
-    flex-direction: column;
+    grid-template-columns: auto;
+    grid-template-rows: auto auto;
+    overflow: auto;
+  }
+
+  .controls {
+    grid-area: unset;
   }
 
   svg {
+    align-self: start;
+    grid-area: unset;
+    height: unset;
     width: calc(min(calc(100vw - 16px), 320px));
   }
 }

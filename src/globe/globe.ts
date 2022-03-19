@@ -1,8 +1,10 @@
 import {
-  CanvasTexture, CylinderGeometry, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, SphereGeometry, WebGLRenderer
+  BufferGeometry, CanvasTexture, CylinderGeometry, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, SphereGeometry,
+  WebGLRenderer
 } from 'three';
 import { isChromeOS, isSafari, isString } from '@tubular/util';
 import { cos, floor, PI, sin, to_radian } from '@tubular/math';
+import { mergeBufferGeometries } from '../three/three-utils';
 
 const MAP_HEIGHT = 500;
 const MAP_WIDTH = 1000;
@@ -90,14 +92,15 @@ export class Globe {
       this.globeMesh = new Mesh(globe, new MeshBasicMaterial({ map: new CanvasTexture(Globe.mapCanvas) }));
       this.scene.add(this.globeMesh);
 
+      const lines: BufferGeometry[] = [];
+
       // Lines of longitude
       for (let n = 0; n < 24; ++n) {
         const line = new CylinderGeometry(GLOBE_RADIUS + HAG, GLOBE_RADIUS + HAG, LINE_THICKNESS, 50, 1, true);
         line.translate(0, -LINE_THICKNESS / 2, 0);
         line.rotateX(PI / 2);
         line.rotateY(n * PI / 12);
-        const mesh = new Mesh(line, new MeshBasicMaterial({ color: GRID_COLOR }));
-        this.globeMesh.add(mesh);
+        lines.push(line);
       }
 
       // Lines of latitude
@@ -109,9 +112,11 @@ export class Globe {
         const r2 = r + LINE_THICKNESS * sin(lat) / 2;
         const line = new CylinderGeometry(r1 + HAG, r2 + HAG, cos(lat) * LINE_THICKNESS, 50, 8, true);
         line.translate(0, -cos(lat) * LINE_THICKNESS / 2 + y, 0);
-        const mesh = new Mesh(line, new MeshBasicMaterial({ color: GRID_COLOR }));
-        this.globeMesh.add(mesh);
+        lines.push(line);
       }
+
+      this.globeMesh.add(new Mesh(mergeBufferGeometries(lines),
+        new MeshBasicMaterial({ color: GRID_COLOR })));
 
       this.camera.position.z = VIEW_DISTANCE;
       this.renderer = new WebGLRenderer({ alpha: true, antialias: true });
