@@ -4,9 +4,8 @@
   font-family: Horologium, sans-serif;
   grid-template-columns: 1fr auto;
   gap: 12px;
-  min-height: 100vh;
+  min-height: var(--mfh);
   place-items: center;
-  overflow: inherit;
   padding: 8px;
 }
 
@@ -45,12 +44,13 @@
 }
 
 svg {
-  height: calc(max(min(calc(100vw - 356px), 100vh) - 16px, 320px));
+  height: calc(max(min(calc(100vw - 356px), var(--mfh)) - 16px, 320px));
   grid-area: 1 / 1;
   min-height: 320px;
   min-width: 320px;
   margin: 0;
-  width: calc(max(min(calc(100vw - 356px), 100vh) - 16px, 320px));
+  user-select: none;
+  width: calc(max(min(calc(100vw - 356px), var(--mfh)) - 16px, 320px));
 }
 
 @media screen and (max-height: 410px) {

@@ -165,7 +165,16 @@ export class AppComponent implements OnInit {
     this.trackTime = true;
     this.placeName = 'Prague, CZE';
 
-    fromEvent(window, 'resize').pipe(debounce(() => interval(500))).subscribe({ next: () => this.updateGlobe() });
+    const doResize = (): void => {
+      const docElem = document.documentElement;
+
+      docElem.style.setProperty('--mfh', window.innerHeight + 'px');
+      docElem.style.setProperty('--mvh', (window.innerHeight * 0.01) + 'px');
+      this.updateGlobe();
+    };
+
+    fromEvent(window, 'resize').pipe(debounce(() => interval(250))).subscribe({ next: () => doResize });
+    doResize();
   }
 
   get latitude(): number { return this._latitude; }
