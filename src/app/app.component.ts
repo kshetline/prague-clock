@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { abs, atan2_deg, cos_deg, floor, max, min, mod, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
+import { abs, atan2_deg, cos_deg, floor, max, mod, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
 import { isChromeOS, isSafari } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import { AstroEvent, EventFinder, MOON, SET_EVENT, SkyObserver, SolarSystem, SUN } from '@tubular/astronomy';
@@ -15,6 +15,8 @@ const LABEL_RADIUS = 212;
 const EQUATOR_RADIUS = 164.1;
 const HORIZON_RADIUS = CLOCK_RADIUS * tan_deg((90 - INCLINATION) / 2);
 const TROPIC_RADIUS = HORIZON_RADIUS * tan_deg((90 - INCLINATION) / 2);
+
+const SIZE_RECHECK_COUNT = 4;
 
 interface CircleAttributes {
   cy: number;
@@ -121,6 +123,7 @@ export class AppComponent implements OnInit {
   private baseSunAngle: number;
   private eventFinder = new EventFinder();
   private globe: Globe
+  private lastHeight = -1;
   private _latitude = 50.0870;
   private _longitude = 14.4185;
   private observer: SkyObserver;
@@ -130,7 +133,6 @@ export class AppComponent implements OnInit {
   private _time = Date.now();
   private timeCheck: any;
   private _trackTime = false;
-  private wasLandscape: boolean = undefined;
   private _zone = 'Europe/Prague';
 
   darkCy: number;
@@ -166,25 +168,30 @@ export class AppComponent implements OnInit {
     this.trackTime = true;
     this.placeName = 'Prague, CZE';
 
-    const doResize = (): void => {
-      const docElem = document.documentElement;
-      const isLandscape = ((window as any).orientation && (window as any).orientation === 90) ||
-        (window.screen.orientation?.angle === 90);
-      const height = (isLandscape ?
-        min(window.innerWidth, window.innerHeight) : max(window.innerWidth, window.innerHeight));
+    const doResize = (recheck = SIZE_RECHECK_COUNT): void => {
+      setTimeout(() => {
+        const docElem = document.documentElement;
+        const r = docElem.getBoundingClientRect();
+        const height = r.height;
 
-      if (this.wasLandscape !== isLandscape) {
-        this.wasLandscape = isLandscape;
-        setTimeout(() => window.scrollTo(0, 1));
-      }
+        docElem.style.setProperty('--mfh', window.innerHeight + 'px');
+        docElem.style.setProperty('--mvh', (window.innerHeight * 0.01) + 'px');
 
-      docElem.style.setProperty('--mfh', height + 'px');
-      docElem.style.setProperty('--mvh', (height * 0.01) + 'px');
-      this.updateGlobe();
+        if (recheck === SIZE_RECHECK_COUNT || this.lastHeight !== height)
+          this.updateGlobe();
+
+        if (this.lastHeight !== height) {
+          this.lastHeight = height;
+          docElem.scrollTop = 0;
+        }
+
+        if (--recheck > 0)
+          setTimeout(() => doResize(recheck), 250);
+      });
     };
 
     fromEvent(window, 'resize').pipe(debounce(() => interval(250))).subscribe({ next: () => doResize });
-    window.addEventListener('orientationchange', doResize);
+    window.addEventListener('orientationchange', () => doResize());
     doResize();
   }
 
