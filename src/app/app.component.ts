@@ -168,9 +168,9 @@ export class AppComponent implements OnInit {
     this.trackTime = true;
     this.placeName = 'Prague, CZE';
 
+    const docElem = document.documentElement;
     const doResize = (recheck = SIZE_RECHECK_COUNT): void => {
       setTimeout(() => {
-        const docElem = document.documentElement;
         const r = docElem.getBoundingClientRect();
         const height = r.height;
 
@@ -190,8 +190,30 @@ export class AppComponent implements OnInit {
       });
     };
 
-    fromEvent(window, 'resize').pipe(debounce(() => interval(250))).subscribe({ next: () => doResize });
-    window.addEventListener('orientationchange', () => doResize());
+    // ChromeOS isn't getting window resize events or orientationchange events. Have to poll for changes.
+    if (isChromeOS()) {
+      let lastW = docElem.getBoundingClientRect().width;
+      let lastH = docElem.getBoundingClientRect().width;
+      const poll = (): void => {
+        const w = docElem.getBoundingClientRect().width;
+        const h = docElem.getBoundingClientRect().width;
+
+        if (lastW !== w || lastH !== h) {
+          lastW = w;
+          lastH = h;
+          doResize(0);
+        }
+
+        setTimeout(poll, 250);
+      };
+
+      poll();
+    }
+    else {
+      fromEvent(window, 'resize').pipe(debounce(() => interval(250))).subscribe({ next: () => doResize });
+      window.addEventListener('orientationchange', () => doResize());
+    }
+
     doResize();
   }
 
