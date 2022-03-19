@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { abs, atan2_deg, cos_deg, floor, max, mod, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
+import { abs, atan2_deg, cos_deg, floor, max, min, mod, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
 import { isChromeOS, isSafari } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import { AstroEvent, EventFinder, MOON, SET_EVENT, SkyObserver, SolarSystem, SUN } from '@tubular/astronomy';
@@ -130,6 +130,7 @@ export class AppComponent implements OnInit {
   private _time = Date.now();
   private timeCheck: any;
   private _trackTime = false;
+  private wasLandscape: boolean = undefined;
   private _zone = 'Europe/Prague';
 
   darkCy: number;
@@ -167,13 +168,23 @@ export class AppComponent implements OnInit {
 
     const doResize = (): void => {
       const docElem = document.documentElement;
+      const isLandscape = ((window as any).orientation && (window as any).orientation === 90) ||
+        (window.screen.orientation?.angle === 90);
+      const height = (isLandscape ?
+        min(window.innerWidth, window.innerHeight) : max(window.innerWidth, window.innerHeight));
 
-      docElem.style.setProperty('--mfh', window.innerHeight + 'px');
-      docElem.style.setProperty('--mvh', (window.innerHeight * 0.01) + 'px');
+      if (this.wasLandscape !== isLandscape) {
+        this.wasLandscape = isLandscape;
+        setTimeout(() => window.scrollTo(0, 1));
+      }
+
+      docElem.style.setProperty('--mfh', height + 'px');
+      docElem.style.setProperty('--mvh', (height * 0.01) + 'px');
       this.updateGlobe();
     };
 
     fromEvent(window, 'resize').pipe(debounce(() => interval(250))).subscribe({ next: () => doResize });
+    window.addEventListener('orientationchange', doResize);
     doResize();
   }
 

@@ -8,9 +8,11 @@
 }
 
 html {
-  height: var(--mvh);
+  height: var(--mfh);
   margin: 0;
-  width: 100%;
+  max-height: var(--mfh);
+  max-width: 100vw;
+  width: 100vw;
 }
 
 body {
