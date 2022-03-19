@@ -7,7 +7,6 @@ import ttime, { DateTime, utToTdt } from '@tubular/time';
 import julianDay = ttime.julianDay;
 import { TzsLocation } from '../timezone-selector/timezone-selector.component';
 import { Globe } from '../globe/globe';
-import { debounce, fromEvent, interval } from 'rxjs';
 
 const CLOCK_RADIUS = 250;
 const INCLINATION = 23.5;
@@ -190,30 +189,25 @@ export class AppComponent implements OnInit {
       });
     };
 
-    // ChromeOS isn't getting window resize events or orientationchange events. Have to poll for changes.
-    if (isChromeOS()) {
-      let lastW = docElem.getBoundingClientRect().width;
-      let lastH = docElem.getBoundingClientRect().width;
-      const poll = (): void => {
-        const w = docElem.getBoundingClientRect().width;
-        const h = docElem.getBoundingClientRect().width;
+    let lastW = docElem.getBoundingClientRect().width;
+    let lastH = docElem.getBoundingClientRect().height;
 
-        if (lastW !== w || lastH !== h) {
-          lastW = w;
-          lastH = h;
-          doResize(0);
-        }
+    const poll = (): void => {
+      const w = docElem.getBoundingClientRect().width;
+      const h = docElem.getBoundingClientRect().height;
+      let delay = 250;
 
-        setTimeout(poll, 250);
-      };
+      if (lastW !== w || lastH !== h) {
+        lastW = w;
+        lastH = h;
+        delay = 1250;
+        doResize();
+      }
 
-      poll();
-    }
-    else {
-      fromEvent(window, 'resize').pipe(debounce(() => interval(250))).subscribe({ next: () => doResize });
-      window.addEventListener('orientationchange', () => doResize());
-    }
+      setTimeout(poll, delay);
+    };
 
+    poll();
     doResize();
   }
 
