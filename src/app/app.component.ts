@@ -165,18 +165,24 @@ export class AppComponent implements OnInit {
     this.trackTime = true;
     this.placeName = 'Prague, CZE';
 
+    const docElem = document.documentElement;
     const doResize = (): void => {
       setTimeout(() => {
-        const docElem = document.documentElement;
         const height = window.innerHeight;
+        const disallowScroll = docElem.style.overflow === 'hidden';
 
         docElem.style.setProperty('--mfh', height + 'px');
         docElem.style.setProperty('--mvh', (height * 0.01) + 'px');
 
         if (this.lastHeight !== height) {
           this.lastHeight = height;
-          docElem.scrollTop = 0;
-          this.updateGlobe();
+
+          if (disallowScroll && (docElem.scrollTop !== 0 || docElem.scrollLeft !== 0)) {
+            docElem.scrollTo(0, 0);
+            setTimeout(doResize, 50);
+          }
+          else
+            this.updateGlobe();
         }
       });
     };
@@ -187,14 +193,15 @@ export class AppComponent implements OnInit {
     const poll = (): void => {
       const w = window.innerWidth;
       const h = window.innerHeight;
+      const disallowScroll = docElem.style.overflow === 'hidden';
 
-      if (lastW !== w || lastH !== h) {
+      if (lastW !== w || lastH !== h || (disallowScroll && (docElem.scrollTop !== 0 || docElem.scrollLeft !== 0))) {
         lastW = w;
         lastH = h;
         doResize();
       }
 
-      setTimeout(poll, 250);
+      setTimeout(poll, 100);
     };
 
     poll();
