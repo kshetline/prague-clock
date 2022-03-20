@@ -26,18 +26,24 @@
 }
 
 .zone-search {
+  display: flex;
+  gap: 0.5em;
   padding-bottom: 1em;
   position: relative;
 
-  p-autoComplete ::ng-deep {
-    span, input {
-      width: 100%;
+  p-autoComplete {
+    flex: 1 1 auto;
+
+    ::ng-deep {
+      span, input {
+        width: 100%;
+      }
     }
   }
 
   i.pi-search {
     position: absolute;
-    right: 0.5em;
+    right: 3.5em;
     top: 0.65em;
   }
 
@@ -46,6 +52,10 @@
     position: absolute;
     right: -1.5em;
     top: 0.65em;
+  }
+
+  i.pi-chevron-down {
+    cursor: pointer;
   }
 }
 

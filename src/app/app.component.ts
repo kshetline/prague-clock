@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { abs, atan2_deg, cos_deg, floor, max, mod, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
-import { isChromeOS, isEqual, isSafari } from '@tubular/util';
+import { clone, isChromeOS, isEqual, isSafari } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import { AstroEvent, EventFinder, MOON, SET_EVENT, SkyObserver, SolarSystem, SUN } from '@tubular/astronomy';
 import ttime, { DateTime, utToTdt } from '@tubular/time';
 import julianDay = ttime.julianDay;
-import { TzsLocation } from '../timezone-selector/timezone-selector.component';
+import { RecentLocation, TzsLocation } from '../timezone-selector/timezone-selector.component';
 import { Globe } from '../globe/globe';
 
 const CLOCK_RADIUS = 250;
@@ -23,14 +23,6 @@ interface CircleAttributes {
 
 const MAX_SAVED_LOCATIONS = 10;
 
-interface Location {
-  lastTimeUsed: number;
-  latitude: number;
-  longitude: number;
-  placeName: string;
-  zone: string;
-}
-
 const defaultSettings = {
   disableDst: true,
   isoFormat: false,
@@ -43,22 +35,12 @@ const defaultSettings = {
     longitude: 14.4185,
     placeName: 'Prague, CZE',
     zone: 'Europe/Prague'
-  }] as Location[],
+  }] as RecentLocation[],
   trackTime: true,
   zone: 'Europe/Prague'
 };
 
-function findMatchingLocation(locations: Location[], location: Location): Location {
-  for (const loc of locations) {
-    if (loc.zone === location.zone &&
-        abs(loc.latitude - location.latitude) < 0.25 && abs(loc.longitude - location.longitude) < 0.25)
-      return loc;
-  }
-
-  return null;
-}
-
-function removeOldestLocation(locations: Location[]): Location[] {
+function removeOldestLocation(locations: RecentLocation[]): RecentLocation[] {
   let earliestTime = Number.POSITIVE_INFINITY;
   let earliestIndex = -1;
 
@@ -181,7 +163,6 @@ export class AppComponent implements OnInit {
   private _latitude = 50.0870;
   private _longitude = 14.4185;
   private observer: SkyObserver;
-  private recentLocations: Location[] = [];
   private solarSystem = new SolarSystem();
   private sunsetA: AstroEvent = null;
   private sunsetB: AstroEvent = null;
@@ -209,6 +190,7 @@ export class AppComponent implements OnInit {
   outerRingAngle = 0;
   outerSunriseAngle: number = null;
   placeName = 'Prague, CZE';
+  recentLocations: RecentLocation[] = [];
   rotateSign = 1;
   siderealAngle = 0;
   southern = false;
@@ -226,7 +208,7 @@ export class AppComponent implements OnInit {
 
     settings = settings ?? defaultSettings;
     Object.keys(defaultSettings).forEach(key => (this as any)[key] = settings[key] ?? (defaultSettings as any)[key]);
-    this.observer = new SkyObserver(this._longitude, this._latitude);
+    this.updateObserver();
 
     window.addEventListener('beforeunload', () => this.saveSettings());
     setInterval(() => this.saveSettings(), 5000);
@@ -296,6 +278,26 @@ export class AppComponent implements OnInit {
     }
   }
 
+  private updateObserver(): void {
+    this.observer = new SkyObserver(this._longitude, this._latitude);
+
+    const loc = { latitude: this._latitude, longitude: this._longitude, zone: this._zone } as RecentLocation;
+    const match = this.findMatchingLocation(loc);
+
+    if (match)
+      setTimeout(() => this.placeName = match.placeName);
+  }
+
+  findMatchingLocation(location: RecentLocation): RecentLocation {
+    for (const loc of this.recentLocations) {
+      if (loc.zone === location.zone &&
+          abs(loc.latitude - location.latitude) < 0.05 && abs(loc.longitude - location.longitude) < 0.05)
+        return loc;
+    }
+
+    return null;
+  }
+
   get latitude(): number { return this._latitude; }
   set latitude(newValue: number) {
     if (this._latitude !== newValue) {
@@ -313,7 +315,7 @@ export class AppComponent implements OnInit {
 
       if (this.initDone) {
         this.placeName = '\xA0';
-        this.observer = new SkyObserver(this._longitude, this._latitude);
+        this.updateObserver();
         this.updateTime(true);
         this.updateGlobe();
       }
@@ -364,12 +366,13 @@ export class AppComponent implements OnInit {
     this._longitude = location.longitude;
     this.latitude = location.latitude;
     this.placeName = location.name;
+    setTimeout(() => this.zone = location.zone);
     this.updateRecentLocations(location.longitude, location.latitude, location.name, location.zone);
   }
 
   private updateRecentLocations(longitude: number, latitude: number, placeName: string, zone: string): void {
     const location = { lastTimeUsed: Date.now(), latitude, longitude, placeName, zone };
-    const match = findMatchingLocation(this.recentLocations, location);
+    const match = this.findMatchingLocation(location);
 
     if (match) {
       match.lastTimeUsed = (match.lastTimeUsed === 0 ? 0 : location.lastTimeUsed);
@@ -377,14 +380,16 @@ export class AppComponent implements OnInit {
       match.longitude = location.longitude;
       match.placeName = location.placeName;
     }
+    else {
+      if (this.recentLocations.length >= MAX_SAVED_LOCATIONS)
+        removeOldestLocation(this.recentLocations);
 
-    if (this.recentLocations.length >= MAX_SAVED_LOCATIONS)
-      removeOldestLocation(this.recentLocations);
+      this.recentLocations.push(location);
+    }
 
     const sortTime = (time: number): number => time === 0 ? Number.MAX_SAFE_INTEGER : time;
-
-    this.recentLocations.push(location);
     this.recentLocations.sort((a, b) => sortTime(b.lastTimeUsed) - sortTime(a.lastTimeUsed));
+    this.recentLocations = clone(this.recentLocations);
     this.saveSettings();
   }
 
@@ -398,7 +403,7 @@ export class AppComponent implements OnInit {
   private adjustLatitude(): void {
     this.southern = (this._latitude < 0);
     this.rotateSign = (this.southern ? -1 : 1);
-    this.observer = new SkyObserver(this._longitude, this._latitude);
+    this.updateObserver();
     this.placeName = '\xA0';
     ({ cy: this.horizonCy, d: this.horizonPath, r: this.horizonR } = this.getAltitudeCircle(0, true));
     ({ cy: this.darkCy, r: this.darkR } = this.getAltitudeCircle(-18));

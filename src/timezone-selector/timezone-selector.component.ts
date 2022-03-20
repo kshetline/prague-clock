@@ -7,6 +7,7 @@ import { Subject, Subscription, timer } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { AutoComplete } from 'primeng/autocomplete';
+import { MenuItem } from 'primeng/api';
 
 const SVC_ZONE_SELECTOR_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -36,6 +37,14 @@ interface AtlasLocation {
 interface AtlasResults {
   error: string;
   matches: AtlasLocation[];
+}
+
+export interface RecentLocation {
+  lastTimeUsed: number;
+  latitude: number;
+  longitude: number;
+  placeName: string;
+  zone: string;
 }
 
 export interface TzsLocation {
@@ -132,6 +141,7 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
   zones: string[] = [];
 
   private _offset: string;
+  private _recents: RecentLocation[] = [];
   private _region: string = this.regions[0];
   private _searchText = '';
   private _selectByOffset = true;
@@ -159,7 +169,19 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
   emptyMessage: string;
   error: string;
   matchZones: string[] = [];
+  recentItems: MenuItem[] = [];
   searching = false;
+
+  get recents(): RecentLocation[] { return this._recents; }
+  @Input() set recents(value: RecentLocation[]) {
+    if (this._recents !== value) {
+      this._recents = value;
+      this.recentItems = [];
+
+      for (let i = 0; i < value.length; ++i)
+        this.recentItems.push({ label: value[i].placeName, command: () => this.recentLocationSelected(i) });
+    }
+  }
 
   // eslint-disable-next-line @angular-eslint/no-output-native
   @Output() focus: EventEmitter<any> = new EventEmitter();
@@ -603,5 +625,16 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
       if (doChangeCallback)
         this.onChangeCallback(this._value);
     }
+  }
+
+  recentLocationSelected(locationIndex: number): void {
+    const loc = this._recents[locationIndex];
+
+    this.location.emit({
+      latitude: loc.latitude,
+      longitude: loc.longitude,
+      name: loc.placeName,
+      zone: loc.zone
+    });
   }
 }

@@ -1,6 +1,6 @@
 <div class="zone-search">
   <p-autoComplete #autoComplete [(ngModel)]="searchText"
-      placeholder="Search cities/timezone names"
+      placeholder="Search cities/timezones"
       [suggestions]="matchZones"
       [forceSelection]="true"
       [showEmptyMessage]="true"
@@ -11,6 +11,8 @@
       appendTo="body"></p-autoComplete>
   <i class="pi pi-search"></i>
   <i class="fas fa-spinner fa-pulse fa-fw" [style.display]="searching ? 'block' : 'none'"></i>
+  <p-menu #recents [popup]="true" [model]="recentItems" appendTo="body"></p-menu>
+  <i class="pi pi-chevron-down p-inputtext" (click)="recents.toggle($event)"></i>
 </div>
 
 <div class="mode-selector">
