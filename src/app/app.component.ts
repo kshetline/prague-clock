@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { abs, atan2_deg, cos_deg, floor, max, mod, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
-import { isChromeOS, isSafari } from '@tubular/util';
+import { isChromeOS, isEqual, isSafari } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import { AstroEvent, EventFinder, MOON, SET_EVENT, SkyObserver, SolarSystem, SUN } from '@tubular/astronomy';
 import ttime, { DateTime, utToTdt } from '@tubular/time';
@@ -19,6 +19,61 @@ interface CircleAttributes {
   cy: number;
   d?: string;
   r: number;
+}
+
+const MAX_SAVED_LOCATIONS = 10;
+
+interface Location {
+  lastTimeUsed: number;
+  latitude: number;
+  longitude: number;
+  placeName: string;
+  zone: string;
+}
+
+const defaultSettings = {
+  disableDst: true,
+  isoFormat: false,
+  latitude: 50.0870,
+  longitude: 14.4185,
+  placeName: 'Prague, CZE',
+  recentLocations: [{
+    lastTimeUsed: 0,
+    latitude: 50.0870,
+    longitude: 14.4185,
+    placeName: 'Prague, CZE',
+    zone: 'Europe/Prague'
+  }] as Location[],
+  trackTime: true,
+  zone: 'Europe/Prague'
+};
+
+function findMatchingLocation(locations: Location[], location: Location): Location {
+  for (const loc of locations) {
+    if (loc.zone === location.zone &&
+        abs(loc.latitude - location.latitude) < 0.25 && abs(loc.longitude - location.longitude) < 0.25)
+      return loc;
+  }
+
+  return null;
+}
+
+function removeOldestLocation(locations: Location[]): Location[] {
+  let earliestTime = Number.POSITIVE_INFINITY;
+  let earliestIndex = -1;
+
+  for (let i = 0; i < locations.length; ++i) {
+    const loc = locations[i];
+
+    if (loc.lastTimeUsed !== 0 && loc.lastTimeUsed < earliestTime) {
+      earliestIndex = i;
+      earliestTime = loc.lastTimeUsed;
+    }
+  }
+
+  locations.splice(earliestIndex, 1);
+
+  return locations;
 }
 
 function circleIntersections(x1: number, y1: number, r1: number, x2: number, y2: number, r2: number): Point[] {
@@ -120,14 +175,17 @@ export class AppComponent implements OnInit {
   private baseSunAngle: number;
   private eventFinder = new EventFinder();
   private globe: Globe
+  private initDone = false;
   private lastHeight = -1;
+  private lastSavedSettings: any = null;
   private _latitude = 50.0870;
   private _longitude = 14.4185;
   private observer: SkyObserver;
+  private recentLocations: Location[] = [];
   private solarSystem = new SolarSystem();
   private sunsetA: AstroEvent = null;
   private sunsetB: AstroEvent = null;
-  private _time = Date.now();
+  private _time = 0;
   private timeCheck: any;
   private _trackTime = false;
   private _zone = 'Europe/Prague';
@@ -150,7 +208,7 @@ export class AppComponent implements OnInit {
   moonAngle = 0;
   outerRingAngle = 0;
   outerSunriseAngle: number = null;
-  placeName = '\xA0';
+  placeName = 'Prague, CZE';
   rotateSign = 1;
   siderealAngle = 0;
   southern = false;
@@ -158,12 +216,31 @@ export class AppComponent implements OnInit {
   sunriseLabelPath: string;
   sunsetLabelPath: string;
 
+  constructor() {
+    let settings: any;
+
+    try {
+      settings = JSON.parse(localStorage.getItem('pac-settings') ?? 'null');
+    }
+    catch {}
+
+    settings = settings ?? defaultSettings;
+    Object.keys(defaultSettings).forEach(key => (this as any)[key] = settings[key] ?? (defaultSettings as any)[key]);
+    this.observer = new SkyObserver(this._longitude, this._latitude);
+
+    window.addEventListener('beforeunload', () => this.saveSettings());
+    setInterval(() => this.saveSettings(), 5000);
+  }
+
   ngOnInit(): void {
+    const placeName = this.placeName;
+
+    this.initDone = true;
     this.globe = new Globe('globe-host');
     this.adjustLatitude();
     this.setNow();
     this.trackTime = true;
-    this.placeName = 'Prague, CZE';
+    this.placeName = placeName;
 
     const docElem = document.documentElement;
     const doResize = (): void => {
@@ -208,11 +285,24 @@ export class AppComponent implements OnInit {
     doResize();
   }
 
+  private saveSettings(): void {
+    const settings: any = {};
+
+    Object.keys(defaultSettings).forEach(key => settings[key] = (this as any)[key]);
+
+    if (!isEqual(this.lastSavedSettings, settings)) {
+      localStorage.setItem('pac-settings', JSON.stringify(settings));
+      this.lastSavedSettings = settings;
+    }
+  }
+
   get latitude(): number { return this._latitude; }
   set latitude(newValue: number) {
     if (this._latitude !== newValue) {
       this._latitude = newValue;
-      this.adjustLatitude();
+
+      if (this.initDone)
+        this.adjustLatitude();
     }
   }
 
@@ -220,10 +310,13 @@ export class AppComponent implements OnInit {
   set longitude(newValue: number) {
     if (this._longitude !== newValue) {
       this._longitude = newValue;
-      this.placeName = '\xA0';
-      this.observer = new SkyObserver(this._longitude, this._latitude);
-      this.updateTime(true);
-      this.updateGlobe();
+
+      if (this.initDone) {
+        this.placeName = '\xA0';
+        this.observer = new SkyObserver(this._longitude, this._latitude);
+        this.updateTime(true);
+        this.updateGlobe();
+      }
     }
   }
 
@@ -231,7 +324,9 @@ export class AppComponent implements OnInit {
   set zone(newValue: string) {
     if (this._zone !== newValue) {
       this._zone = newValue;
-      this.updateTime(true);
+
+      if (this.initDone)
+        this.updateTime(true);
     }
   }
 
@@ -239,7 +334,9 @@ export class AppComponent implements OnInit {
   set time(newValue: number) {
     if (this._time !== newValue) {
       this._time = newValue;
-      this.updateTime();
+
+      if (this.initDone)
+        this.updateTime();
     }
   }
 
@@ -267,6 +364,28 @@ export class AppComponent implements OnInit {
     this._longitude = location.longitude;
     this.latitude = location.latitude;
     this.placeName = location.name;
+    this.updateRecentLocations(location.longitude, location.latitude, location.name, location.zone);
+  }
+
+  private updateRecentLocations(longitude: number, latitude: number, placeName: string, zone: string): void {
+    const location = { lastTimeUsed: Date.now(), latitude, longitude, placeName, zone };
+    const match = findMatchingLocation(this.recentLocations, location);
+
+    if (match) {
+      match.lastTimeUsed = (match.lastTimeUsed === 0 ? 0 : location.lastTimeUsed);
+      match.latitude = location.latitude;
+      match.longitude = location.longitude;
+      match.placeName = location.placeName;
+    }
+
+    if (this.recentLocations.length >= MAX_SAVED_LOCATIONS)
+      removeOldestLocation(this.recentLocations);
+
+    const sortTime = (time: number): number => time === 0 ? Number.MAX_SAFE_INTEGER : time;
+
+    this.recentLocations.push(location);
+    this.recentLocations.sort((a, b) => sortTime(b.lastTimeUsed) - sortTime(a.lastTimeUsed));
+    this.saveSettings();
   }
 
   setNow(): void {
@@ -365,6 +484,9 @@ export class AppComponent implements OnInit {
   }
 
   updateTime(forceUpdate = false): void {
+    if (!this.observer)
+      return;
+
     const jdu = julianDay(this.time);
     const jde = utToTdt(jdu);
 

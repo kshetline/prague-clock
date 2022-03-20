@@ -42,6 +42,7 @@ export interface TzsLocation {
   latitude: number;
   longitude: number;
   name: string;
+  zone: string;
 }
 
 function toCanonicalOffset(offset: string): string {
@@ -222,20 +223,20 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
 
   set value(newValue: string) {
     let $ = /\s+\([^)]+\)$/.exec(newValue);
+    const zone = toCanonicalZone(newValue);
 
     if ($ && ($ = /^(.+?):\xA0.*?([0-9.]+).([NS]).+?([0-9.]+).([EW])/.exec(newValue)))
       this.location.emit({
         latitude: toNumber($[2]) * ($[3] === 'S' ? -1 : 1),
         longitude: toNumber($[4]) * ($[5] === 'W' ? -1 : 1),
-        name: $[1]
+        name: $[1],
+        zone
       });
 
-    newValue = toCanonicalZone(newValue);
-
-    if (this._value !== newValue) {
-      this._value = newValue;
-      this.updateValue(newValue);
-      setTimeout(() => this.onChangeCallback(newValue));
+    if (this._value !== zone) {
+      this._value = zone;
+      this.updateValue(zone);
+      setTimeout(() => this.onChangeCallback(zone));
     }
   }
 
