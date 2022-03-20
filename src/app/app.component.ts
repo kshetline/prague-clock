@@ -15,8 +15,6 @@ const EQUATOR_RADIUS = 164.1;
 const HORIZON_RADIUS = CLOCK_RADIUS * tan_deg((90 - INCLINATION) / 2);
 const TROPIC_RADIUS = HORIZON_RADIUS * tan_deg((90 - INCLINATION) / 2);
 
-const SIZE_RECHECK_COUNT = 4;
-
 interface CircleAttributes {
   cy: number;
   d?: string;
@@ -167,44 +165,36 @@ export class AppComponent implements OnInit {
     this.trackTime = true;
     this.placeName = 'Prague, CZE';
 
-    const docElem = document.documentElement;
-    const doResize = (recheck = SIZE_RECHECK_COUNT): void => {
+    const doResize = (): void => {
       setTimeout(() => {
-        const r = docElem.getBoundingClientRect();
-        const height = r.height;
+        const docElem = document.documentElement;
+        const height = window.innerHeight;
 
-        docElem.style.setProperty('--mfh', window.innerHeight + 'px');
-        docElem.style.setProperty('--mvh', (window.innerHeight * 0.01) + 'px');
-
-        if (recheck === SIZE_RECHECK_COUNT || this.lastHeight !== height)
-          this.updateGlobe();
+        docElem.style.setProperty('--mfh', height + 'px');
+        docElem.style.setProperty('--mvh', (height * 0.01) + 'px');
 
         if (this.lastHeight !== height) {
           this.lastHeight = height;
           docElem.scrollTop = 0;
+          this.updateGlobe();
         }
-
-        if (--recheck > 0)
-          setTimeout(() => doResize(recheck), 250);
       });
     };
 
-    let lastW = docElem.getBoundingClientRect().width;
-    let lastH = docElem.getBoundingClientRect().height;
+    let lastW = window.innerWidth;
+    let lastH = window.innerHeight;
 
     const poll = (): void => {
-      const w = docElem.getBoundingClientRect().width;
-      const h = docElem.getBoundingClientRect().height;
-      let delay = 250;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
 
       if (lastW !== w || lastH !== h) {
         lastW = w;
         lastH = h;
-        delay = 1250;
         doResize();
       }
 
-      setTimeout(poll, delay);
+      setTimeout(poll, 250);
     };
 
     poll();
