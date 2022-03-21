@@ -228,7 +228,7 @@ export class AppComponent implements OnInit {
     settings = settings ?? defaultSettings;
     Object.keys(defaultSettings).forEach(key => (this as any)[key] = settings[key] ?? (defaultSettings as any)[key]);
     this.updateObserver();
-    this.setEventType(settings.eventType);
+    this.setEventType(this.eventType);
 
     window.addEventListener('beforeunload', () => this.saveSettings());
     setInterval(() => this.saveSettings(), 5000);
