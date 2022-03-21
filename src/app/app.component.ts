@@ -602,7 +602,7 @@ export class AppComponent implements OnInit {
       return;
 
     this.confirmService.confirm({
-      message: 'Turn of "Track current time" so you can edit the time?',
+      message: 'Turn off "Track current time" so you can edit the time?',
       accept: () => this.trackTime = false
     });
   }

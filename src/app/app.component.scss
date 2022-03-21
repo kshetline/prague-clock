@@ -54,7 +54,9 @@ svg {
   width: calc(max(min(calc(100vw - 356px), var(--mfh)) - 16px, 320px));
 }
 
-@media screen and (max-height: 410px) {
+@media screen and (max-height: 410px),
+       screen and (orientation:portrait) and (max-height: 1000px)
+{
   .controls {
     margin: -20px -16px;
     transform: scale(0.9);

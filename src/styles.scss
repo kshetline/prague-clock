@@ -67,3 +67,7 @@ body {
   max-height: calc(90 * var(--mvh));
   overflow-y: scroll;
 }
+
+.p-dialog-content {
+  max-width: 95vw;
+}
