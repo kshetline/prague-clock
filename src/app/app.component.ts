@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { abs, atan2_deg, cos_deg, floor, max, mod, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
-import { clone, getCssValue, isChromeOS, isEqual, isSafari, toMixedCase } from '@tubular/util';
+import { clone, getCssValue, isChromeOS, isEqual, isLikelyMobile, isSafari, toMixedCase } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import { AstroEvent, EventFinder, FALL_EQUINOX, FIRST_QUARTER, FULL_MOON, LAST_QUARTER, MOON, NEW_MOON, RISE_EVENT, SET_EVENT, SkyObserver, SolarSystem, SPRING_EQUINOX, SUMMER_SOLSTICE, SUN, WINTER_SOLSTICE } from '@tubular/astronomy';
 import ttime, { DateTime, utToTdt } from '@tubular/time';
@@ -40,6 +40,7 @@ const defaultSettings = {
     name: 'Prague, CZE',
     zone: 'Europe/Prague'
   }] as TzsLocation[],
+  suppressOsKeyboard: false,
   trackTime: true,
   zone: 'Europe/Prague'
 };
@@ -170,6 +171,7 @@ export class AppComponent implements OnInit {
   private solarSystem = new SolarSystem();
   private sunsetA: AstroEvent = null;
   private sunsetB: AstroEvent = null;
+  private _suppressOsKeyboard = false;
   private _time = 0;
   private timeCheck: any;
   private _trackTime = false;
@@ -179,6 +181,8 @@ export class AppComponent implements OnInit {
     { label: '↔ Equinox/solstice', icon: 'pi pi-check', command: (): void => this.setEventType(EventType.EQUISOLSTICE) },
     { label: '↔ Moon phase', icon: 'pi pi-circle', command: (): void => this.setEventType(EventType.MOON_PHASE) },
     { label: '↔ Sunrise/sunset', icon: 'pi pi-circle', command: (): void => this.setEventType(EventType.RISE_SET) },
+    { separator : true },
+    { label: 'About the clock', url: 'https://en.wikipedia.org/wiki/Prague_astronomical_clock' }
   ];
 
   darkCy: number;
@@ -215,6 +219,12 @@ export class AppComponent implements OnInit {
   ) {
     let settings: any;
 
+    if (isLikelyMobile()) {
+      this.menuItems.push({ separator: true });
+      this.menuItems.push({ label: 'Suppress onscreen keyboard', icon: 'pi pi-circle', id: 'sok',
+                            command: (): boolean => this.suppressOsKeyboard = !this.suppressOsKeyboard });
+    }
+
     try {
       settings = JSON.parse(localStorage.getItem('pac-settings') ?? 'null');
 
@@ -228,7 +238,7 @@ export class AppComponent implements OnInit {
     settings = settings ?? defaultSettings;
     Object.keys(defaultSettings).forEach(key => (this as any)[key] = settings[key] ?? (defaultSettings as any)[key]);
     this.updateObserver();
-    this.setEventType(this.eventType);
+    this.updateMenu();
 
     window.addEventListener('beforeunload', () => this.saveSettings());
     setInterval(() => this.saveSettings(), 5000);
@@ -319,6 +329,18 @@ export class AppComponent implements OnInit {
     }
 
     return null;
+  }
+
+  private menuItemById(id: string): MenuItem {
+    return this.menuItems.find(item => item.id === id);
+  }
+
+  get suppressOsKeyboard(): boolean { return this._suppressOsKeyboard; }
+  set suppressOsKeyboard(value: boolean) {
+    if (this._suppressOsKeyboard !== value) {
+      this._suppressOsKeyboard = value;
+      this.updateMenu();
+    }
   }
 
   get latitude(): number { return this._latitude; }
@@ -620,9 +642,18 @@ export class AppComponent implements OnInit {
   }
 
   private setEventType(eventType: EventType): void {
-    this.eventType = eventType;
+    if (this.eventType !== eventType) {
+      this.eventType = eventType;
+      this.updateMenu();
+    }
+  }
+
+  private updateMenu(): void {
     this.menuItems = clone(this.menuItems);
-    this.menuItems.forEach((item, index) => item.icon = (index === eventType ? 'pi pi-check' : 'pi pi-circle'));
+    this.menuItems.forEach((item, index) => item.icon = (index === this.eventType ? 'pi pi-check' : 'pi pi-circle'));
+
+    if (this.menuItemById('sok'))
+      this.menuItemById('sok').icon = (this.suppressOsKeyboard ? 'pi pi-check' : 'pi pi-circle');
   }
 
   skipToEvent(previous = false): void {

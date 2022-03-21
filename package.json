@@ -28,7 +28,7 @@
     "@tubular/math": "^3.1.0",
     "@tubular/ng-widgets": "^2.1.0",
     "@tubular/time": "^3.8.1",
-    "@tubular/util": "^4.6.0",
+    "@tubular/util": "^4.7.1",
     "primeicons": "^5.0.0",
     "primeng": "^13.2.1",
     "rxjs": "~7.5.0",

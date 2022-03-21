@@ -14,6 +14,7 @@
       [options]="isoFormat ? ISO_OPTS : LOCAL_OPTS"
       [viewOnly]="trackTime"
       [timezone]="zone"
+      [disableMobileKeyboard]="suppressOsKeyboard"
       [(ngModel)]="time"></tbw-time-editor>
     <i class="pi pi-caret-right" (click)="skipToEvent()"></i>
   </div>
@@ -28,8 +29,10 @@
     <button type="button" pButton (click)="setNow()" [disabled]="trackTime">Now</button>
   </div>
   <div class="button-row">
-    <tbw-angle-editor wideSpinner [(ngModel)]="latitude" [options]="{ angleStyle: DD, compass: true, decimalPrecision: 1 }"></tbw-angle-editor>
-    <tbw-angle-editor wideSpinner [(ngModel)]="longitude" [options]="{ angleStyle: DDD, compass: true, decimalPrecision: 1 }"></tbw-angle-editor>
+    <tbw-angle-editor wideSpinner [(ngModel)]="latitude" [disableMobileKeyboard]="suppressOsKeyboard"
+        [options]="{ angleStyle: DD, compass: true, decimalPrecision: 1 }"></tbw-angle-editor>
+    <tbw-angle-editor wideSpinner [(ngModel)]="longitude" [disableMobileKeyboard]="suppressOsKeyboard"
+        [options]="{ angleStyle: DDD, compass: true, decimalPrecision: 1 }"></tbw-angle-editor>
   </div>
 </div>
 
@@ -40,12 +43,18 @@
     <filter id="filterHand" x="0" y="0" width="200%" height="200%">
       <feOffset result="offOut" in="SourceAlpha" dx="8" dy="8"/>
       <feGaussianBlur result="blurOut" in="offOut" stdDeviation="4"/>
-      <feBlend in="SourceGraphic" in2="blurOut" mode="normal"/>
+      <feComponentTransfer result="fadeOut" in="blurOut">
+        <feFuncA type="linear" slope="0.85"/>
+      </feComponentTransfer>
+      <feBlend in="SourceGraphic" in2="fadeOut" mode="normal"/>
     </filter>
     <filter id="filterEcliptic" x="0" y="0" width="200%" height="200%">
       <feOffset result="offOut" in="SourceAlpha" dx="15" dy="15"/>
       <feGaussianBlur result="blurOut" in="offOut" stdDeviation="3"/>
-      <feBlend in="SourceGraphic" in2="blurOut" mode="normal"/>
+      <feComponentTransfer result="fadeOut" in="blurOut">
+        <feFuncA type="linear" slope="0.75"/>
+      </feComponentTransfer>
+      <feBlend in="SourceGraphic" in2="fadeOut" mode="normal"/>
     </filter>
     <filter id="filterRelief" filterUnits="userSpaceOnUse" x="-60%" y="-60%">
       <feOffset result="offOut" in="SourceAlpha" dx="1" dy="1"/>

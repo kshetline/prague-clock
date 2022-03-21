@@ -63,7 +63,12 @@ body {
   }
 }
 
+.p-menu {
+  width: 18em;
+}
+
 .p-menu-list {
+  min-width: 18em;
   max-height: calc(90 * var(--mvh));
   overflow-y: scroll;
 }
