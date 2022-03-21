@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ConfirmationService } from 'primeng/api';
 import { abs, atan2_deg, cos_deg, floor, max, mod, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
 import { clone, isChromeOS, isEqual, isSafari } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
@@ -198,7 +199,7 @@ export class AppComponent implements OnInit {
   sunriseLabelPath: string;
   sunsetLabelPath: string;
 
-  constructor() {
+  constructor(private confirmService: ConfirmationService) {
     let settings: any;
 
     try {
@@ -594,5 +595,15 @@ export class AppComponent implements OnInit {
         `A ${CLOCK_RADIUS} ${CLOCK_RADIUS} 0 0 ${h < 6 ? 0 : 1} ${RO(x1)} ${RO(y1)} Z`;
 
     return path;
+  }
+
+  checkIfTimeIsEditable(): void {
+    if (!this.trackTime)
+      return;
+
+    this.confirmService.confirm({
+      message: 'Turn of "Track current time" so you can edit the time?',
+      accept: () => this.trackTime = false
+    });
   }
 }

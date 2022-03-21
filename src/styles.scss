@@ -62,3 +62,8 @@ body {
     position: static;
   }
 }
+
+.p-menu-list {
+  max-height: calc(90 * var(--mvh));
+  overflow-y: scroll;
+}

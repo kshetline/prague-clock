@@ -1,9 +1,13 @@
+<p-confirmDialog header="Change time"></p-confirmDialog>
 <div class="controls">
   <div class="place-name">{{placeName}}</div>
   <tbw-time-editor
     max="2399-12-31"
     min="1400-01-01"
     wideSpinner
+    (click)="checkIfTimeIsEditable()"
+    pTooltip='Uncheck on "Track current time" to modify the time'
+    [tooltipDisabled]="!trackTime"
     [options]="isoFormat ? ISO_OPTS : LOCAL_OPTS"
     [viewOnly]="trackTime"
     [timezone]="zone"
