@@ -146,9 +146,11 @@ function RO(n: number): string {
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
+  buggyForeignObject = isChromeOS() || isSafari();
   DD = AngleStyle.DD;
   DDD = AngleStyle.DDD;
-  buggyForeignObject = isChromeOS() || isSafari();
+  MAX_YEAR = 2399;
+  MIN_YEAR = 1400;
 
   LOCAL_OPTS: TimeEditorOptions = {
     dateTimeStyle: DateTimeStyle.DATE_AND_TIME,
@@ -720,9 +722,15 @@ export class AppComponent implements OnInit {
     if (eventsFound.length > 0) {
       const evt = eventsFound[0];
       const eventText = toMixedCase(evt.eventText).replace('Rise', 'Sunrise').replace('Set', 'Sunset');
+      const year = new DateTime(evt.eventTime.utcMillis, this.zone).wallTime.year;
 
-      this.time = evt.eventTime.utcMillis;
-      this.messageService.add({ severity: 'info', summary:'Event', detail: eventText });
+      if (year < this.MIN_YEAR || year > this.MAX_YEAR)
+        this.messageService.add({ severity: 'error', summary:'Event',
+                                  detail: `Event outside of ${this.MIN_YEAR}-${this.MAX_YEAR} year range.` });
+      else {
+        this.time = evt.eventTime.utcMillis;
+        this.messageService.add({ severity: 'info', summary:'Event', detail: eventText });
+      }
     }
   }
 }

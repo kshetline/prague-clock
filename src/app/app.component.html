@@ -5,8 +5,8 @@
   <div class="time-row">
     <i class="pi pi-caret-left" (click)="skipToEvent(true)"></i>
     <tbw-time-editor
-      max="2399-12-31"
-      min="1400-01-01"
+      [max]="MAX_YEAR + '-12-31'"
+      [min]="MIN_YEAR + '-01-01'"
       wideSpinner
       (click)="checkIfTimeIsEditable()"
       pTooltip='Uncheck on "Track current time" to modify the time'
