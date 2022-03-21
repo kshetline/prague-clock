@@ -1,5 +1,3 @@
-<p-toast position="center"></p-toast>
-<p-confirmDialog header="Change time"></p-confirmDialog>
 <div class="controls" [class.short]="lastHeight <= 420 && lastHeight > 380" [class.extra-short]="lastHeight <= 380">
   <div class="place-name">{{placeName}}</div>
   <p-menu #menu [popup]="true" [model]="menuItems" appendTo="body"></p-menu>
@@ -573,3 +571,5 @@
     </g>
   </g>
 </svg>
+<p-toast position="center"></p-toast>
+<p-confirmDialog header="Change time"></p-confirmDialog>

@@ -9,6 +9,10 @@
   padding: 8px;
 }
 
+p-toast, p-confirmDialog {
+  position: absolute; // Prevent these items from adding grid gap.
+}
+
 .controls {
   align-items: center;
   align-self: start;
@@ -44,6 +48,7 @@
   i.pi-caret-left, i.pi-caret-right {
     cursor: pointer;
     font-size: 1.75em;
+    opacity: 0.75;
     padding: 0.125em;
   }
 
@@ -83,7 +88,7 @@ svg {
   width: calc(max(min(calc(100vw - 400px), var(--mfh)) - 16px, 320px));
 }
 
-@media screen and (max-height: 420px),
+@media screen and (orientation:landscape) and (max-height: 420px),
        screen and (orientation:portrait) and (max-height: 1000px)
 {
   .controls {
@@ -92,7 +97,7 @@ svg {
   }
 }
 
-@media screen and (max-height: 380px) {
+@media screen and (orientation:portrait) and (max-height: 380px) {
   .controls {
     margin: -40px;
     transform: scale(0.8);
