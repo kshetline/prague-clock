@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfirmationService, MenuItem } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { abs, atan2_deg, cos_deg, floor, max, mod, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
-import { clone, getCssValue, isChromeOS, isEqual, isSafari } from '@tubular/util';
+import { clone, getCssValue, isChromeOS, isEqual, isSafari, toMixedCase } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
-import { AstroEvent, EventFinder, MOON, SET_EVENT, SkyObserver, SolarSystem, SUN } from '@tubular/astronomy';
+import { AstroEvent, EventFinder, FALL_EQUINOX, FIRST_QUARTER, FULL_MOON, LAST_QUARTER, MOON, NEW_MOON, RISE_EVENT, SET_EVENT, SkyObserver, SolarSystem, SPRING_EQUINOX, SUMMER_SOLSTICE, SUN, WINTER_SOLSTICE } from '@tubular/astronomy';
 import ttime, { DateTime, utToTdt } from '@tubular/time';
 import julianDay = ttime.julianDay;
 import { TzsLocation } from '../timezone-selector/timezone-selector.component';
@@ -22,10 +22,13 @@ interface CircleAttributes {
   r: number;
 }
 
+enum EventType { EQUISOLSTICE, MOON_PHASE, RISE_SET }
+
 const MAX_SAVED_LOCATIONS = 10;
 
 const defaultSettings = {
   disableDst: true,
+  eventType: EventType.EQUISOLSTICE,
   isoFormat: false,
   latitude: 50.0870,
   longitude: 14.4185,
@@ -157,6 +160,7 @@ export class AppComponent implements OnInit {
   private baseMoonAngle: number;
   private baseSunAngle: number;
   private eventFinder = new EventFinder();
+  private eventType = EventType.EQUISOLSTICE;
   private globe: Globe
   private initDone = false;
   private lastSavedSettings: any = null;
@@ -172,9 +176,9 @@ export class AppComponent implements OnInit {
   private _zone = 'Europe/Prague';
 
   menuItems: MenuItem[] = [
-    { label: '↔ Sunrise/sunset' },
-    { label: '↔ Equinox/solstice' },
-    { label: '↔ Moon phase' }
+    { label: '↔ Equinox/solstice', icon: 'pi pi-check', command: (): void => this.setEventType(EventType.EQUISOLSTICE) },
+    { label: '↔ Moon phase', icon: 'pi pi-circle', command: (): void => this.setEventType(EventType.MOON_PHASE) },
+    { label: '↔ Sunrise/sunset', icon: 'pi pi-circle', command: (): void => this.setEventType(EventType.RISE_SET) },
   ];
 
   darkCy: number;
@@ -205,7 +209,10 @@ export class AppComponent implements OnInit {
   sunriseLabelPath: string;
   sunsetLabelPath: string;
 
-  constructor(private confirmService: ConfirmationService) {
+  constructor(
+    private confirmService: ConfirmationService,
+    private messageService: MessageService
+  ) {
     let settings: any;
 
     try {
@@ -221,6 +228,7 @@ export class AppComponent implements OnInit {
     settings = settings ?? defaultSettings;
     Object.keys(defaultSettings).forEach(key => (this as any)[key] = settings[key] ?? (defaultSettings as any)[key]);
     this.updateObserver();
+    this.setEventType(settings.eventType);
 
     window.addEventListener('beforeunload', () => this.saveSettings());
     setInterval(() => this.saveSettings(), 5000);
@@ -233,7 +241,6 @@ export class AppComponent implements OnInit {
     this.globe = new Globe('globe-host');
     this.adjustLatitude();
     this.setNow();
-    this.trackTime = true;
     this.placeName = placeName;
 
     const docElem = document.documentElement;
@@ -610,5 +617,58 @@ export class AppComponent implements OnInit {
       message: 'Turn off "Track current time" so you can edit the time?',
       accept: () => this.trackTime = false
     });
+  }
+
+  private setEventType(eventType: EventType): void {
+    this.eventType = eventType;
+    this.menuItems = clone(this.menuItems);
+    this.menuItems.forEach((item, index) => item.icon = (index === eventType ? 'pi pi-check' : 'pi pi-circle'));
+  }
+
+  skipToEvent(previous = false): void {
+    if (this.trackTime) {
+      this.confirmService.confirm({
+        message: 'Turn off "Track current time" and change the clock time?',
+        accept: () => {
+          this.trackTime = false;
+          this.skipToEvent(previous);
+        }
+      });
+
+      return;
+    }
+
+    const jdu = julianDay(this.time);
+    let eventsToCheck: number[] = [];
+    const eventsFound: AstroEvent[] = [];
+
+    switch (this.eventType) {
+      case EventType.EQUISOLSTICE:
+        eventsToCheck = [SPRING_EQUINOX, SUMMER_SOLSTICE, FALL_EQUINOX, WINTER_SOLSTICE];
+        break;
+      case EventType.MOON_PHASE:
+        eventsToCheck = [NEW_MOON, FIRST_QUARTER, FULL_MOON, LAST_QUARTER];
+        break;
+      case EventType.RISE_SET:
+        eventsToCheck = [RISE_EVENT, SET_EVENT];
+        break;
+    }
+
+    for (const eventType of eventsToCheck) {
+      const evt = this.eventFinder.findEvent(SUN, eventType, jdu, this.observer, undefined, undefined, previous);
+
+      if (evt)
+        eventsFound.push(evt);
+    }
+
+    eventsFound.sort((a, b) => previous ? b.ut - a.ut : a.ut - b.ut);
+
+    if (eventsFound.length > 0) {
+      const evt = eventsFound[0];
+      const eventText = toMixedCase(evt.eventText).replace('Rise', 'Sunrise').replace('Set', 'Sunset');
+
+      this.time = evt.eventTime.utcMillis;
+      this.messageService.add({ severity: 'info', summary:'Event', detail: eventText });
+    }
   }
 }

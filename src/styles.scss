@@ -71,3 +71,11 @@ body {
 .p-dialog-content {
   max-width: 95vw;
 }
+
+span.p-menuitem-text {
+  white-space: nowrap;
+}
+
+.pi.pi-circle {
+  opacity: 0;
+}

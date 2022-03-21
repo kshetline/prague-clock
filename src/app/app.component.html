@@ -1,10 +1,11 @@
+<p-toast position="center"></p-toast>
 <p-confirmDialog header="Change time"></p-confirmDialog>
-<div class="controls" [class.short]="lastHeight <= 420 && lastHeight > 366" [class.extra-short]="lastHeight <= 366">
+<div class="controls" [class.short]="lastHeight <= 420 && lastHeight > 380" [class.extra-short]="lastHeight <= 380">
   <div class="place-name">{{placeName}}</div>
   <p-menu #menu [popup]="true" [model]="menuItems" appendTo="body"></p-menu>
   <i class="pi pi-bars" (click)="menu.toggle($event)"></i>
   <div class="time-row">
-    <i class="pi pi-caret-left"></i>
+    <i class="pi pi-caret-left" (click)="skipToEvent(true)"></i>
     <tbw-time-editor
       max="2399-12-31"
       min="1400-01-01"
@@ -16,7 +17,7 @@
       [viewOnly]="trackTime"
       [timezone]="zone"
       [(ngModel)]="time"></tbw-time-editor>
-    <i class="pi pi-caret-right"></i>
+    <i class="pi pi-caret-right" (click)="skipToEvent()"></i>
   </div>
   <div class="button-row">
     <p-checkbox [(ngModel)]="isoFormat" [binary]="true" label="ISO input format"></p-checkbox>
