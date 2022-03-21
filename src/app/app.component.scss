@@ -17,13 +17,42 @@
   flex-direction: column;
   font: 14px sans-serif;
   grid-area: 1 / 2;
-  min-width: 340px;
-  padding: 1em;
+  min-height: 400px;
+  min-width: 400px;
+  padding: 1em 0.5em;
+  position: relative;
   gap: 4px;
+
+  &.short {
+    margin: -20px;
+    transform: scale(0.9);
+  }
+
+  &.extra-short {
+    margin: -40px;
+    transform: scale(0.8);
+  }
 
   .place-name {
     font-weight: bold;
+    margin: 0 2em;
     padding-bottom: 0.5em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  i.pi-caret-left, i.pi-caret-right {
+    cursor: pointer;
+    font-size: 1.75em;
+    padding: 0.125em;
+  }
+
+  i.pi-bars {
+    cursor: pointer;
+    padding: 0.5em;
+    position: absolute;
+    right: 0;
+    top: 0;
   }
 
   ::ng-deep .p-checkbox-label {
@@ -46,26 +75,26 @@
 svg {
   align-self: start;
   grid-area: 1 / 1;
-  height: calc(max(min(calc(100vw - 356px), var(--mfh)) - 16px, 320px));
+  height: calc(max(min(calc(100vw - 400px), var(--mfh)) - 16px, 320px));
   min-height: 320px;
   min-width: 320px;
   margin: 0;
   user-select: none;
-  width: calc(max(min(calc(100vw - 356px), var(--mfh)) - 16px, 320px));
+  width: calc(max(min(calc(100vw - 400px), var(--mfh)) - 16px, 320px));
 }
 
-@media screen and (max-height: 410px),
+@media screen and (max-height: 420px),
        screen and (orientation:portrait) and (max-height: 1000px)
 {
   .controls {
-    margin: -20px -16px;
+    margin: -20px;
     transform: scale(0.9);
   }
 }
 
 @media screen and (max-height: 366px) {
   .controls {
-    margin: -38px -34px;
+    margin: -40px;
     transform: scale(0.8);
   }
 }
@@ -93,6 +122,13 @@ svg {
   display: flex;
   flex-direction: row;
   gap: 12px;
+}
+
+.time-row {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
 }
 
 .graphics-credit {

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MenuItem } from 'primeng/api';
 import { abs, atan2_deg, cos_deg, floor, max, mod, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
-import { clone, isChromeOS, isEqual, isSafari } from '@tubular/util';
+import { clone, getCssValue, isChromeOS, isEqual, isSafari } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import { AstroEvent, EventFinder, MOON, SET_EVENT, SkyObserver, SolarSystem, SUN } from '@tubular/astronomy';
 import ttime, { DateTime, utToTdt } from '@tubular/time';
@@ -159,7 +159,6 @@ export class AppComponent implements OnInit {
   private eventFinder = new EventFinder();
   private globe: Globe
   private initDone = false;
-  private lastHeight = -1;
   private lastSavedSettings: any = null;
   private _latitude = 50.0870;
   private _longitude = 14.4185;
@@ -171,6 +170,12 @@ export class AppComponent implements OnInit {
   private timeCheck: any;
   private _trackTime = false;
   private _zone = 'Europe/Prague';
+
+  menuItems: MenuItem[] = [
+    { label: '↔ Sunrise/sunset' },
+    { label: '↔ Equinox/solstice' },
+    { label: '↔ Moon phase' }
+  ];
 
   darkCy: number;
   darkR: number;
@@ -187,6 +192,7 @@ export class AppComponent implements OnInit {
   hourWedges: string[] = [];
   innerSunriseAngle: number = null;
   isoFormat = false;
+  lastHeight = -1;
   moonAngle = 0;
   outerRingAngle = 0;
   outerSunriseAngle: number = null;
@@ -234,20 +240,19 @@ export class AppComponent implements OnInit {
     const doResize = (): void => {
       setTimeout(() => {
         const height = window.innerHeight;
-        const disallowScroll = docElem.style.overflow === 'hidden';
+        const disallowScroll = getCssValue(docElem, 'overflow') === 'hidden';
 
         docElem.style.setProperty('--mfh', height + 'px');
         docElem.style.setProperty('--mvh', (height * 0.01) + 'px');
 
+        if (disallowScroll && (docElem.scrollTop !== 0 || docElem.scrollLeft !== 0)) {
+          docElem.scrollTo(0, 0);
+          setTimeout(doResize, 50);
+        }
+
         if (this.lastHeight !== height) {
           this.lastHeight = height;
-
-          if (disallowScroll && (docElem.scrollTop !== 0 || docElem.scrollLeft !== 0)) {
-            docElem.scrollTo(0, 0);
-            setTimeout(doResize, 50);
-          }
-          else
-            this.updateGlobe();
+          this.updateGlobe();
         }
       });
     };

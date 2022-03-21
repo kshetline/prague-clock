@@ -1,17 +1,23 @@
 <p-confirmDialog header="Change time"></p-confirmDialog>
-<div class="controls">
+<div class="controls" [class.short]="lastHeight <= 420 && lastHeight > 366" [class.extra-short]="lastHeight <= 366">
   <div class="place-name">{{placeName}}</div>
-  <tbw-time-editor
-    max="2399-12-31"
-    min="1400-01-01"
-    wideSpinner
-    (click)="checkIfTimeIsEditable()"
-    pTooltip='Uncheck on "Track current time" to modify the time'
-    [tooltipDisabled]="!trackTime"
-    [options]="isoFormat ? ISO_OPTS : LOCAL_OPTS"
-    [viewOnly]="trackTime"
-    [timezone]="zone"
-    [(ngModel)]="time"></tbw-time-editor>
+  <p-menu #menu [popup]="true" [model]="menuItems" appendTo="body"></p-menu>
+  <i class="pi pi-bars" (click)="menu.toggle($event)"></i>
+  <div class="time-row">
+    <i class="pi pi-caret-left"></i>
+    <tbw-time-editor
+      max="2399-12-31"
+      min="1400-01-01"
+      wideSpinner
+      (click)="checkIfTimeIsEditable()"
+      pTooltip='Uncheck on "Track current time" to modify the time'
+      [tooltipDisabled]="!trackTime"
+      [options]="isoFormat ? ISO_OPTS : LOCAL_OPTS"
+      [viewOnly]="trackTime"
+      [timezone]="zone"
+      [(ngModel)]="time"></tbw-time-editor>
+    <i class="pi pi-caret-right"></i>
+  </div>
   <div class="button-row">
     <p-checkbox [(ngModel)]="isoFormat" [binary]="true" label="ISO input format"></p-checkbox>
     <p-checkbox [(ngModel)]="disableDst" [binary]="true" label="Disable DST on clock" (onChange)="updateTime(true)"></p-checkbox>
