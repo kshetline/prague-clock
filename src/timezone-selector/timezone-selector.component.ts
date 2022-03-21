@@ -39,15 +39,8 @@ interface AtlasResults {
   matches: AtlasLocation[];
 }
 
-export interface RecentLocation {
-  lastTimeUsed: number;
-  latitude: number;
-  longitude: number;
-  placeName: string;
-  zone: string;
-}
-
 export interface TzsLocation {
+  lastTimeUsed?: number;
   latitude: number;
   longitude: number;
   name: string;
@@ -141,7 +134,7 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
   zones: string[] = [];
 
   private _offset: string;
-  private _recents: RecentLocation[] = [];
+  private _recents: TzsLocation[] = [];
   private _region: string = this.regions[0];
   private _searchText = '';
   private _selectByOffset = true;
@@ -172,14 +165,18 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
   recentItems: MenuItem[] = [];
   searching = false;
 
-  get recents(): RecentLocation[] { return this._recents; }
-  @Input() set recents(value: RecentLocation[]) {
+  get recents(): TzsLocation[] { return this._recents; }
+  @Input() set recents(value: TzsLocation[]) {
     if (this._recents !== value) {
       this._recents = value;
       this.recentItems = [];
 
       for (let i = 0; i < value.length; ++i)
-        this.recentItems.push({ label: value[i].placeName, command: () => this.recentLocationSelected(i) });
+        this.recentItems.push({ label: value[i].name, command: () => this.recentLocationSelected(i) });
+
+      if (value.length > 1)
+        this.recentItems.push({ label: 'Clear recent locations', style: { 'font-style': 'italic' },
+                                command: () => this.clearRecents.emit() });
     }
   }
 
@@ -187,6 +184,7 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
   @Output() focus: EventEmitter<any> = new EventEmitter();
   // eslint-disable-next-line @angular-eslint/no-output-native
   @Output() blur: EventEmitter<any> = new EventEmitter();
+  @Output() clearRecents: EventEmitter<void> = new EventEmitter();
   @Output() location: EventEmitter<TzsLocation> = new EventEmitter();
 
   @ViewChild('autoComplete', { static: true }) autoComplete: AutoComplete;
@@ -633,7 +631,7 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
     this.location.emit({
       latitude: loc.latitude,
       longitude: loc.longitude,
-      name: loc.placeName,
+      name: loc.name,
       zone: loc.zone
     });
   }
