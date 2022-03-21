@@ -42,6 +42,7 @@ const defaultSettings = {
   }] as TzsLocation[],
   suppressOsKeyboard: false,
   trackTime: true,
+  translucentEcliptic: false,
   zone: 'Europe/Prague'
 };
 
@@ -175,14 +176,22 @@ export class AppComponent implements OnInit {
   private _time = 0;
   private timeCheck: any;
   private _trackTime = false;
+  private _translucentEcliptic = false;
   private _zone = 'Europe/Prague';
 
   menuItems: MenuItem[] = [
-    { label: '↔ Equinox/solstice', icon: 'pi pi-check', command: (): void => this.setEventType(EventType.EQUISOLSTICE) },
-    { label: '↔ Moon phase', icon: 'pi pi-circle', command: (): void => this.setEventType(EventType.MOON_PHASE) },
-    { label: '↔ Sunrise/sunset', icon: 'pi pi-circle', command: (): void => this.setEventType(EventType.RISE_SET) },
+    { label: '↔ Equinox/solstice', icon: 'pi pi-check',
+      command: (): void => this.setEventType(EventType.EQUISOLSTICE) },
+    { label: '↔ Moon phase', icon: 'pi pi-circle',
+      command: (): void => this.setEventType(EventType.MOON_PHASE) },
+    { label: '↔ Sunrise/sunset', icon: 'pi pi-circle',
+      command: (): void => this.setEventType(EventType.RISE_SET) },
     { separator : true },
-    { label: 'About the clock', url: 'https://en.wikipedia.org/wiki/Prague_astronomical_clock' }
+    { label: 'Translucent ecliptic', icon: 'pi pi-circle', id: 'tec',
+      command: (): boolean => this.translucentEcliptic = !this.translucentEcliptic },
+    { label: 'Code on GitHub', icon: 'pi pi-github', url: 'https://github.com/kshetline/prague-clock' },
+    { label: 'About the clock', icon: 'pi pi-info-circle',
+      url: 'https://en.wikipedia.org/wiki/Prague_astronomical_clock' }
   ];
 
   darkCy: number;
@@ -333,6 +342,14 @@ export class AppComponent implements OnInit {
 
   private menuItemById(id: string): MenuItem {
     return this.menuItems.find(item => item.id === id);
+  }
+
+  get translucentEcliptic(): boolean { return this._translucentEcliptic; }
+  set translucentEcliptic(value: boolean) {
+    if (this._translucentEcliptic !== value) {
+      this._translucentEcliptic = value;
+      this.updateMenu();
+    }
   }
 
   get suppressOsKeyboard(): boolean { return this._suppressOsKeyboard; }
@@ -650,7 +667,13 @@ export class AppComponent implements OnInit {
 
   private updateMenu(): void {
     this.menuItems = clone(this.menuItems);
-    this.menuItems.forEach((item, index) => item.icon = (index === this.eventType ? 'pi pi-check' : 'pi pi-circle'));
+    this.menuItems.forEach((item, index) => {
+      if (index < 3)
+        item.icon = (index === this.eventType ? 'pi pi-check' : 'pi pi-circle');
+    });
+
+    if (this.menuItemById('tec'))
+      this.menuItemById('tec').icon = (this.translucentEcliptic ? 'pi pi-check' : 'pi pi-circle');
 
     if (this.menuItemById('sok'))
       this.menuItemById('sok').icon = (this.suppressOsKeyboard ? 'pi pi-check' : 'pi pi-circle');

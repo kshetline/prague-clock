@@ -160,11 +160,11 @@ svg {
 .timeText {
   font-size: 50px;
   text-anchor: middle;
-  fill: #ffe696;
+  fill: #FFE696;
 }
 
 .baseCircle {
-  stroke: #ffe696;
+  stroke: #FFE696;
   stroke-width: 3px;
   fill: none;
 }
@@ -173,14 +173,19 @@ svg {
   fill: #4C8388;
 }
 
+.eclipticWheel {
+  opacity: 1;
+  transition: opacity 1s ease-in-out;
+}
+
 .eclipticDial {
-  stroke: #ffe696;
+  stroke: #FFE696;
   stroke-width: 3px;
   fill: none;
 }
 
 .eclipticCircle {
-  stroke: #ffe696;
+  stroke: #FFE696;
   stroke-width: 4px;
   fill: none;
 }
@@ -188,7 +193,7 @@ svg {
 .eclipticSymbol {
   font-size: 85px;
   text-anchor: middle;
-  fill: #ffe696;
+  fill: #FFE696;
 }
 
 .signsArea {
@@ -203,11 +208,11 @@ svg {
 }
 
 .sunBeamLargeSymbol {
-  fill: #ffe696;
+  fill: #FFE696;
 }
 
 .sunBeamSmallSymbol {
-  fill: #ffe696;
+  fill: #FFE696;
 }
 
 .leverRafieSymbol {
@@ -216,7 +221,7 @@ svg {
 }
 
 .leverRafieGolden {
-  stroke: #ffe696;
+  stroke: #FFE696;
   stroke-width: 5px;
 }
 
@@ -227,7 +232,7 @@ svg {
 
 .hourAngleStarSymbol {
   stroke: none;
-  fill: #ffe696;
+  fill: #FFE696;
 }
 
 .moonDark {
@@ -262,11 +267,11 @@ svg {
 
 .outerRingBackground {
   stroke: none;
-  fill: #0e3d64;
+  fill: #0E3D64;
 }
 
 .outerRingBorder {
-  stroke: #ffe696;
+  stroke: #FFE696;
   stroke-width: 4px;
   fill: none;
 }
@@ -274,7 +279,7 @@ svg {
 .outerRingText {
   font-size: 60px;
   text-anchor: middle;
-  fill: #ffe696;
+  fill: #FFE696;
 }
 
 .eventText {
@@ -292,7 +297,7 @@ svg {
 }
 
 .unequalHourBorder {
-  stroke: #ffe696;
+  stroke: #FFE696;
   stroke-width: 2px;
   fill: none;
 }
@@ -304,7 +309,7 @@ svg {
 }
 
 .unequalHour6 {
-  fill: #0081ae;
+  fill: #1085AE;
 }
 
 .unequalHour5 {
@@ -316,21 +321,21 @@ svg {
 }
 
 .unequalHour3 {
-  fill: #4799ae;
+  fill: #4799AE;
 }
 
 .unequalHour2 {
-  fill: #8ca8a7;
+  fill: #8CA8A7;
 }
 
 .unequalHour1 {
-  fill: #b0bab1;
+  fill: #B0BAB1;
 }
 
 .horizonArea {
-  fill: #d3964d;
+  fill: #D3964D;
 }
 
 .darkArea {
-  fill: #05304f;
+  fill: #05304F;
 }

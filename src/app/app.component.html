@@ -332,7 +332,7 @@
           </g>
         </g>
       </g>
-      <g filter="url(#filterEcliptic)">
+      <g filter="url(#filterEcliptic)" class="eclipticWheel" [style.opacity]="translucentEcliptic ? '0.33' : '1'">
         <g filter="url(#filterRelief)">
           <g id="ecliptic_positive_levers" [attr.transform]="rotate(siderealAngle * rotateSign)">
             <use xlink:href="#leverSymbol" class="leverSymbol"/>
