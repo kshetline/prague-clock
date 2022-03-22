@@ -212,6 +212,7 @@ export class AppComponent implements OnInit {
   innerSunriseAngle: number = null;
   isoFormat = false;
   lastHeight = -1;
+  maxAltitude = '';
   moonAngle = 0;
   outerRingAngle = 0;
   outerSunriseAngle: number = null;
@@ -516,6 +517,13 @@ export class AppComponent implements OnInit {
       hourLabels.innerHTML = html;
     }
 
+    const maxAltitude = 90 - abs(this._latitude);
+
+    if (maxAltitude < INCLINATION)
+      this.maxAltitude = ''; // this.getAltitudeCircle(maxAltitude, true).d;
+    else
+      this.maxAltitude = '';
+
     this.updateTime(true);
     this.updateGlobe();
   }
@@ -697,6 +705,7 @@ export class AppComponent implements OnInit {
     const jdu = julianDay(this.time);
     let eventsToCheck: number[] = [];
     const eventsFound: AstroEvent[] = [];
+    let altitude: number;
 
     switch (this.eventType) {
       case EventType.EQUISOLSTICE:
@@ -707,11 +716,12 @@ export class AppComponent implements OnInit {
         break;
       case EventType.RISE_SET:
         eventsToCheck = [RISE_EVENT, SET_EVENT];
+        altitude = 0;
         break;
     }
 
     for (const eventType of eventsToCheck) {
-      const evt = this.eventFinder.findEvent(SUN, eventType, jdu, this.observer, undefined, undefined, previous);
+      const evt = this.eventFinder.findEvent(SUN, eventType, jdu, this.observer, undefined, undefined, previous, altitude);
 
       if (evt)
         eventsFound.push(evt);
