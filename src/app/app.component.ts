@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
-import { abs, atan2_deg, cos_deg, floor, max, mod, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
+import { abs, atan2_deg, atan_deg, cos_deg, floor, max, mod, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
 import { clone, getCssValue, isChromeOS, isEqual, isLikelyMobile, isSafari, toMixedCase } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
-import { AstroEvent, EventFinder, FALL_EQUINOX, FIRST_QUARTER, FULL_MOON, LAST_QUARTER, MOON, NEW_MOON, RISE_EVENT, SET_EVENT, SkyObserver, SolarSystem, SPRING_EQUINOX, SUMMER_SOLSTICE, SUN, WINTER_SOLSTICE } from '@tubular/astronomy';
+import { AstroEvent, EventFinder, FALL_EQUINOX, FIRST_QUARTER, FULL_MOON, LAST_QUARTER, MOON, NEW_MOON, RISE_EVENT, SET_EVENT, SkyObserver, SolarSystem, SPRING_EQUINOX, SUMMER_SOLSTICE, SUN, TRANSIT_EVENT, WINTER_SOLSTICE } from '@tubular/astronomy';
 import ttime, { DateTime, utToTdt } from '@tubular/time';
 import julianDay = ttime.julianDay;
 import { TzsLocation } from '../timezone-selector/timezone-selector.component';
@@ -186,7 +186,7 @@ export class AppComponent implements OnInit {
       command: (): void => this.setEventType(EventType.EQUISOLSTICE) },
     { label: '↔ Moon phase', icon: 'pi pi-circle',
       command: (): void => this.setEventType(EventType.MOON_PHASE) },
-    { label: '↔ Sunrise/sunset', icon: 'pi pi-circle',
+    { label: '↔ Sunrise/transit/sunset', icon: 'pi pi-circle',
       command: (): void => this.setEventType(EventType.RISE_SET) },
     { separator : true },
     { label: 'Translucent ecliptic', icon: 'pi pi-circle', id: 'tec',
@@ -212,7 +212,7 @@ export class AppComponent implements OnInit {
   innerSunriseAngle: number = null;
   isoFormat = false;
   lastHeight = -1;
-  maxAltitude = '';
+  midnightSunR = 0;
   moonAngle = 0;
   outerRingAngle = 0;
   outerSunriseAngle: number = null;
@@ -475,9 +475,19 @@ export class AppComponent implements OnInit {
     this.placeName = '\xA0';
     ({ cy: this.horizonCy, d: this.horizonPath, r: this.horizonR } = this.getAltitudeCircle(0, true));
     ({ cy: this.darkCy, r: this.darkR } = this.getAltitudeCircle(-18));
-    this.createDayAreaMask();
 
-    if (this.outerSunriseAngle != null && abs(this._latitude) <= 66) {
+    const excessLatitude = abs(this._latitude) - 90 + INCLINATION;
+
+    if (excessLatitude <= 0) {
+      this.midnightSunR = 0;
+      this.createDayAreaMask(CLOCK_RADIUS);
+    }
+    else {
+      this.midnightSunR = this.horizonR + this.horizonCy - 1E-4;
+      this.createDayAreaMask(this.midnightSunR);
+    }
+
+    if (this.outerSunriseAngle != null && abs(this._latitude) <= 86) {
       for (let h = 1; h <= 11; ++h) {
         this.hourArcs[h] = this.getHourArc(h);
         this.hourWedges[h] = this.getHourArc(h, true);
@@ -517,13 +527,6 @@ export class AppComponent implements OnInit {
       hourLabels.innerHTML = html;
     }
 
-    const maxAltitude = 90 - abs(this._latitude);
-
-    if (maxAltitude < INCLINATION)
-      this.maxAltitude = ''; // this.getAltitudeCircle(maxAltitude, true).d;
-    else
-      this.maxAltitude = '';
-
     this.updateTime(true);
     this.updateGlobe();
   }
@@ -532,12 +535,19 @@ export class AppComponent implements OnInit {
     this.globe.orient(this._longitude, this.latitude).finally();
   }
 
-  private createDayAreaMask(): void {
-    const outerPoints = circleIntersections(0, 0, CLOCK_RADIUS, 0, this.horizonCy, this.horizonR);
-    const equatorPoints = circleIntersections(0, 0, EQUATOR_RADIUS, 0, this.horizonCy, this.horizonR);
-    const innerPoints = circleIntersections(0, 0, TROPIC_RADIUS, 0, this.horizonCy, this.horizonR);
+  private createDayAreaMask(outerR: number): void {
+    let inner = TROPIC_RADIUS;
 
-    if (!outerPoints || outerPoints.length < 2 || !innerPoints || innerPoints.length < 2 ||  abs(this._latitude) > 66) {
+    if (outerR !== CLOCK_RADIUS) {
+      const deltaLat = 90 - 2 * atan_deg(outerR / CLOCK_RADIUS);
+      inner = TROPIC_RADIUS * tan_deg((90 + deltaLat) / 2);
+    }
+
+    const outerPoints = circleIntersections(0, 0, outerR, 0, this.horizonCy, this.horizonR);
+    const equatorPoints = circleIntersections(0, 0, EQUATOR_RADIUS, 0, this.horizonCy, this.horizonR);
+    const innerPoints = circleIntersections(0, 0, inner, 0, this.horizonCy, this.horizonR);
+
+    if (!outerPoints || outerPoints.length < 2 || !innerPoints || innerPoints.length < 2 || abs(this._latitude) > 87) {
       this.dayAreaMask = '';
       this.outerSunriseAngle = null;
       return;
@@ -548,16 +558,21 @@ export class AppComponent implements OnInit {
     const r2 = RO(this.horizonR);
     const x2 = innerPoints[0].x;
     const y2 = innerPoints[0].y;
-    const r3 = RO(TROPIC_RADIUS);
+    const r3 = RO(inner);
     const x3 = RO(innerPoints[1].x);
     const y3 = RO(innerPoints[1].y);
     const r4 = RO(this.horizonR);
     const x4 = RO(outerPoints[1].x);
     const y4 = RO(outerPoints[1].y);
-    const r5 = RO(CLOCK_RADIUS);
+    const r5 = RO(outerR);
 
-    this.dayAreaMask = `M${RO(x1)} ${RO(y1)} A${r2} ${r2} 0 0 0 ${RO(x2)} ${RO(y2)}A${r3} ${r3} 0 0 0 ${x3} ${y3} ` +
-                       `A${r4} ${r4} 0 0 0 ${x4} ${y4}A${r5} ${r5} 0 1 1 ${x1} ${y1}`;
+    this.dayAreaMask = `M${RO(x1)} ${RO(y1)} A${r2} ${r2} 0 0 0 ${RO(x2)} ${RO(y2)}`;
+
+    if (outerR === CLOCK_RADIUS)
+      this.dayAreaMask += `A${r3} ${r3} 0 0 0 ${x3} ${y3} `;
+
+    this.dayAreaMask += `A${r4} ${r4} 0 0 0 ${x4} ${y4}A${r5} ${r5} 0 1 1 ${RO(x1)} ${RO(y1)}`;
+
     this.outerSunriseAngle = atan2_deg(y1, x1);
     this.innerSunriseAngle = atan2_deg(y2, x2);
     this.equatorSunriseAngle = atan2_deg(equatorPoints[0].y, equatorPoints[0].x);
@@ -628,19 +643,28 @@ export class AppComponent implements OnInit {
     if (this.outerSunriseAngle == null)
       return '';
 
+    let outer = CLOCK_RADIUS;
+    let inner = TROPIC_RADIUS;
+
+    if (this.midnightSunR) {
+      outer = this.midnightSunR;
+      const deltaLat = 90 - 2 * atan_deg(this.midnightSunR / CLOCK_RADIUS);
+      inner = TROPIC_RADIUS * tan_deg((90 + deltaLat) / 2);
+    }
+
     const h = (this.southern ? hour : 12 - hour);
     const outerSweep = 180 + this.outerSunriseAngle * 2;
     const outerAngle = this.outerSunriseAngle - outerSweep / 12 * h;
-    const x1 = CLOCK_RADIUS * cos_deg(outerAngle);
-    const y1 = CLOCK_RADIUS * sin_deg(outerAngle);
+    const x1 = outer * cos_deg(outerAngle);
+    const y1 = outer * sin_deg(outerAngle);
     const equatorSweep = 180 + this.equatorSunriseAngle * 2;
     const equatorAngle = this.equatorSunriseAngle - equatorSweep / 12 * h;
     const x2 = EQUATOR_RADIUS * cos_deg(equatorAngle);
     const y2 = EQUATOR_RADIUS * sin_deg(equatorAngle);
     const innerSweep = 180 + this.innerSunriseAngle * 2;
     const innerAngle = this.innerSunriseAngle - innerSweep / 12 * h;
-    const x3 = TROPIC_RADIUS * cos_deg(innerAngle);
-    const y3 = TROPIC_RADIUS * sin_deg(innerAngle);
+    const x3 = inner * cos_deg(innerAngle);
+    const y3 = inner * sin_deg(innerAngle);
     const r = findCircleRadius(x1, y1, x2, y2, x3, y3);
 
     if (!asWedge && this.southern)
@@ -653,7 +677,7 @@ export class AppComponent implements OnInit {
 
     if (asWedge)
       path += 'L' + this.getHourArc(hour + sign(hour - 6), false, !this.southern).substring(1) +
-        `A ${CLOCK_RADIUS} ${CLOCK_RADIUS} 0 0 ${h < 6 ? 0 : 1} ${RO(x1)} ${RO(y1)} Z`;
+        `A ${RO(outer)} ${RO(outer)} 0 0 ${h < 6 ? 0 : 1} ${RO(x1)} ${RO(y1)} Z`;
 
     return path;
   }
@@ -715,7 +739,7 @@ export class AppComponent implements OnInit {
         eventsToCheck = [NEW_MOON, FIRST_QUARTER, FULL_MOON, LAST_QUARTER];
         break;
       case EventType.RISE_SET:
-        eventsToCheck = [RISE_EVENT, SET_EVENT];
+        eventsToCheck = [RISE_EVENT, TRANSIT_EVENT, SET_EVENT];
         altitude = 0;
         break;
     }
