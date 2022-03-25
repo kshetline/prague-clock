@@ -161,8 +161,7 @@
           </textPath>
         </text>
         <text>
-          <textPath xlink:href="#dawnPath" [attr.startOffset]="southern ? 210 : dawnPathLength - 205"
-              side="right" class="eventText">
+          <textPath xlink:href="#dawnPath" [attr.startOffset]="dawnTextOffset" class="eventText">
             <tspan dy="1">ɜɝɞɟɠɡ</tspan><!-- AURORA -->
           </textPath>
         </text>
@@ -172,7 +171,7 @@
           </textPath>
         </text>
         <text>
-          <textPath xlink:href="#duskPath" [attr.startOffset]="southern ? dawnPathLength - 205 : 205" class="eventText">
+          <textPath xlink:href="#duskPath" [attr.startOffset]="duskTextOffset" class="eventText">
             <tspan dy="1">ɢɣɤɥɦɧɨɩɪɫɬ</tspan><!-- CREPUSCULUM -->
           </textPath>
         </text>

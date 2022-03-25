@@ -194,9 +194,10 @@ export class AppComponent implements OnInit {
   darkR: number;
   dayAreaMask: string;
   dawnLabelPath: string;
-  dawnPathLength: number;
+  dawnTextOffset: number;
   disableDst = true;
   duskLabelPath: string;
+  duskTextOffset: number;
   equatorSunriseAngle: number = null;
   handAngle = 0;
   horizonCy: number;
@@ -496,10 +497,13 @@ export class AppComponent implements OnInit {
       const r = (this.horizonR + this.darkR) / 2;
       const leftArc = `M 0 ${bottom} A ${r} ${r} 0 0 1 0 ${top}`;
       const rightArc = `M 0 ${top} A ${r} ${r} 0 0 1 0 ${bottom}`;
+      const pathLength = r * PI;
+      const labelShift = 250 - cos_deg(this._latitude) * 70;
 
       this.dawnLabelPath = this.southern ? rightArc : leftArc;
+      this.dawnTextOffset = this.southern ? labelShift : pathLength - labelShift;
       this.duskLabelPath = this.southern ? leftArc : rightArc;
-      this.dawnPathLength = r * PI;
+      this.duskTextOffset = this.southern ? pathLength - labelShift : labelShift;
     }
     else {
       this.hourArcs = [];
