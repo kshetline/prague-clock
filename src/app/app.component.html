@@ -150,6 +150,33 @@
         <circle id="darkArea" [attr.r]="darkR" cx="0" [attr.cy]="darkCy" class="darkArea"/>
       </g>
       <g id="unequalHourLabels"/>
+      <g id="eventLabels">
+        <path id="dawnPath" [attr.d]="dawnLabelPath" class="textPath"/>
+        <path id="duskPath" [attr.d]="duskLabelPath" class="textPath"/>
+        <path id="sunrisePath" [attr.d]="sunriseLabelPath" class="textPath"/>
+        <path id="sunsetPath" [attr.d]="sunsetLabelPath" class="textPath"/>
+        <text>
+          <textPath xlink:href="#sunrisePath" [attr.startOffset]="southern ? '40%' : '54%'" class="eventText">
+            <tspan>ɐɑɒɓɔ</tspan><!-- ORTUS -->
+          </textPath>
+        </text>
+        <text>
+          <textPath xlink:href="#dawnPath" [attr.startOffset]="southern ? 210 : dawnPathLength - 205"
+              side="right" class="eventText">
+            <tspan dy="1">ɜɝɞɟɠɡ</tspan><!-- AURORA -->
+          </textPath>
+        </text>
+        <text>
+          <textPath xlink:href="#sunsetPath" [attr.startOffset]="southern ? '59%' : '41%'" class="eventText">
+            <tspan>ɕɖɗɘəɚɛ</tspan><!-- OCCASUS -->
+          </textPath>
+        </text>
+        <text>
+          <textPath xlink:href="#duskPath" [attr.startOffset]="southern ? dawnPathLength - 205 : 205" class="eventText">
+            <tspan dy="1">ɢɣɤɥɦɧɨɩɪɫɬ</tspan><!-- CREPUSCULUM -->
+          </textPath>
+        </text>
+      </g>
       <g id="time">
         <path id="timeTextPath" d="M0.0 -221.0C122.0 -221.0 221.0 -122.0 221.0 0.0C221.0 122.0 122.0 221.0 0.0 221.0C-122.0 221.0 -221.0 122.0 -221.0 0.0C-221.0 -122.0 -122.0 -221.0 0.0 -221.0" class="textPath"/>
         <g *ngIf="!southern" filter="url(#filterRelief)">
@@ -225,32 +252,6 @@
       <g id="horizonBorder" mask="url(#baseArea)" filter="url(#filterRelief)">
         <circle *ngIf="midnightSunR" [attr.r]="midnightSunR" cx="0" cy="0" class="midnightSunCircle"/>
         <circle id="horizonBorder" [attr.r]="horizonR" cx="0" [attr.cy]="horizonCy" class="baseCircle"/>
-      </g>
-      <g id="eventLabels">
-        <path id="dawnPath" [attr.d]="dawnLabelPath" class="textPath"/>
-        <path id="duskPath" [attr.d]="duskLabelPath" class="textPath"/>
-        <path id="sunrisePath" [attr.d]="sunriseLabelPath" class="textPath"/>
-        <path id="sunsetPath" [attr.d]="sunsetLabelPath" class="textPath"/>
-        <text>
-          <textPath xlink:href="#sunrisePath" [attr.startOffset]="southern ? '46%' : '54%'" class="eventText">
-            <tspan>ɐɑɒɓɔ</tspan><!-- ORTUS -->
-          </textPath>
-        </text>
-        <text>
-          <textPath xlink:href="#dawnPath" [attr.startOffset]="southern ? '42%' : '58%'" class="eventText">
-            <tspan>ɜɝɞɟɠɡ</tspan><!-- AURORA -->
-          </textPath>
-        </text>
-        <text>
-          <textPath xlink:href="#sunsetPath" [attr.startOffset]="southern ? '59%' : '41%'" class="eventText">
-            <tspan>ɕɖɗɘəɚɛ</tspan><!-- OCCASUS -->
-          </textPath>
-        </text>
-        <text>
-          <textPath xlink:href="#duskPath" [attr.startOffset]="southern ? '58%' : '42%'" class="eventText">
-            <tspan>ɢɣɤɥɦɧɨɩɪɫɬ</tspan><!-- CREPUSCULUM -->
-          </textPath>
-        </text>
       </g>
       <g id="baseCircles" filter="url(#filterRelief)">
         <circle cx="0" cy="0" r="107.7" class="baseCircle innerCircle"/>

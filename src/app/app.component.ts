@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
-import { abs, atan2_deg, atan_deg, cos_deg, floor, max, mod, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
+import { abs, atan2_deg, atan_deg, cos_deg, floor, max, mod, PI, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
 import { clone, getCssValue, isChromeOS, isEqual, isLikelyMobile, isSafari, toMixedCase } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import { AstroEvent, EventFinder, FALL_EQUINOX, FIRST_QUARTER, FULL_MOON, LAST_QUARTER, MOON, NEW_MOON, RISE_EVENT, SET_EVENT, SkyObserver, SolarSystem, SPRING_EQUINOX, SUMMER_SOLSTICE, SUN, TRANSIT_EVENT, WINTER_SOLSTICE } from '@tubular/astronomy';
@@ -77,7 +77,7 @@ function circleIntersections(x1: number, y1: number, r1: number, x2: number, y2:
     return [];
 
   const a = (r1 ** 2 - r2 ** 2 + d ** 2) / 2 / d;
-  const h = sqrt(r1 ** 2 - a ** 2);
+  const h = sqrt(max(r1 ** 2 - a ** 2, 0));
   const x3 = x1 + a * (x2 - x1) / d;
   const y3 = y1 + a * (y2 - y1) / d;
 
@@ -104,10 +104,8 @@ function findCircleRadius(x1: number, y1: number, x2: number, y2: number, x3: nu
   const x31 = x3 - x1;
   const x21 = x2 - x1;
 
-  // x1^2 - x3^2
   const sx13 = x1 ** 2 - x3 ** 2;
 
-  // y1^2 - y3^2
   const sy13 = y1 ** 2 - y3 ** 2;
 
   const sx21 = x2 ** 2 - x1 ** 2;
@@ -134,10 +132,6 @@ function findCircleRadius(x1: number, y1: number, x2: number, y2: number, x3: nu
   const sqr_of_r = h * h + k * k - c;
 
   return sqrt(sqr_of_r);
-}
-
-function RO(n: number): string {
-  return n.toFixed(1).replace(/\.0$/, '');
 }
 
 @Component({
@@ -200,6 +194,7 @@ export class AppComponent implements OnInit {
   darkR: number;
   dayAreaMask: string;
   dawnLabelPath: string;
+  dawnPathLength: number;
   disableDst = true;
   duskLabelPath: string;
   equatorSunriseAngle: number = null;
@@ -478,7 +473,7 @@ export class AppComponent implements OnInit {
 
     const excessLatitude = abs(this._latitude) - 90 + INCLINATION;
 
-    if (excessLatitude <= 0) {
+    if (excessLatitude < 0) {
       this.midnightSunR = 0;
       this.createDayAreaMask(CLOCK_RADIUS);
     }
@@ -493,10 +488,18 @@ export class AppComponent implements OnInit {
         this.hourWedges[h] = this.getHourArc(h, true);
       }
 
-      this.dawnLabelPath = this.getHourArc(-0.5 - sin_deg(abs(this._latitude)) * 0.65);
-      this.duskLabelPath = this.getHourArc(12.5 + sin_deg(abs(this._latitude)) * 0.65, false, true);
       this.sunriseLabelPath = this.getHourArc(0.5);
       this.sunsetLabelPath = this.getHourArc(11.5, false, true);
+
+      const top = (this.horizonCy - this.horizonR + this.darkCy - this.darkR) / 2;
+      const bottom = (this.horizonCy + this.horizonR + this.darkCy + this.darkR) / 2;
+      const r = (this.horizonR + this.darkR) / 2;
+      const leftArc = `M 0 ${bottom} A ${r} ${r} 0 0 1 0 ${top}`;
+      const rightArc = `M 0 ${top} A ${r} ${r} 0 0 1 0 ${bottom}`;
+
+      this.dawnLabelPath = this.southern ? rightArc : leftArc;
+      this.duskLabelPath = this.southern ? leftArc : rightArc;
+      this.dawnPathLength = r * PI;
     }
     else {
       this.hourArcs = [];
@@ -518,8 +521,8 @@ export class AppComponent implements OnInit {
       let html = '';
 
       for (let h = 1; h <= 12; ++h, angle += step) {
-        const x = RO(cos_deg(angle) * LABEL_RADIUS + hAdj[h]);
-        const y = RO(sin_deg(angle) * LABEL_RADIUS + vAdj[h]);
+        const x = cos_deg(angle) * LABEL_RADIUS + hAdj[h];
+        const y = sin_deg(angle) * LABEL_RADIUS + vAdj[h];
 
         html += `<text x="${x}" y="${y}" class="unequalHourText">${this.southern ? 13 - h : h}</text>`;
       }
@@ -543,9 +546,15 @@ export class AppComponent implements OnInit {
       inner = TROPIC_RADIUS * tan_deg((90 + deltaLat) / 2);
     }
 
-    const outerPoints = circleIntersections(0, 0, outerR, 0, this.horizonCy, this.horizonR);
+    let outerPoints = circleIntersections(0, 0, outerR, 0, this.horizonCy, this.horizonR);
     const equatorPoints = circleIntersections(0, 0, EQUATOR_RADIUS, 0, this.horizonCy, this.horizonR);
-    const innerPoints = circleIntersections(0, 0, inner, 0, this.horizonCy, this.horizonR);
+    let innerPoints = circleIntersections(0, 0, inner, 0, this.horizonCy, this.horizonR);
+
+    if (!outerPoints || outerPoints.length < 2)
+      outerPoints = circleIntersections(0, 0, outerR - 1E-6, 0, this.horizonCy, this.horizonR);
+
+    if (!innerPoints || innerPoints.length < 2)
+      innerPoints = circleIntersections(0, 0, inner + 1E-6, 0, this.horizonCy, this.horizonR);
 
     if (!outerPoints || outerPoints.length < 2 || !innerPoints || innerPoints.length < 2 || abs(this._latitude) > 87) {
       this.dayAreaMask = '';
@@ -555,23 +564,23 @@ export class AppComponent implements OnInit {
 
     const x1 = outerPoints[0].x;
     const y1 = outerPoints[0].y;
-    const r2 = RO(this.horizonR);
+    const r2 = this.horizonR;
     const x2 = innerPoints[0].x;
     const y2 = innerPoints[0].y;
-    const r3 = RO(inner);
-    const x3 = RO(innerPoints[1].x);
-    const y3 = RO(innerPoints[1].y);
-    const r4 = RO(this.horizonR);
-    const x4 = RO(outerPoints[1].x);
-    const y4 = RO(outerPoints[1].y);
-    const r5 = RO(outerR);
+    const r3 = inner;
+    const x3 = innerPoints[1].x;
+    const y3 = innerPoints[1].y;
+    const r4 = this.horizonR;
+    const x4 = outerPoints[1].x;
+    const y4 = outerPoints[1].y;
+    const r5 = outerR;
 
-    this.dayAreaMask = `M${RO(x1)} ${RO(y1)} A${r2} ${r2} 0 0 0 ${RO(x2)} ${RO(y2)}`;
+    this.dayAreaMask = `M${x1} ${y1} A${r2} ${r2} 0 0 0 ${x2} ${y2}`;
 
     if (outerR === CLOCK_RADIUS)
       this.dayAreaMask += `A${r3} ${r3} 0 0 0 ${x3} ${y3} `;
 
-    this.dayAreaMask += `A${r4} ${r4} 0 0 0 ${x4} ${y4}A${r5} ${r5} 0 1 1 ${RO(x1)} ${RO(y1)}`;
+    this.dayAreaMask += `A${r4} ${r4} 0 0 0 ${x4} ${y4}A${r5} ${r5} 0 1 1 ${x1} ${y1}`;
 
     this.outerSunriseAngle = atan2_deg(y1, x1);
     this.innerSunriseAngle = atan2_deg(y2, x2);
@@ -634,7 +643,7 @@ export class AppComponent implements OnInit {
 
     return {
       cy,
-      d: doPath && `M 0 ${RO(cy)} m ${RO(-r)} 0 a ${RO(r)},${RO(r)} 0 1,1 ${RO(r * 2)},0 a ${RO(r)},${RO(r)} 0 1,1 ${RO(-r * 2)},0`,
+      d: doPath && `M 0 ${cy} m ${-r} 0 a ${r},${r} 0 1,1 ${r * 2},0 a ${r},${r} 0 1,1 ${-r * 2},0`,
       r
     };
   }
@@ -671,13 +680,13 @@ export class AppComponent implements OnInit {
       reverse = !reverse;
 
     if (reverse)
-      return `M ${RO(x3)} ${RO(y3)} A${RO(r)} ${RO(r)} 0 0 ${h < 6 ? 1 : 0} ${RO(x1)} ${RO(y1)} `;
+      return `M ${x3} ${y3} A${r} ${r} 0 0 ${h < 6 ? 1 : 0} ${x1} ${y1} `;
 
-    let path = `M ${RO(x1)} ${RO(y1)} A${RO(r)} ${RO(r)} 0 0 ${h < 6 ? 0 : 1} ${RO(x3)} ${RO(y3)}`;
+    let path = `M ${x1} ${y1} A${r} ${r} 0 0 ${h < 6 ? 0 : 1} ${x3} ${y3}`;
 
     if (asWedge)
       path += 'L' + this.getHourArc(hour + sign(hour - 6), false, !this.southern).substring(1) +
-        `A ${RO(outer)} ${RO(outer)} 0 0 ${h < 6 ? 0 : 1} ${RO(x1)} ${RO(y1)} Z`;
+        `A ${outer} ${outer} 0 0 ${h < 6 ? 0 : 1} ${x1} ${y1} Z`;
 
     return path;
   }
