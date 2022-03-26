@@ -538,10 +538,12 @@ export class AppComponent implements OnInit {
 
     const hourLabels = document.getElementById('unequalHourLabels') as unknown as SVGGElement;
     const pts = circleIntersections(0, 0, LABEL_RADIUS, 0, this.horizonCy, this.horizonR);
-    const hAdj = [0, 3, -3, -7, -9, -9, -9, -12, -14, -13, -9, -3, 5];
-    const vAdj = [0, 30, 27, 23, 19, 16, 12, 9, 3, -4, -9, -14, -17];
+    const hAdj1 = [0, 3, -3, -7, -9, -9, -9, -12, -14, -13, -9, -3, 5];
+    const vAdj1 = [0, 30, 27, 23, 19, 16, 12, 9, 3, -4, -9, -14, -17];
+    const hAdj2 = [0, 15, 12, 0, -12, -20, -9, -5, -5, 0, 0, 8, 20];
+    const vAdj2 = [0, 30, 27, 42, 38, 25, 12, 9, 6, 5, -5, -14, -24];
 
-    if (this.outerSunriseAngle == null || !pts || pts.length < 2)
+    if (this.outerSunriseAngle == null || !pts || pts.length < 2 || absLat > 74)
       hourLabels.innerHTML = '';
     else {
       const sunrise = atan2_deg(pts[0].y, pts[0].x);
@@ -550,10 +552,37 @@ export class AppComponent implements OnInit {
       let html = '';
 
       for (let h = 1; h <= 12; ++h, angle += step) {
-        const x = cos_deg(angle) * LABEL_RADIUS + hAdj[h];
-        const y = sin_deg(angle) * LABEL_RADIUS + vAdj[h];
+        const x = cos_deg(angle) * LABEL_RADIUS;
+        const y = sin_deg(angle) * LABEL_RADIUS;
+        let hAdj = hAdj1[h];
+        let vAdj = vAdj1[h];
+        let fontSize = 30;
 
-        html += `<text x="${x}" y="${y}" class="unequalHourText">${this.southern ? 13 - h : h}</text>`;
+        if (absLat > ARCTIC) {
+          if (h === 1)
+            hAdj = 0.0555555556 * absLat ** 3 - 11.55555557 * absLat ** 2 + 801.5416677 * absLat - 18521.50002;
+          else if (h === 12)
+            hAdj = 0.1666666669 * absLat ** 3 - 34.50000004 * absLat ** 2 + 2379.958336 * absLat - 54688.87507;
+          else
+            hAdj = hAdj2[h];
+
+          vAdj = vAdj2[h];
+          fontSize = 20;
+        }
+        else if (absLat > 50) {
+          const wgt = (ARCTIC - absLat) / (ARCTIC - 50);
+
+          hAdj = hAdj * wgt + hAdj2[h] * (1 - wgt);
+          vAdj = vAdj * wgt + vAdj2[h] * (1 - wgt);
+          fontSize = 30 * wgt + 20 * (1 - wgt);
+        }
+
+        html += `<text x="${x}" y="${y}" dx="${hAdj}" dy="${vAdj}" class="unequalHourText"`;
+
+        if (fontSize !== 30 && (h < 4 || h > 9))
+          html += ` style="font-size: ${fontSize}px"`;
+
+        html += `>${this.southern ? 13 - h : h}</text>`;
       }
 
       hourLabels.innerHTML = html;
