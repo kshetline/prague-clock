@@ -16,6 +16,7 @@ const LABEL_RADIUS = 212;
 const EQUATOR_RADIUS = 164.1;
 const HORIZON_RADIUS = CLOCK_RADIUS * tan_deg((90 - INCLINATION) / 2);
 const TROPIC_RADIUS = HORIZON_RADIUS * tan_deg((90 - INCLINATION) / 2);
+const MAX_UNEVEN_HOUR_LATITUDE = 86;
 
 interface CircleAttributes {
   cy: number;
@@ -498,7 +499,7 @@ export class AppComponent implements OnInit {
       this.createDayAreaMask(this.midnightSunR);
     }
 
-    if (this.outerSunriseAngle != null && absLat <= 86) {
+    if (this.outerSunriseAngle != null && absLat <= MAX_UNEVEN_HOUR_LATITUDE) {
       for (let h = 1; h <= 11; ++h) {
         this.hourArcs[h] = this.getHourArc(h);
         this.hourWedges[h] = this.getHourArc(h, true);
@@ -614,7 +615,8 @@ export class AppComponent implements OnInit {
     if (!innerPoints || innerPoints.length < 2)
       innerPoints = circleIntersections(0, 0, inner + 1E-6, 0, this.horizonCy, this.horizonR);
 
-    if (!outerPoints || outerPoints.length < 2 || !innerPoints || innerPoints.length < 2 || abs(this._latitude) > 87) {
+    if (!outerPoints || outerPoints.length < 2 || !innerPoints || innerPoints.length < 2 ||
+        abs(this._latitude) > MAX_UNEVEN_HOUR_LATITUDE) {
       this.dayAreaMask = '';
       this.outerSunriseAngle = null;
       return;
