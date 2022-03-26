@@ -11,6 +11,7 @@ import { Globe } from '../globe/globe';
 
 const CLOCK_RADIUS = 250;
 const INCLINATION = 23.5;
+const ARCTIC = 90 - INCLINATION;
 const LABEL_RADIUS = 212;
 const EQUATOR_RADIUS = 164.1;
 const HORIZON_RADIUS = CLOCK_RADIUS * tan_deg((90 - INCLINATION) / 2);
@@ -193,6 +194,7 @@ export class AppComponent implements OnInit {
   darkCy: number;
   darkR: number;
   dayAreaMask: string;
+  dawnDuskFontSize = '15px';
   dawnLabelPath: string;
   dawnTextOffset: number;
   disableDst = true;
@@ -200,6 +202,7 @@ export class AppComponent implements OnInit {
   duskTextOffset: number;
   equatorSunriseAngle: number = null;
   handAngle = 0;
+  hourStroke = 2;
   horizonCy: number;
   horizonPath: string;
   horizonR: number;
@@ -214,8 +217,10 @@ export class AppComponent implements OnInit {
   outerSunriseAngle: number = null;
   placeName = 'Prague, CZE';
   recentLocations: TzsLocation[] = [];
+  riseSetFontSize = '15px';
   rotateSign = 1;
   siderealAngle = 0;
+  solNoctisPath = '';
   southern = false;
   sunAngle = 0;
   sunriseLabelPath: string;
@@ -472,18 +477,28 @@ export class AppComponent implements OnInit {
     ({ cy: this.horizonCy, d: this.horizonPath, r: this.horizonR } = this.getAltitudeCircle(0, true));
     ({ cy: this.darkCy, r: this.darkR } = this.getAltitudeCircle(-18));
 
-    const excessLatitude = abs(this._latitude) - 90 + INCLINATION;
+    const absLat = abs(this._latitude);
+    const excessLatitude = absLat - ARCTIC;
 
     if (excessLatitude < 0) {
       this.midnightSunR = 0;
+      this.solNoctisPath = '';
       this.createDayAreaMask(CLOCK_RADIUS);
     }
     else {
       this.midnightSunR = this.horizonR + this.horizonCy - 1E-4;
+
+      const r = (this.midnightSunR + CLOCK_RADIUS) / 2;
+      const x1 = cos_deg(105) * r;
+      const y1 = sin_deg(105) * r;
+      const x2 = cos_deg(75) * r;
+      const y2 = sin_deg(75) * r;
+
+      this.solNoctisPath = `M ${x1} ${y1} A ${r} ${r} 0 0 0${x2} ${y2}`;
       this.createDayAreaMask(this.midnightSunR);
     }
 
-    if (this.outerSunriseAngle != null && abs(this._latitude) <= 86) {
+    if (this.outerSunriseAngle != null && absLat <= 86) {
       for (let h = 1; h <= 11; ++h) {
         this.hourArcs[h] = this.getHourArc(h);
         this.hourWedges[h] = this.getHourArc(h, true);
@@ -504,9 +519,19 @@ export class AppComponent implements OnInit {
       this.dawnTextOffset = this.southern ? labelShift : pathLength - labelShift;
       this.duskLabelPath = this.southern ? leftArc : rightArc;
       this.duskTextOffset = this.southern ? pathLength - labelShift : labelShift;
+
+      if (excessLatitude <= 0) {
+        this.hourStroke = 2;
+        this.riseSetFontSize = '15px';
+      }
+      else {
+        this.hourStroke = 1;
+        this.riseSetFontSize = (cos_deg(absLat) * 37.6).toFixed(1) + 'px';
+      }
     }
     else {
       this.hourArcs = [];
+      this.hourStroke = 2;
       this.hourWedges = [];
       this.dawnLabelPath = this.duskLabelPath = this.sunriseLabelPath = this.sunsetLabelPath = '';
     }

@@ -155,24 +155,30 @@
         <path id="duskPath" [attr.d]="duskLabelPath" class="textPath"/>
         <path id="sunrisePath" [attr.d]="sunriseLabelPath" class="textPath"/>
         <path id="sunsetPath" [attr.d]="sunsetLabelPath" class="textPath"/>
+        <path id="solNoctis" [attr.d]="solNoctisPath" class="textPath"/>
         <text>
           <textPath xlink:href="#sunrisePath" [attr.startOffset]="southern ? '40%' : '54%'" class="eventText">
-            <tspan>ɐɑɒɓɔ</tspan><!-- ORTUS -->
+            <tspan [style.font-size]="riseSetFontSize">ɐɑɒɓɔ</tspan><!-- ORTUS -->
           </textPath>
         </text>
         <text>
           <textPath xlink:href="#dawnPath" [attr.startOffset]="dawnTextOffset" class="eventText">
-            <tspan dy="1">ɜɝɞɟɠɡ</tspan><!-- AURORA -->
+            <tspan dy="1" [style.font-size]="dawnDuskFontSize">ɜɝɞɟɠɡ</tspan><!-- AURORA -->
           </textPath>
         </text>
         <text>
           <textPath xlink:href="#sunsetPath" [attr.startOffset]="southern ? '59%' : '41%'" class="eventText">
-            <tspan>ɕɖɗɘəɚɛ</tspan><!-- OCCASUS -->
+            <tspan [style.font-size]="riseSetFontSize">ɕɖɗɘəɚɛ</tspan><!-- OCCASUS -->
           </textPath>
         </text>
         <text>
           <textPath xlink:href="#duskPath" [attr.startOffset]="duskTextOffset" class="eventText">
-            <tspan dy="1">ɢɣɤɥɦɧɨɩɪɫɬ</tspan><!-- CREPUSCULUM -->
+            <tspan dy="1" [style.font-size]="dawnDuskFontSize">ɢɣɤɥɦɧɨɩɪɫɬ</tspan><!-- CREPUSCULUM -->
+          </textPath>
+        </text>
+        <text *ngIf="midnightSunR">
+          <textPath xlink:href="#solNoctis" startOffset="49%" class="eventText">
+            <tspan dy="-2" [style.font-size]="'12px'">ⓈⓄⓁ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ⓃⓄⒸⓉⒾⓈ</tspan><!-- CREPUSCULUM -->
           </textPath>
         </text>
       </g>
@@ -235,7 +241,7 @@
           </g>
         </g>
       </g>
-      <g id="unequalHourBorders" mask="url(#dayArea)" filter="url(#filterRelief)">
+      <g id="unequalHourBorders" mask="url(#dayArea)" filter="url(#filterRelief)" [attr.stroke-width]="hourStroke + 'px'">
         <path [attr.d]="hourArcs[1]" class="unequalHourBorder"/>
         <path [attr.d]="hourArcs[2]" class="unequalHourBorder"/>
         <path [attr.d]="hourArcs[3]" class="unequalHourBorder"/>
