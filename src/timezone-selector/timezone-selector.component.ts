@@ -128,6 +128,8 @@ function formatSearchResult(location: AtlasLocation): string {
   providers: [SVC_ZONE_SELECTOR_VALUE_ACCESSOR],
 })
 export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
+  private static instanceCount = 0;
+
   regions: string[] = [UT_OPTION];
   subzones: string[] = [UT];
   offsets: string[] = [];
@@ -144,6 +146,7 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
 
   private focusCount = 0;
   private hasFocus = false;
+  private instanceId = ++TimezoneSelectorComponent.instanceCount;
   private knownIanaZones = new Set<string>();
   private lastRemoteSearch: Subscription;
   private lastSearch: string;
@@ -163,6 +166,7 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
   error: string;
   matchZones: string[] = [];
   recentItems: MenuItem[] = [];
+  recentsOpen = false;
   searching = false;
 
   get recents(): TzsLocation[] { return this._recents; }
@@ -172,11 +176,16 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
       this.recentItems = [];
 
       for (let i = 0; i < value.length; ++i)
-        this.recentItems.push({ label: value[i].name, command: () => this.recentLocationSelected(i) });
+        this.recentItems.push({ label: value[i].name, id: `tzs-loc-${this.instanceId}-${i}`,
+                                command: () => this.recentLocationSelected(i) });
 
-      if (value.length > 1)
+      if (value.length > 1) {
         this.recentItems.push({ label: 'Clear recent locations', style: { 'font-style': 'italic' },
                                 command: () => this.clearRecents.emit() });
+
+        if (this.recentsOpen)
+          setTimeout(() => this.recentsShown());
+      }
     }
   }
 
@@ -184,6 +193,7 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
   @Output() focus: EventEmitter<any> = new EventEmitter();
   // eslint-disable-next-line @angular-eslint/no-output-native
   @Output() blur: EventEmitter<any> = new EventEmitter();
+  @Output() clearItem: EventEmitter<number> = new EventEmitter();
   @Output() clearRecents: EventEmitter<void> = new EventEmitter();
   @Output() location: EventEmitter<TzsLocation> = new EventEmitter();
 
@@ -634,5 +644,32 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
       name: loc.name,
       zone: loc.zone
     });
+  }
+
+  recentsShown(): void {
+    this.recentsOpen = true;
+
+    for (let i = 1; i < this.recents.length; ++i) {
+      const menuElem = document.querySelector(`#tzs-loc-${this.instanceId}-${i} > span`);
+
+      if (menuElem) {
+        if (!menuElem.parentElement.querySelector('.clear-icon')) {
+          const clearIcon = document.createElement('span');
+
+          clearIcon.classList.add('clear-icon');
+          clearIcon.textContent = '\u24E7';
+          clearIcon.onclick = (evt: MouseEvent): void => {
+            evt.stopPropagation();
+            this.clearRecentItem(i);
+          };
+          menuElem.parentElement.style.justifyContent = 'space-between';
+          menuElem.after(clearIcon);
+        }
+      }
+    }
+  }
+
+  private clearRecentItem(index: number): void {
+    this.clearItem.emit(index);
   }
 }

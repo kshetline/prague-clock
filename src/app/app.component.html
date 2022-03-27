@@ -2,7 +2,8 @@
   <div class="place-name-group">
     <span *ngIf="!canSaveName && placeName" class="place-name">{{placeName}}</span>
     <span *ngIf="!canSaveName && !placeName" class="no-name">No name provided</span>
-    <input *ngIf="canSaveName" id="name-input" class="name-input" [value]="inputName" (input)="inputChanged($event)">
+    <input *ngIf="canSaveName" id="name-input" class="name-input" [value]="inputName"
+        (input)="inputChanged($event)" (keydown.enter)="saveName()">
     <span *ngIf="canSaveName" class="height-holder">&nbsp;</span>
     <i *ngIf="canEditName" class="pi pi-pencil" (click)="editName()"></i>
     <i *ngIf="canSaveName" class="pi pi-save"
@@ -31,8 +32,8 @@
     <p-checkbox [(ngModel)]="isoFormat" [binary]="true" label="ISO input format"></p-checkbox>
     <p-checkbox [(ngModel)]="disableDst" [binary]="true" label="Disable DST on clock" (onChange)="updateTime(true)"></p-checkbox>
   </div>
-  <tze-zone-selector [(ngModel)]="zone" [recents]="recentLocations" (clearRecents)="clearRecents()" [autofocus]="false"
-      [disabled]="canSaveName" (location)="changeLocation($event)"></tze-zone-selector>
+  <tze-zone-selector [(ngModel)]="zone" [recents]="recentLocations" (clearItem)='clearItem($event)' (clearRecents)="clearRecents()"
+      [autofocus]="false" [disabled]="canSaveName" (location)="changeLocation($event)"></tze-zone-selector>
   <div class="button-row">
     <p-checkbox [(ngModel)]="trackTime" [binary]="true" label="Track current time"></p-checkbox>
     <button type="button" pButton (click)="setNow()" [disabled]="trackTime">Now</button>

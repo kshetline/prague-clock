@@ -12,7 +12,8 @@
       appendTo="body"></p-autoComplete>
   <i class="pi pi-search" [style.opacity]="disabled ? 0.33 : 1"></i>
   <i class="fas fa-spinner fa-pulse fa-fw" [style.display]="searching ? 'block' : 'none'"></i>
-  <p-menu #recents [popup]="true" [model]="recentItems" appendTo="body"></p-menu>
+  <p-menu #recents [popup]="true" [model]="recentItems" appendTo="body"
+      (onShow)="recentsShown()" (onHide)="recentsOpen = false"></p-menu>
   <i class="pi pi-chevron-down p-inputtext" (click)="recents.toggle($event)" [class.icon-disabled]="disabled"></i>
 </div>
 

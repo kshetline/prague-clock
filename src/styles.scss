@@ -70,7 +70,7 @@ body {
 .p-menu-list {
   min-width: 18em;
   max-height: calc(90 * var(--mvh));
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .p-dialog-content {
@@ -89,4 +89,11 @@ span.p-menuitem-text {
   cursor: default;
   opacity: 0.33;
   pointer-events: none;
+}
+
+.clear-icon {
+  cursor: pointer;
+  display: inline-block;
+  margin: -0.33em;
+  padding: 0.33em;
 }

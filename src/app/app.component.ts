@@ -342,9 +342,19 @@ export class AppComponent implements OnInit {
     });
   }
 
+  clearItem(index: number): void {
+    if (this.placeName === this.recentLocations[index].name)
+      this.placeName = '';
+
+    this.recentLocations.splice(index, 1);
+    this.recentLocations = clone(this.recentLocations);
+    this.sortRecentLocations();
+  }
+
   clearRecents(): void {
     this.recentLocations = clone(defaultSettings.recentLocations);
     this.changeLocation(this.recentLocations[0]);
+    this.saveSettings();
   }
 
   findMatchingLocation(location?: TzsLocation): TzsLocation {
@@ -472,10 +482,14 @@ export class AppComponent implements OnInit {
       this.recentLocations.push(location);
     }
 
+    this.sortRecentLocations();
+  }
+
+  private sortRecentLocations(): void {
     const sortTime = (time: number): number => time === 0 ? Number.MAX_SAFE_INTEGER : time;
+
     this.recentLocations.sort((a, b) => sortTime(b.lastTimeUsed) - sortTime(a.lastTimeUsed));
     this.recentLocations = clone(this.recentLocations);
-    this.saveSettings();
   }
 
   setNow(): void {
@@ -812,6 +826,9 @@ export class AppComponent implements OnInit {
   }
 
   saveName(): void {
+    if (!this.inputLength)
+      return;
+
     this.canEditName = true;
     this.canSaveName = false;
     this.placeName = this.inputName.trim();
@@ -835,8 +852,7 @@ export class AppComponent implements OnInit {
       });
     }
 
-    this.recentLocations = clone(this.recentLocations);
-    this.saveSettings();
+    this.sortRecentLocations();
   }
 
   cancelEdit(): void {
