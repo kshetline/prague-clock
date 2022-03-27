@@ -172,6 +172,7 @@ export class AppComponent implements OnInit {
   private _latitude = 50.0870;
   private _longitude = 14.4185;
   private observer: SkyObserver;
+  private zoneFixTimeout: any;
   private solarSystem = new SolarSystem();
   private sunsetA: AstroEvent = null;
   private sunsetB: AstroEvent = null;
@@ -281,6 +282,7 @@ export class AppComponent implements OnInit {
 
     const docElem = document.documentElement;
     const doResize = (): void => {
+      this.graphicsRateChangeCheck();
       setTimeout(() => {
         const height = window.innerHeight;
         const disallowScroll = getCssValue(docElem, 'overflow') === 'hidden';
@@ -469,11 +471,18 @@ export class AppComponent implements OnInit {
   }
 
   changeLocation(location: TzsLocation): void {
+    if (this.zoneFixTimeout)
+      clearTimeout(this.zoneFixTimeout);
+
     this._longitude = location.longitude;
     this.latitude = location.latitude;
     this.placeName = location.name;
-    setTimeout(() => this.zone = location.zone);
     this.updateRecentLocations(location);
+    this.zoneFixTimeout = setTimeout(() => {
+      this.placeName = location.name;
+      this.zone = location.zone;
+      this.zoneFixTimeout = undefined;
+    }, 250);
   }
 
   private updateRecentLocations(location: TzsLocation): void {
@@ -510,8 +519,16 @@ export class AppComponent implements OnInit {
       this.time = newTime;
   }
 
+  private clearZoneFixTimeout(): void {
+    if (this.zoneFixTimeout) {
+      clearTimeout(this.zoneFixTimeout);
+      this.zoneFixTimeout = undefined;
+    }
+  }
+
   private adjustLatitude(): void {
     this.graphicsRateChangeCheck();
+    this.clearZoneFixTimeout();
 
     this.southern = (this._latitude < 0);
     this.rotateSign = (this.southern ? -1 : 1);
