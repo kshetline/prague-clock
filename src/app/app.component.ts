@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { abs, atan2_deg, atan_deg, cos_deg, floor, max, mod, PI, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
-import { clone, getCssValue, isChromeOS, isEqual, isLikelyMobile, isSafari, toMixedCase } from '@tubular/util';
+import { clone, getCssValue, isChromeOS, isEqual, isLikelyMobile, isSafari, processMillis, toMixedCase } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import { AstroEvent, EventFinder, FALL_EQUINOX, FIRST_QUARTER, FULL_MOON, LAST_QUARTER, MOON, NEW_MOON, RISE_EVENT, SET_EVENT, SkyObserver, SolarSystem, SPRING_EQUINOX, SUMMER_SOLSTICE, SUN, TRANSIT_EVENT, WINTER_SOLSTICE } from '@tubular/astronomy';
 import ttime, { DateTime, utToTdt } from '@tubular/time';
@@ -17,6 +17,8 @@ const EQUATOR_RADIUS = 164.1;
 const HORIZON_RADIUS = CLOCK_RADIUS * tan_deg((90 - INCLINATION) / 2);
 const TROPIC_RADIUS = HORIZON_RADIUS * tan_deg((90 - INCLINATION) / 2);
 const MAX_UNEVEN_HOUR_LATITUDE = 86;
+const RESUME_FILTERING_DELAY = 1000;
+const STOP_FILTERING_DELAY = isSafari() ? 1000 : 3000;
 
 interface CircleAttributes {
   cy: number;
@@ -162,6 +164,9 @@ export class AppComponent implements OnInit {
   private eventFinder = new EventFinder();
   private eventType = EventType.EQUISOLSTICE;
   private globe: Globe
+  private graphicsChangeLastTime = -1;
+  private graphicsChangeStartTime = -1;
+  private graphicsChangeStopTimer: any;
   private initDone = false;
   private lastSavedSettings: any = null;
   private _latitude = 50.0870;
@@ -232,6 +237,7 @@ export class AppComponent implements OnInit {
   sunAngle = 0;
   sunriseLabelPath: string;
   sunsetLabelPath: string;
+  svgFilteringOn = true;
 
   constructor(
     private confirmService: ConfirmationService,
@@ -315,6 +321,7 @@ export class AppComponent implements OnInit {
     doResize();
 
     setTimeout(() => document.getElementById('graphics-credit').style.opacity = '0', 30000);
+    this.graphicsChangeStartTime = -1;
   }
 
   private saveSettings(): void {
@@ -504,6 +511,8 @@ export class AppComponent implements OnInit {
   }
 
   private adjustLatitude(): void {
+    this.graphicsRateChangeCheck();
+
     this.southern = (this._latitude < 0);
     this.rotateSign = (this.southern ? -1 : 1);
     this.updateObserver();
@@ -626,6 +635,31 @@ export class AppComponent implements OnInit {
     this.updateGlobe();
   }
 
+  private graphicsRateChangeCheck(): void {
+    const now = processMillis();
+    const resumeFiltering = (): void => {
+      this.svgFilteringOn = true;
+      this.graphicsChangeStartTime = -1;
+      this.graphicsChangeStopTimer = undefined;
+    };
+
+    if (this.svgFilteringOn) {
+      if (this.graphicsChangeStartTime < 0 || now > this.graphicsChangeLastTime  + STOP_FILTERING_DELAY)
+        this.graphicsChangeStartTime = now;
+      else if (now > this.graphicsChangeStartTime + STOP_FILTERING_DELAY) {
+        this.graphicsChangeStartTime = -1;
+        this.svgFilteringOn = false;
+        this.graphicsChangeStopTimer = setTimeout(resumeFiltering, RESUME_FILTERING_DELAY);
+      }
+    }
+    else if (this.graphicsChangeStopTimer) {
+      clearTimeout(this.graphicsChangeStopTimer);
+      this.graphicsChangeStopTimer = setTimeout(resumeFiltering, RESUME_FILTERING_DELAY);
+    }
+
+    this.graphicsChangeLastTime = now;
+  }
+
   private updateGlobe(): void {
     this.globe.orient(this._longitude, this.latitude).finally();
   }
@@ -683,6 +717,8 @@ export class AppComponent implements OnInit {
   updateTime(forceUpdate = false): void {
     if (!this.observer)
       return;
+
+    this.graphicsRateChangeCheck();
 
     const jdu = julianDay(this.time);
     const jde = utToTdt(jdu);
