@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>About the Prague Astronomical Clock Simulator</title>
+  <base href="./">
+<style>
+  body {
+    align-items: center;
+    background: rgb(212,150,76);
+    background: linear-gradient(90deg,
+      rgba(212, 150, 76, 0.33) 0%, rgba(176, 186, 177, 0.33) 8%, rgba(140, 168, 167, 0.33) 17%, rgba(71, 153, 174, 0.33) 25%,
+      rgba(24, 146, 178, 0.33) 33%, rgba(11, 138, 176, 0.33) 42%, rgba(18, 133, 174, 0.33) 50%, rgba(11, 138, 176, 0.33) 58%,
+      rgba(24, 146, 178, 0.33) 67%, rgba(71, 153, 174, 0.33) 75%, rgba(140, 168, 167, 0.33) 83%, rgba(176, 186, 177, 0.33) 92%,
+      rgba(212, 150, 76, 0.33) 100%);
+    color: #444;
+    display: flex;
+    flex-direction: column;
+    font: 14px Arial, Helvetica, sans-serif;
+    margin: 1em;
+    width: calc(100vw - 2em);
+  }
+
+  .page {
+    background: none;
+    width: calc(min(800px, calc(100vw - 2em)));
+  }
+
+  #clock {
+    left: calc(50% - 235px);
+    position: relative;
+  }
+
+  h1 {
+    font: bold 18px Arial, Helvetica, sans-serif;
+    text-align: center;
+  }
+
+  h2 {
+    font: bold 16px Arial, Helvetica, sans-serif;
+  }
+
+  li {
+    padding-left: 0.6em;
+    padding-bottom: 0.6em;
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <h1>Prague Astronomical Clock Simulator</h1>
+    <img id="clock" src="clock.jpg" width="470" height="470" alt="clock face">
+    <h2>Graphic design</h2>
+    <p>The original SVG clock graphics and font used here were originally developed by Jan Tošovský, as found on
+      this <a href="https://drifted.in/horologium-app/" target="_blank">web site</a>.</p>
+    <p>The color scheme here has been altered, the graphics have been modified to cover a full range of latitudes,
+      and the graphics can now be updated quickly within a web browser, rather than relying on server-based updates.
+      A central map, similar to the one featured in the original clock, has been added.</p>
+
+    <h2>Differences between the simulator and the original Prague clock</h2>
+    <ul>
+      <li>The positioning of the simulator’s clock hands, hour dial, sun, moon, and ecliptic wheel are done using
+        modern astronomical calculations, rather than simulating the internal gearing of the physical clock.</li>
+      <li>The original clock shows a map of the world in at center of the clock face, with the south pole toward the
+        top, centered on Prague. The map projection (as best as I can tell) is a
+        <a href="https://en.wikipedia.org/wiki/Stereographic_projection" target="_blank">stereographic projection</a>,
+        which corresponds to the type of projection used in the astrolabe-like design of the entire clock face.<br><br>
+
+        Since this simulation can be set to any location on Earth, not only Prague, the globe image needs to turn and
+        rotate rather than being an unchanging painting. The easiest, fastest-rendering way to do this was to use a
+        camera-like perspective, rendering the globe as the Earth would be seen at a distance from space. The result
+        is a map which is somewhat different than the original map, even when the simulator’s location is set to
+        Prague.</li>
+      <li>The simulator can operate within the Arctic and Antarctic circles. This lead to the possibility of all-day
+        darkness and all-day light. A new region of the clock face, marked “SOL NOCTIS” (Latin for <em>evening sun</em>)
+        will appear at these extreme latitudes. The lines of unequal hours can become very narrow, and may be dropped
+        altogether.<br><br>
+
+        The time between one sunset and the next is always divided into twenty four hours of
+        <a href="https://www.theflorentine.net/2016/03/03/the-duomo-clock/" target="_blank">Bohemian time</a> (aka
+        Italian time), even when it days or even months might pass between sunsets.
+        </li>
+      <li>The simulator can operate in the southern hemisphere. When the latitude is set south of the equator, the
+        clock markings and clock hand motion are reversed, becoming counter-clockwise.</li>
+    </ul>
+  </div>
+</body>
+</html>

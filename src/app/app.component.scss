@@ -168,12 +168,14 @@ svg {
   gap: 4px;
 }
 
-.graphics-credit {
+#graphics-credit {
   bottom: 16px;
   color: #CCC;
   font: italic 14px sans-serif;
   left: 16px;
+  opacity: 1;
   position: fixed;
+  transition: opacity 2s ease-in-out;
 }
 
 .maskBlack {

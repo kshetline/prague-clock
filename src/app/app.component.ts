@@ -188,8 +188,10 @@ export class AppComponent implements OnInit {
     { label: 'Translucent ecliptic', icon: 'pi pi-circle', id: 'tec',
       command: (): boolean => this.translucentEcliptic = !this.translucentEcliptic },
     { label: 'Code on GitHub', icon: 'pi pi-github', url: 'https://github.com/kshetline/prague-clock' },
-    { label: 'About the clock', icon: 'pi pi-info-circle',
-      url: 'https://en.wikipedia.org/wiki/Prague_astronomical_clock' }
+    { label: 'About the real clock', icon: 'pi pi-info-circle',
+      url: 'https://en.wikipedia.org/wiki/Prague_astronomical_clock' },
+    { label: 'About this simulator', icon: 'pi pi-info-circle',
+      url: 'assets/about.html' }
   ];
 
   canEditName = false;
@@ -311,6 +313,8 @@ export class AppComponent implements OnInit {
 
     poll();
     doResize();
+
+    setTimeout(() => document.getElementById('graphics-credit').style.opacity = '0', 30000);
   }
 
   private saveSettings(): void {
