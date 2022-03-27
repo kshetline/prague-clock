@@ -131,6 +131,11 @@
         <circle cx="0" cy="0" r="250"/>
       </g>
     </mask>
+    <mask id="mapArea">
+      <g class="maskWhite">
+        <circle cx="0" cy="0" r="82"/>
+      </g>
+    </mask>
     <mask id="dayArea">
       <g class="maskWhite">
         <path [attr.d]="dayAreaMask"/>
@@ -272,6 +277,8 @@
         <circle cx="0" cy="0" r="107.7" class="baseCircle innerCircle"/>
         <circle cx="0" cy="0" r="164.1" class="baseCircle"/>
         <circle cx="0" cy="0" r="250" class="baseCircle"/>
+      </g>
+      <g id="worldMap" mask="url(#mapArea)" transform="scale(-1, -1)">
         <foreignObject x="-90" y="-90" width="180" height="180">
           <div id="globe-host"></div>
         </foreignObject>

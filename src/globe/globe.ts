@@ -1,6 +1,6 @@
 import {
-  BufferGeometry, CanvasTexture, CylinderGeometry, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, SphereGeometry,
-  WebGLRenderer
+  BufferGeometry, CanvasTexture, CylinderGeometry, DoubleSide, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene,
+  SphereGeometry, WebGLRenderer
 } from 'three';
 import { isChromeOS, isSafari, isString } from '@tubular/util';
 import { cos, floor, PI, sin, to_radian } from '@tubular/math';
@@ -10,10 +10,10 @@ const MAP_HEIGHT = 500;
 const MAP_WIDTH = 1000;
 const DEFAULT_GLOBE_PIXEL_SIZE = 500;
 const GLOBE_RADIUS = 5;
-const FIELD_OF_VIEW = 19.3;
-const VIEW_DISTANCE = 30;
+const FIELD_OF_VIEW = 91;
+const VIEW_DISTANCE = 4.975;
 const LINE_THICKNESS = 0.03;
-const HAG = 0.01; // Sleight distance above globe that longitude/latitude lines are drawn.
+const HAG = 0.02; // Sleight distance above globe that longitude/latitude lines are drawn.
 
 const GRID_COLOR = '#262F36';
 
@@ -89,14 +89,15 @@ export class Globe {
       this.scene = new Scene();
       const globe = new SphereGeometry(GLOBE_RADIUS, 50, 50);
       globe.rotateY(-PI / 2);
-      this.globeMesh = new Mesh(globe, new MeshBasicMaterial({ map: new CanvasTexture(Globe.mapCanvas) }));
+      globe.scale(-1, -1, -1);
+      this.globeMesh = new Mesh(globe, new MeshBasicMaterial({ map: new CanvasTexture(Globe.mapCanvas), side: DoubleSide }));
       this.scene.add(this.globeMesh);
 
       const lines: BufferGeometry[] = [];
 
       // Lines of longitude
       for (let n = 0; n < 24; ++n) {
-        const line = new CylinderGeometry(GLOBE_RADIUS + HAG, GLOBE_RADIUS + HAG, LINE_THICKNESS, 50, 1, true);
+        const line = new CylinderGeometry(GLOBE_RADIUS - HAG, GLOBE_RADIUS - HAG, LINE_THICKNESS, 50, 1, true);
         line.translate(0, -LINE_THICKNESS / 2, 0);
         line.rotateX(PI / 2);
         line.rotateY(n * PI / 12);
@@ -110,13 +111,13 @@ export class Globe {
         const y = GLOBE_RADIUS * sin(lat);
         const r1 = r - LINE_THICKNESS * sin(lat) / 2;
         const r2 = r + LINE_THICKNESS * sin(lat) / 2;
-        const line = new CylinderGeometry(r1 + HAG, r2 + HAG, cos(lat) * LINE_THICKNESS, 50, 8, true);
+        const line = new CylinderGeometry(r1 - HAG, r2 - HAG, cos(lat) * LINE_THICKNESS, 50, 8, true);
         line.translate(0, -cos(lat) * LINE_THICKNESS / 2 + y, 0);
         lines.push(line);
       }
 
       this.globeMesh.add(new Mesh(mergeBufferGeometries(lines),
-        new MeshBasicMaterial({ color: GRID_COLOR })));
+        new MeshBasicMaterial({ color: GRID_COLOR, side: DoubleSide })));
 
       this.camera.position.z = VIEW_DISTANCE;
       this.renderer = new WebGLRenderer({ alpha: true, antialias: true });

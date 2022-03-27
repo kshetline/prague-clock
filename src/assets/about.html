@@ -27,7 +27,7 @@
   }
 
   #clock {
-    left: calc(50% - 235px);
+    left: calc(50% - 217px);
     position: relative;
   }
 
@@ -49,28 +49,22 @@
 <body>
   <div class="page">
     <h1>Prague Astronomical Clock Simulator</h1>
-    <img id="clock" src="clock.jpg" width="470" height="470" alt="clock face">
+    <img id="clock" src="clock.jpg" width="435" height="435" alt="clock face">
     <h2>Graphic design</h2>
     <p>The original SVG clock graphics and font used here were originally developed by Jan Tošovský, as found on
       this <a href="https://drifted.in/horologium-app/" target="_blank">web site</a>.</p>
     <p>The color scheme here has been altered, the graphics have been modified to cover a full range of latitudes,
       and the graphics can now be updated quickly within a web browser, rather than relying on server-based updates.
-      A central map, similar to the one featured in the original clock, has been added.</p>
+      A central world map, similar to the one featured in the original clock, has been added.</p>
 
     <h2>Differences between the simulator and the original Prague clock</h2>
     <ul>
       <li>The positioning of the simulator’s clock hands, hour dial, sun, moon, and ecliptic wheel are done using
         modern astronomical calculations, rather than simulating the internal gearing of the physical clock.</li>
-      <li>The original clock shows a map of the world in the center of the clock face, with the south pole toward the
-        top, centered on Prague. The map projection (as best as I can tell) is a
+      <li>The original clock shows a map of the world in the center of the clock face, done using a
         <a href="https://en.wikipedia.org/wiki/Stereographic_projection" target="_blank">stereographic projection</a>,
-        which corresponds to the type of projection used in the astrolabe-like design of the entire clock face.<br><br>
-
-        Since this simulation can be set to any location on Earth, not only Prague, the globe image needs to turn and
-        rotate rather than being an unchanging painting. The easiest, fastest-rendering way to do this was to use a
-        camera-like perspective, rendering the globe as the Earth would be seen at a distance from space. The result
-        is a map which is somewhat different than the original map, even when the simulator’s location is set to
-        Prague.</li>
+        with the south pole toward the top, centered on Prague. Since this simulation can be set to any location on
+        Earth, not only Prague, the map will rotate in order to center on the currently set latitude and longitude.</li>
       <li>The simulator can operate within the Arctic and Antarctic circles. This lead to the possibility of all-day
         darkness and all-day light. A new region of the clock face, marked “SOL NOCTIS” (Latin for <em>evening sun</em>)
         will appear at these extreme latitudes. The lines of unequal hours can become very narrow, and may be dropped
