@@ -1,5 +1,14 @@
 <div class="controls" [class.short]="lastHeight <= 420 && lastHeight > 380" [class.extra-short]="lastHeight <= 380">
-  <div class="place-name">{{placeName}}</div>
+  <div class="place-name-group">
+    <span *ngIf="!canSaveName && placeName" class="place-name">{{placeName}}</span>
+    <span *ngIf="!canSaveName && !placeName" class="no-name">No name provided</span>
+    <input *ngIf="canSaveName" id="name-input" class="name-input" [value]="inputName" (input)="inputChanged($event)">
+    <span *ngIf="canSaveName" class="height-holder">&nbsp;</span>
+    <i *ngIf="canEditName" class="pi pi-pencil" (click)="editName()"></i>
+    <i *ngIf="canSaveName" class="pi pi-save"
+        [class.icon-disabled]="inputLength === 0" (click)="saveName()"></i>
+    <i *ngIf="canSaveName" class="pi pi-undo" (click)="cancelEdit()"></i>
+  </div>
   <p-menu #menu [popup]="true" [model]="menuItems" appendTo="body"></p-menu>
   <i class="pi pi-bars" (click)="menu.toggle($event)"></i>
   <div class="time-row">
@@ -23,16 +32,16 @@
     <p-checkbox [(ngModel)]="disableDst" [binary]="true" label="Disable DST on clock" (onChange)="updateTime(true)"></p-checkbox>
   </div>
   <tze-zone-selector [(ngModel)]="zone" [recents]="recentLocations" (clearRecents)="clearRecents()" [autofocus]="false"
-      (location)="changeLocation($event)"></tze-zone-selector>
+      [disabled]="canSaveName" (location)="changeLocation($event)"></tze-zone-selector>
   <div class="button-row">
     <p-checkbox [(ngModel)]="trackTime" [binary]="true" label="Track current time"></p-checkbox>
     <button type="button" pButton (click)="setNow()" [disabled]="trackTime">Now</button>
   </div>
   <div class="button-row">
     <tbw-angle-editor wideSpinner [(ngModel)]="latitude" [disableMobileKeyboard]="suppressOsKeyboard"
-        [options]="{ angleStyle: DD, compass: true, decimalPrecision: 1 }"></tbw-angle-editor>
+        [disabled]="canSaveName" [options]="{ angleStyle: DD, compass: true, decimalPrecision: 1 }"></tbw-angle-editor>
     <tbw-angle-editor wideSpinner [(ngModel)]="longitude" [disableMobileKeyboard]="suppressOsKeyboard"
-        [options]="{ angleStyle: DDD, compass: true, decimalPrecision: 1 }"></tbw-angle-editor>
+        [disabled]="canSaveName" [options]="{ angleStyle: DDD, compass: true, decimalPrecision: 1 }"></tbw-angle-editor>
   </div>
 </div>
 

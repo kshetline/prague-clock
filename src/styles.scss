@@ -84,3 +84,9 @@ span.p-menuitem-text {
 .pi.pi-circle {
   opacity: 0;
 }
+
+.icon-disabled {
+  cursor: default;
+  opacity: 0.33;
+  pointer-events: none;
+}

@@ -192,6 +192,8 @@ export class AppComponent implements OnInit {
       url: 'https://en.wikipedia.org/wiki/Prague_astronomical_clock' }
   ];
 
+  canEditName = false;
+  canSaveName = false;
   darkCy: number;
   darkR: number;
   dayAreaMask: string;
@@ -210,6 +212,8 @@ export class AppComponent implements OnInit {
   hourArcs: string[] = [];
   hourWedges: string[] = [];
   innerSunriseAngle: number = null;
+  inputLength = 0;
+  inputName: string;
   isoFormat = false;
   lastHeight = -1;
   midnightSunR = 0;
@@ -326,8 +330,16 @@ export class AppComponent implements OnInit {
     const loc = { latitude: this._latitude, longitude: this._longitude, name: '', zone: this._zone };
     const match = this.findMatchingLocation(loc);
 
-    if (match)
-      setTimeout(() => this.placeName = match.name);
+    setTimeout(() => {
+      if (match) {
+        this.placeName = match.name;
+        this.canEditName = (match.lastTimeUsed !== 0);
+      }
+      else {
+        this.placeName = '';
+        this.canEditName = true;
+      }
+    });
   }
 
   clearRecents(): void {
@@ -335,7 +347,10 @@ export class AppComponent implements OnInit {
     this.changeLocation(this.recentLocations[0]);
   }
 
-  findMatchingLocation(location: TzsLocation): TzsLocation {
+  findMatchingLocation(location?: TzsLocation): TzsLocation {
+    if (!location)
+      location = { latitude: this._latitude, longitude: this._longitude, zone: this._zone, name: '' };
+
     for (const loc of this.recentLocations) {
       if (loc.zone === location.zone &&
           abs(loc.latitude - location.latitude) < 0.05 && abs(loc.longitude - location.longitude) < 0.05)
@@ -381,7 +396,7 @@ export class AppComponent implements OnInit {
       this._longitude = newValue;
 
       if (this.initDone) {
-        this.placeName = '\xA0';
+        this.placeName = '';
         this.updateObserver();
         this.updateTime(true);
         this.updateGlobe();
@@ -395,7 +410,7 @@ export class AppComponent implements OnInit {
       this._zone = newValue;
 
       if (this.initDone) {
-        this.placeName = '\xA0';
+        this.placeName = '';
         this.updateObserver();
         this.updateTime(true);
       }
@@ -474,7 +489,7 @@ export class AppComponent implements OnInit {
     this.southern = (this._latitude < 0);
     this.rotateSign = (this.southern ? -1 : 1);
     this.updateObserver();
-    this.placeName = '\xA0';
+    this.placeName = '';
     ({ cy: this.horizonCy, d: this.horizonPath, r: this.horizonR } = this.getAltitudeCircle(0, true));
     ({ cy: this.darkCy, r: this.darkR } = this.getAltitudeCircle(-18));
 
@@ -780,6 +795,53 @@ export class AppComponent implements OnInit {
 
     if (this.menuItemById('sok'))
       this.menuItemById('sok').icon = (this.suppressOsKeyboard ? 'pi pi-check' : 'pi pi-circle');
+  }
+
+  editName(): void {
+    this.canEditName = false;
+    this.canSaveName = true;
+    this.inputName = this.placeName || '';
+    this.inputLength = this.inputName.trim().length;
+
+    setTimeout(() => document.getElementById('name-input')?.focus());
+  }
+
+  inputChanged(evt: any): void {
+    this.inputName = (evt.target as HTMLInputElement).value || '';
+    this.inputLength = this.inputName.trim().length;
+  }
+
+  saveName(): void {
+    this.canEditName = true;
+    this.canSaveName = false;
+    this.placeName = this.inputName.trim();
+
+    const match = this.findMatchingLocation();
+
+    if (match) {
+      match.name = this.placeName;
+      match.lastTimeUsed = Date.now();
+    }
+    else {
+      if (this.recentLocations.length >= MAX_SAVED_LOCATIONS)
+        removeOldestLocation(this.recentLocations);
+
+      this.recentLocations.push({
+        lastTimeUsed: Date.now(),
+        latitude: this._latitude,
+        longitude: this._longitude,
+        name: this.placeName,
+        zone: this._zone
+      });
+    }
+
+    this.recentLocations = clone(this.recentLocations);
+    this.saveSettings();
+  }
+
+  cancelEdit(): void {
+    this.canEditName = true;
+    this.canSaveName = false;
   }
 
   skipToEvent(previous = false): void {
