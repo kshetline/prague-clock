@@ -120,6 +120,29 @@ svg {
   width: calc(max(min(calc(100vw - 400px), var(--mfh)) - 16px, 320px));
 }
 
+#svg-wrapper {
+  position: relative;
+}
+
+.svg-overlay {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+#globe-host {
+  border-radius: 50%;
+  left: 36.333%;
+  height: 27.333%;
+  overflow: hidden;
+  position: absolute;
+  top: 36.333%;
+  transform: scale(-1, -1);
+  width: 27.333%;
+}
+
 @media screen and (orientation:landscape) and (max-height: 420px),
        screen and (orientation:portrait) and (max-height: 1000px)
 {

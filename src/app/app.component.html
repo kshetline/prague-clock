@@ -48,531 +48,550 @@
 
 <div id="graphics-credit">Original SVG clock graphics by Jan Tošovský</div>
 
-<svg viewBox="0 0 600 600" xml:space="preserve">
-  <defs>
-    <filter id="filterHand" x="0" y="0" width="200%" height="200%">
-      <feOffset result="offOut" in="SourceAlpha" dx="8" dy="8"/>
-      <feGaussianBlur result="blurOut" in="offOut" stdDeviation="4"/>
-      <feComponentTransfer result="fadeOut" in="blurOut">
-        <feFuncA type="linear" slope="0.85"/>
-      </feComponentTransfer>
-      <feBlend in="SourceGraphic" in2="fadeOut" mode="normal"/>
-    </filter>
-    <filter id="filterEcliptic" x="0" y="0" width="200%" height="200%">
-      <feOffset result="offOut" in="SourceAlpha" dx="15" dy="15"/>
-      <feGaussianBlur result="blurOut" in="offOut" stdDeviation="3"/>
-      <feComponentTransfer result="fadeOut" in="blurOut">
-        <feFuncA type="linear" slope="0.75"/>
-      </feComponentTransfer>
-      <feBlend in="SourceGraphic" in2="fadeOut" mode="normal"/>
-    </filter>
-    <filter id="filterRelief" filterUnits="userSpaceOnUse" x="-60%" y="-60%">
-      <feOffset result="offOut" in="SourceAlpha" dx="1" dy="1"/>
-      <feGaussianBlur result="blurOut" in="offOut" stdDeviation="1"/>
-      <feBlend in="SourceGraphic" in2="blurOut" mode="normal"/>
-    </filter>
-    <symbol id="handData" overflow="visible">
-      <path d="M-4 57C-4 57-6 45-6 42C-8 38-27 18-28 9C-29-2-33-7-33-15C-33-18-30-18-29-18C-21-17-19 2-18 2C-18 2-20-23-16-37C-15-40-11-40-10-37C-8-34-11-5-10-5C-9-5-9-36-7-40C-6-44-1-44 0-41C3-37-1-0 0 0C1 1-1-11 3-16C6-20 11-18 11-13C11-10 8 5 9 5C10 5 11-8 14-12C16-15 21-15 22-10C23-7 19 7 18 11C17 15 13 28 13 32C13 40 21 49 21 49L-4 57z"/>
-    </symbol>
-    <symbol id="handSymbol" overflow="visible">
-      <g transform="scale(0.4)">
-        <use xlink:href="#handData" class="handSymbol"/>
-      </g>
-    </symbol>
-    <symbol id="sunBeamData" overflow="visible">
-      <path d="M47 8C55 10 58 4 68 5 S81 1 88 3 S100 -3 100 -3 S96 -2 89 -4 S80 -2 70 -3 S62 -7 47 -8 C55 -9 56 -16 66 -19 S76 -27 84 -27 S93 -37 93 -37 S90 -35 82 -34 S74 -29 65 -27 S56 -28 41 -24 C49 -28 47 -34 55 -40 S63 -51 69 -54 S75 -67 75 -67 S72 -63 66 -60 S60 -53 52 -47 S43 -45 31 -36 C36 -43 32 -48 38 -56 S41 -70 47 -75 S47 -88 47 -88 S46 -84 41 -79 S38 -70 32 -62 S25 -57 17 -45 C19 -52 14 -56 17 -66 S15 -80 18 -86 S14 -99 14 -99 S15 -95 12 -88 S12 -79 9 -69 S4 -62 0 -48 C0 -56 -6 -58 -7 -68 S-13 -80 -12 -87 S-20 -98 -20 -98 S-19 -94 -19 -87 S-16 -78 -15 -68 S-18 -60 -16 -45 C-19 -53 -26 -52 -30 -61 S-40 -71 -41 -78 S-53 -85 -53 -85 S-50 -82 -48 -75 S-42 -68 -38 -59 S-37 -50 -30 -37 C-36 -43 -42 -40 -49 -48 S-61 -53 -65 -59 S-79 -62 -79 -62 S-75 -60 -71 -54 S-63 -50 -56 -43 S-52 -34 -41 -24 C-48 -28 -53 -24 -62 -28 S-76 -29 -82 -33 S-95 -31 -95 -31 S-91 -31 -85 -27 S-76 -25 -67 -21 S-61 -15 -47 -9 C-55 -10 -58 -4 -68 -5 S-81 -1 -88 -3 S-100 3 -100 3 S-96 2 -89 4 S-80 2 -70 3 S-62 7 -47 8 C-55 9 -56 16 -66 19 S-76 27 -84 27 S-93 37 -93 37 S-90 35 -82 34 S-74 29 -65 27 S-56 28 -41 24 C-49 28 -47 34 -55 40 S-63 51 -69 54 S-75 67 -75 67 S-72 63 -66 60 S-60 53 -52 47 S-43 45 -31 36 C-36 43 -32 48 -38 56 S-41 70 -47 75 S-47 88 -47 88 S-46 84 -41 79 S-38 70 -32 62 S-25 57 -17 45 C-19 52 -14 56 -17 66 S-15 80 -18 86 S-14 99 -14 99 S-15 95 -12 88 S-12 79 -9 69 S-4 62 0 48 C0 56 6 58 7 68 S13 80 12 87 S20 98 20 98 S19 94 19 87 S16 78 15 68 S18 60 16 45 C19 53 26 52 30 61 S40 71 41 78 S53 85 53 85 S50 82 48 75 S42 68 38 59 S37 50 30 37 C36 43 42 40 49 48 S61 53 65 59 S79 62 79 62 S75 60 71 54 S63 50 56 43 S52 34 41 24 C48 28 53 24 62 28 S76 29 82 33 S95 31 95 31 S91 31 85 27 S76 25 67 21 S61 15 47 9 "/>
-    </symbol>
-    <symbol id="sunBeamLargeSymbol" overflow="visible">
-      <g transform="scale(0.28)">
-        <use xlink:href="#sunBeamData" class="sunBeamLargeSymbol"/>
-      </g>
-    </symbol>
-    <symbol id="sunBeamSmallSymbol" overflow="visible">
-      <g transform="scale(0.23) rotate(10)">
-        <use xlink:href="#sunBeamData" class="sunBeamSmallSymbol"/>
-      </g>
-    </symbol>
-    <symbol id="leverRafieData" overflow="visible">
-      <path d="M2.0 -250.0V195.0A5.0 5.0 0 0 1 5.0 200.0v5.0A5.0 5.0 0 0 0 10.0 210.0h0.0A5.0 5.0 0 0 1 15.0 215.0H-15.0A5.0 5.0 0 0 1 -10.0 210.0h0.0A5.0 5.0 0 0 0 -5.0 205.0v-5.0A5.0 5.0 0 0 1 -2.0 195.0V-250.0"/>
-    </symbol>
-    <symbol id="leverRafieSymbol" overflow="visible">
-      <use xlink:href="#leverRafieData" class="leverRafieSymbol"/>
-    </symbol>
-    <symbol id="leverData" overflow="visible">
-      <path d="M2.0 -200.0L2.0 -11.313708498984761A4.0 4.0 0 0 0 4.0 -6.928203230275509A8.0 8.0 0 0 1 6.928203230275509 -4.0A4.0 4.0 0 0 0 11.313708498984761 -2.0L100.0 -2.0L100.0 -1.25L200.0 -1.25L200.0 1.25L100.0 1.25L100.0 2.0L11.313708498984761 2.0A4.0 4.0 0 0 0 6.928203230275509 4.0A8.0 8.0 0 0 1 4.0 6.928203230275509A4.0 4.0 0 0 0 2.0 11.313708498984761L2.0 80.0L-2.0 80.0L-2.0 11.313708498984761A4.0 4.0 0 0 0 -4.0 6.928203230275509A8.0 8.0 0 0 1 -6.928203230275509 4.0A4.0 4.0 0 0 0 -11.313708498984761 2.0L-100.0 2.0L-100.0 -2.0L-11.313708498984761 -2.0A4.0 4.0 0 0 0 -6.928203230275509 -4.0A8.0 8.0 0 0 1 -4.0 -6.928203230275509A4.0 4.0 0 0 0 -2.0 -11.313708498984761L-2.0 -200.0"/>
-    </symbol>
-    <symbol id="leverSymbol" overflow="visible">
-      <use xlink:href="#leverData" class="leverSymbol"/>
-    </symbol>
-    <symbol id="hourAngleStarData" overflow="visible">
-      <path d="M193.0 5.0L197.5 7.8L197.3 2.5L202.0 0.0L197.3 -2.5L197.5 -7.8L193.0 -5.0L188.5 -7.8L188.7 -2.5L184.0 -0.0L188.7 2.5L188.5 7.8"/>
-    </symbol>
-    <symbol id="hourAngleStarSymbol" overflow="visible">
-      <use xlink:href="#hourAngleStarData" class="hourAngleStarSymbol"/>
-    </symbol>
-    <radialGradient id="gradient_01" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-      <stop offset="0" style="stop-color:#C8DEE8"/>
-      <stop offset="1" style="stop-color:#14648C"/>
-    </radialGradient>
-    <radialGradient id="gradient_02" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-      <stop offset="0" style="stop-color:#14648C"/>
-      <stop offset="1" style="stop-color:#C8DEE8"/>
-    </radialGradient>
-    <radialGradient id="gradientSunSphere" cx="50%" cy="50%" r="65%" fx="30%" fy="30%">
-      <stop offset="0%" style="stop-color: rgb(255, 255, 255); stop-opacity: 0"/>
-      <stop offset="100%" style="stop-color: rgb(99, 99, 99); stop-opacity: 1"/>
-    </radialGradient>
-    <radialGradient id="gradientMoonSphere" cx="50%" cy="50%" r="55%" fx="30%" fy="30%">
-      <stop offset="0%" style="stop-color: rgb(255, 255, 255); stop-opacity: 0.2"/>
-      <stop offset="100%" style="stop-color: rgb(99, 99, 99); stop-opacity: 1"/>
-    </radialGradient>
-    <mask id="baseArea">
-      <g class="maskWhite">
-        <circle cx="0" cy="0" r="250"/>
-      </g>
-    </mask>
-    <mask id="mapArea">
-      <g class="maskWhite">
-        <circle cx="0" cy="0" r="82"/>
-      </g>
-    </mask>
-    <mask id="dayArea">
-      <g class="maskWhite">
-        <path [attr.d]="dayAreaMask"/>
-      </g>
-    </mask>
-    <clipPath id="backgroundArea">
-      <rect x="521.317" y="233.188" width="1024" height="768"/>
-    </clipPath>
-  </defs>
+<div id="svg-wrapper">
+  <svg viewBox="0 0 600 600" xml:space="preserve">
+    <defs>
+      <filter id="filterHand" x="0" y="0" width="200%" height="200%">
+        <feOffset result="offOut" in="SourceAlpha" dx="8" dy="8"/>
+        <feGaussianBlur result="blurOut" in="offOut" stdDeviation="4"/>
+        <feComponentTransfer result="fadeOut" in="blurOut">
+          <feFuncA type="linear" slope="0.85"/>
+        </feComponentTransfer>
+        <feBlend in="SourceGraphic" in2="fadeOut" mode="normal"/>
+      </filter>
+      <filter id="filterEcliptic" x="0" y="0" width="200%" height="200%">
+        <feOffset result="offOut" in="SourceAlpha" dx="15" dy="15"/>
+        <feGaussianBlur result="blurOut" in="offOut" stdDeviation="3"/>
+        <feComponentTransfer result="fadeOut" in="blurOut">
+          <feFuncA type="linear" slope="0.75"/>
+        </feComponentTransfer>
+        <feBlend in="SourceGraphic" in2="fadeOut" mode="normal"/>
+      </filter>
+      <filter id="filterRelief" filterUnits="userSpaceOnUse" x="-60%" y="-60%">
+        <feOffset result="offOut" in="SourceAlpha" dx="1" dy="1"/>
+        <feGaussianBlur result="blurOut" in="offOut" stdDeviation="1"/>
+        <feBlend in="SourceGraphic" in2="blurOut" mode="normal"/>
+      </filter>
+      <symbol id="handData" overflow="visible">
+        <path d="M-4 57C-4 57-6 45-6 42C-8 38-27 18-28 9C-29-2-33-7-33-15C-33-18-30-18-29-18C-21-17-19 2-18 2C-18 2-20-23-16-37C-15-40-11-40-10-37C-8-34-11-5-10-5C-9-5-9-36-7-40C-6-44-1-44 0-41C3-37-1-0 0 0C1 1-1-11 3-16C6-20 11-18 11-13C11-10 8 5 9 5C10 5 11-8 14-12C16-15 21-15 22-10C23-7 19 7 18 11C17 15 13 28 13 32C13 40 21 49 21 49L-4 57z"/>
+      </symbol>
+      <symbol id="handSymbol" overflow="visible">
+        <g transform="scale(0.4)">
+          <use xlink:href="#handData" class="handSymbol"/>
+        </g>
+      </symbol>
+      <symbol id="sunBeamData" overflow="visible">
+        <path d="M47 8C55 10 58 4 68 5 S81 1 88 3 S100 -3 100 -3 S96 -2 89 -4 S80 -2 70 -3 S62 -7 47 -8 C55 -9 56 -16 66 -19 S76 -27 84 -27 S93 -37 93 -37 S90 -35 82 -34 S74 -29 65 -27 S56 -28 41 -24 C49 -28 47 -34 55 -40 S63 -51 69 -54 S75 -67 75 -67 S72 -63 66 -60 S60 -53 52 -47 S43 -45 31 -36 C36 -43 32 -48 38 -56 S41 -70 47 -75 S47 -88 47 -88 S46 -84 41 -79 S38 -70 32 -62 S25 -57 17 -45 C19 -52 14 -56 17 -66 S15 -80 18 -86 S14 -99 14 -99 S15 -95 12 -88 S12 -79 9 -69 S4 -62 0 -48 C0 -56 -6 -58 -7 -68 S-13 -80 -12 -87 S-20 -98 -20 -98 S-19 -94 -19 -87 S-16 -78 -15 -68 S-18 -60 -16 -45 C-19 -53 -26 -52 -30 -61 S-40 -71 -41 -78 S-53 -85 -53 -85 S-50 -82 -48 -75 S-42 -68 -38 -59 S-37 -50 -30 -37 C-36 -43 -42 -40 -49 -48 S-61 -53 -65 -59 S-79 -62 -79 -62 S-75 -60 -71 -54 S-63 -50 -56 -43 S-52 -34 -41 -24 C-48 -28 -53 -24 -62 -28 S-76 -29 -82 -33 S-95 -31 -95 -31 S-91 -31 -85 -27 S-76 -25 -67 -21 S-61 -15 -47 -9 C-55 -10 -58 -4 -68 -5 S-81 -1 -88 -3 S-100 3 -100 3 S-96 2 -89 4 S-80 2 -70 3 S-62 7 -47 8 C-55 9 -56 16 -66 19 S-76 27 -84 27 S-93 37 -93 37 S-90 35 -82 34 S-74 29 -65 27 S-56 28 -41 24 C-49 28 -47 34 -55 40 S-63 51 -69 54 S-75 67 -75 67 S-72 63 -66 60 S-60 53 -52 47 S-43 45 -31 36 C-36 43 -32 48 -38 56 S-41 70 -47 75 S-47 88 -47 88 S-46 84 -41 79 S-38 70 -32 62 S-25 57 -17 45 C-19 52 -14 56 -17 66 S-15 80 -18 86 S-14 99 -14 99 S-15 95 -12 88 S-12 79 -9 69 S-4 62 0 48 C0 56 6 58 7 68 S13 80 12 87 S20 98 20 98 S19 94 19 87 S16 78 15 68 S18 60 16 45 C19 53 26 52 30 61 S40 71 41 78 S53 85 53 85 S50 82 48 75 S42 68 38 59 S37 50 30 37 C36 43 42 40 49 48 S61 53 65 59 S79 62 79 62 S75 60 71 54 S63 50 56 43 S52 34 41 24 C48 28 53 24 62 28 S76 29 82 33 S95 31 95 31 S91 31 85 27 S76 25 67 21 S61 15 47 9 "/>
+      </symbol>
+      <symbol id="sunBeamLargeSymbol" overflow="visible">
+        <g transform="scale(0.28)">
+          <use xlink:href="#sunBeamData" class="sunBeamLargeSymbol"/>
+        </g>
+      </symbol>
+      <symbol id="sunBeamSmallSymbol" overflow="visible">
+        <g transform="scale(0.23) rotate(10)">
+          <use xlink:href="#sunBeamData" class="sunBeamSmallSymbol"/>
+        </g>
+      </symbol>
+      <symbol id="leverRafieData" overflow="visible">
+        <path d="M2.0 -250.0V195.0A5.0 5.0 0 0 1 5.0 200.0v5.0A5.0 5.0 0 0 0 10.0 210.0h0.0A5.0 5.0 0 0 1 15.0 215.0H-15.0A5.0 5.0 0 0 1 -10.0 210.0h0.0A5.0 5.0 0 0 0 -5.0 205.0v-5.0A5.0 5.0 0 0 1 -2.0 195.0V-250.0"/>
+      </symbol>
+      <symbol id="leverRafieSymbol" overflow="visible">
+        <use xlink:href="#leverRafieData" class="leverRafieSymbol"/>
+      </symbol>
+      <symbol id="leverData" overflow="visible">
+        <path d="M2.0 -200.0L2.0 -11.313708498984761A4.0 4.0 0 0 0 4.0 -6.928203230275509A8.0 8.0 0 0 1 6.928203230275509 -4.0A4.0 4.0 0 0 0 11.313708498984761 -2.0L100.0 -2.0L100.0 -1.25L200.0 -1.25L200.0 1.25L100.0 1.25L100.0 2.0L11.313708498984761 2.0A4.0 4.0 0 0 0 6.928203230275509 4.0A8.0 8.0 0 0 1 4.0 6.928203230275509A4.0 4.0 0 0 0 2.0 11.313708498984761L2.0 80.0L-2.0 80.0L-2.0 11.313708498984761A4.0 4.0 0 0 0 -4.0 6.928203230275509A8.0 8.0 0 0 1 -6.928203230275509 4.0A4.0 4.0 0 0 0 -11.313708498984761 2.0L-100.0 2.0L-100.0 -2.0L-11.313708498984761 -2.0A4.0 4.0 0 0 0 -6.928203230275509 -4.0A8.0 8.0 0 0 1 -4.0 -6.928203230275509A4.0 4.0 0 0 0 -2.0 -11.313708498984761L-2.0 -200.0"/>
+      </symbol>
+      <symbol id="leverSymbol" overflow="visible">
+        <use xlink:href="#leverData" class="leverSymbol"/>
+      </symbol>
+      <symbol id="hourAngleStarData" overflow="visible">
+        <path d="M193.0 5.0L197.5 7.8L197.3 2.5L202.0 0.0L197.3 -2.5L197.5 -7.8L193.0 -5.0L188.5 -7.8L188.7 -2.5L184.0 -0.0L188.7 2.5L188.5 7.8"/>
+      </symbol>
+      <symbol id="hourAngleStarSymbol" overflow="visible">
+        <use xlink:href="#hourAngleStarData" class="hourAngleStarSymbol"/>
+      </symbol>
+      <radialGradient id="gradient_01" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+        <stop offset="0" style="stop-color:#C8DEE8"/>
+        <stop offset="1" style="stop-color:#14648C"/>
+      </radialGradient>
+      <radialGradient id="gradient_02" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+        <stop offset="0" style="stop-color:#14648C"/>
+        <stop offset="1" style="stop-color:#C8DEE8"/>
+      </radialGradient>
+      <radialGradient id="gradientSunSphere" cx="50%" cy="50%" r="65%" fx="30%" fy="30%">
+        <stop offset="0%" style="stop-color: rgb(255, 255, 255); stop-opacity: 0"/>
+        <stop offset="100%" style="stop-color: rgb(99, 99, 99); stop-opacity: 1"/>
+      </radialGradient>
+      <radialGradient id="gradientMoonSphere" cx="50%" cy="50%" r="55%" fx="30%" fy="30%">
+        <stop offset="0%" style="stop-color: rgb(255, 255, 255); stop-opacity: 0.2"/>
+        <stop offset="100%" style="stop-color: rgb(99, 99, 99); stop-opacity: 1"/>
+      </radialGradient>
+      <mask id="baseArea">
+        <g class="maskWhite">
+          <circle cx="0" cy="0" r="250"/>
+        </g>
+      </mask>
+      <mask id="dayArea">
+        <g class="maskWhite">
+          <path [attr.d]="dayAreaMask"/>
+        </g>
+      </mask>
+      <clipPath id="backgroundArea">
+        <rect x="521.317" y="233.188" width="1024" height="768"/>
+      </clipPath>
+    </defs>
 
-  <g transform="translate(300, 300)" class="content">
-    <g id="base">
-      <g id="unequalHourAreas" mask="url(#baseArea)">
-        <circle *ngIf="midnightSunR" cx="0" cy="0" r="250" class="midnightSunColor"/>
-        <circle cx="0" cy="0" [attr.r]="midnightSunR ? midnightSunR : 250" class="unequalHour6"/>
-        <path [attr.d]="hourWedges[1]"  class="unequalHourArea unequalHour1"/>
-        <path [attr.d]="hourWedges[2]"  class="unequalHourArea unequalHour2"/>
-        <path [attr.d]="hourWedges[3]"  class="unequalHourArea unequalHour3"/>
-        <path [attr.d]="hourWedges[4]"  class="unequalHourArea unequalHour4"/>
-        <path [attr.d]="hourWedges[5]"  class="unequalHourArea unequalHour5"/>
-        <path [attr.d]="hourWedges[7]"  class="unequalHourArea unequalHour5"/>
-        <path [attr.d]="hourWedges[8]"  class="unequalHourArea unequalHour4"/>
-        <path [attr.d]="hourWedges[9]"  class="unequalHourArea unequalHour3"/>
-        <path [attr.d]="hourWedges[10]" class="unequalHourArea unequalHour2"/>
-        <path [attr.d]="hourWedges[11]" class="unequalHourArea unequalHour1"/>
-        <circle id="horizonArea" [attr.r]="horizonR" cx="0" [attr.cy]="horizonCy" class="horizonArea"/>
-        <circle id="darkArea" [attr.r]="darkR" cx="0" [attr.cy]="darkCy" class="darkArea"/>
-      </g>
-      <g id="unequalHourLabels"/>
-      <g id="eventLabels">
-        <path id="dawnPath" [attr.d]="dawnLabelPath" class="textPath"/>
-        <path id="duskPath" [attr.d]="duskLabelPath" class="textPath"/>
-        <path id="sunrisePath" [attr.d]="sunriseLabelPath" class="textPath"/>
-        <path id="sunsetPath" [attr.d]="sunsetLabelPath" class="textPath"/>
-        <path id="solNoctis" [attr.d]="solNoctisPath" class="textPath"/>
-        <text>
-          <textPath xlink:href="#sunrisePath" [attr.startOffset]="southern ? '40%' : '54%'" class="eventText">
-            <tspan [style.font-size]="riseSetFontSize">ɐɑɒɓɔ</tspan><!-- ORTUS -->
-          </textPath>
-        </text>
-        <text>
-          <textPath xlink:href="#dawnPath" [attr.startOffset]="dawnTextOffset" class="eventText">
-            <tspan dy="1" [style.font-size]="dawnDuskFontSize">ɜɝɞɟɠɡ</tspan><!-- AURORA -->
-          </textPath>
-        </text>
-        <text>
-          <textPath xlink:href="#sunsetPath" [attr.startOffset]="southern ? '59%' : '41%'" class="eventText">
-            <tspan [style.font-size]="riseSetFontSize">ɕɖɗɘəɚɛ</tspan><!-- OCCASUS -->
-          </textPath>
-        </text>
-        <text>
-          <textPath xlink:href="#duskPath" [attr.startOffset]="duskTextOffset" class="eventText">
-            <tspan dy="1" [style.font-size]="dawnDuskFontSize">ɢɣɤɥɦɧɨɩɪɫɬ</tspan><!-- CREPUSCULUM -->
-          </textPath>
-        </text>
-        <text *ngIf="midnightSunR">
-          <textPath xlink:href="#solNoctis" startOffset="49%" class="eventText">
-            <tspan dy="-2" [style.font-size]="'12px'">ⓈⓄⓁ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ⓃⓄⒸⓉⒾⓈ</tspan><!-- CREPUSCULUM -->
-          </textPath>
-        </text>
-      </g>
-      <g id="time">
-        <path id="timeTextPath" d="M0.0 -221.0C122.0 -221.0 221.0 -122.0 221.0 0.0C221.0 122.0 122.0 221.0 0.0 221.0C-122.0 221.0 -221.0 122.0 -221.0 0.0C-221.0 -122.0 -122.0 -221.0 0.0 -221.0" class="textPath"/>
-        <g *ngIf="!southern" filter="url(#filterRelief)">
-          <text><textPath xlink:href="#timeTextPath" startOffset="4.2%" class="timeText">I</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="8.3%" class="timeText">II</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="12.5%" class="timeText">III</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="16.7%" class="timeText">IV</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="20.8%" class="timeText">V</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="25.0%" class="timeText">VI</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="29.2%" class="timeText">VII</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="33.3%" class="timeText">VIII</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="37.5%" class="timeText">IX</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="41.7%" class="timeText">X</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="45.8%" class="timeText">XI</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="50.0%" class="timeText">XII</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="54.2%" class="timeText">I</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="58.3%" class="timeText">II</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="62.5%" class="timeText">III</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="66.7%" class="timeText">IV</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="70.8%" class="timeText">V</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="75.0%" class="timeText">VI</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="79.2%" class="timeText">VII</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="83.3%" class="timeText">VIII</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="87.5%" class="timeText">IX</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="91.7%" class="timeText">X</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="95.8%" class="timeText">XI</textPath></text>
-          <g transform="rotate(180)">
+    <g transform="translate(300, 300)" class="content">
+      <g id="base">
+        <g id="unequalHourAreas" mask="url(#baseArea)">
+          <circle *ngIf="midnightSunR" cx="0" cy="0" r="250" class="midnightSunColor"/>
+          <circle cx="0" cy="0" [attr.r]="midnightSunR ? midnightSunR : 250" class="unequalHour6"/>
+          <path [attr.d]="hourWedges[1]"  class="unequalHourArea unequalHour1"/>
+          <path [attr.d]="hourWedges[2]"  class="unequalHourArea unequalHour2"/>
+          <path [attr.d]="hourWedges[3]"  class="unequalHourArea unequalHour3"/>
+          <path [attr.d]="hourWedges[4]"  class="unequalHourArea unequalHour4"/>
+          <path [attr.d]="hourWedges[5]"  class="unequalHourArea unequalHour5"/>
+          <path [attr.d]="hourWedges[7]"  class="unequalHourArea unequalHour5"/>
+          <path [attr.d]="hourWedges[8]"  class="unequalHourArea unequalHour4"/>
+          <path [attr.d]="hourWedges[9]"  class="unequalHourArea unequalHour3"/>
+          <path [attr.d]="hourWedges[10]" class="unequalHourArea unequalHour2"/>
+          <path [attr.d]="hourWedges[11]" class="unequalHourArea unequalHour1"/>
+          <circle id="horizonArea" [attr.r]="horizonR" cx="0" [attr.cy]="horizonCy" class="horizonArea"/>
+          <circle id="darkArea" [attr.r]="darkR" cx="0" [attr.cy]="darkCy" class="darkArea"/>
+        </g>
+        <g id="unequalHourLabels"/>
+        <g id="eventLabels">
+          <path id="dawnPath" [attr.d]="dawnLabelPath" class="textPath"/>
+          <path id="duskPath" [attr.d]="duskLabelPath" class="textPath"/>
+          <path id="sunrisePath" [attr.d]="sunriseLabelPath" class="textPath"/>
+          <path id="sunsetPath" [attr.d]="sunsetLabelPath" class="textPath"/>
+          <path id="solNoctis" [attr.d]="solNoctisPath" class="textPath"/>
+          <text>
+            <textPath xlink:href="#sunrisePath" [attr.startOffset]="southern ? '40%' : '54%'" class="eventText">
+              <tspan [style.font-size]="riseSetFontSize">ɐɑɒɓɔ</tspan><!-- ORTUS -->
+            </textPath>
+          </text>
+          <text>
+            <textPath xlink:href="#dawnPath" [attr.startOffset]="dawnTextOffset" class="eventText">
+              <tspan dy="1" [style.font-size]="dawnDuskFontSize">ɜɝɞɟɠɡ</tspan><!-- AURORA -->
+            </textPath>
+          </text>
+          <text>
+            <textPath xlink:href="#sunsetPath" [attr.startOffset]="southern ? '59%' : '41%'" class="eventText">
+              <tspan [style.font-size]="riseSetFontSize">ɕɖɗɘəɚɛ</tspan><!-- OCCASUS -->
+            </textPath>
+          </text>
+          <text>
+            <textPath xlink:href="#duskPath" [attr.startOffset]="duskTextOffset" class="eventText">
+              <tspan dy="1" [style.font-size]="dawnDuskFontSize">ɢɣɤɥɦɧɨɩɪɫɬ</tspan><!-- CREPUSCULUM -->
+            </textPath>
+          </text>
+          <text *ngIf="midnightSunR">
+            <textPath xlink:href="#solNoctis" startOffset="49%" class="eventText">
+              <tspan dy="-2" [style.font-size]="'12px'">ⓈⓄⓁ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ⓃⓄⒸⓉⒾⓈ</tspan><!-- CREPUSCULUM -->
+            </textPath>
+          </text>
+        </g>
+        <g id="time">
+          <path id="timeTextPath" d="M0.0 -221.0C122.0 -221.0 221.0 -122.0 221.0 0.0C221.0 122.0 122.0 221.0 0.0 221.0C-122.0 221.0 -221.0 122.0 -221.0 0.0C-221.0 -122.0 -122.0 -221.0 0.0 -221.0" class="textPath"/>
+          <g *ngIf="!southern" filter="url(#filterRelief)">
+            <text><textPath xlink:href="#timeTextPath" startOffset="4.2%" class="timeText">I</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="8.3%" class="timeText">II</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="12.5%" class="timeText">III</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="16.7%" class="timeText">IV</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="20.8%" class="timeText">V</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="25.0%" class="timeText">VI</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="29.2%" class="timeText">VII</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="33.3%" class="timeText">VIII</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="37.5%" class="timeText">IX</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="41.7%" class="timeText">X</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="45.8%" class="timeText">XI</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="50.0%" class="timeText">XII</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="54.2%" class="timeText">I</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="58.3%" class="timeText">II</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="62.5%" class="timeText">III</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="66.7%" class="timeText">IV</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="70.8%" class="timeText">V</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="75.0%" class="timeText">VI</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="79.2%" class="timeText">VII</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="83.3%" class="timeText">VIII</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="87.5%" class="timeText">IX</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="91.7%" class="timeText">X</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="95.8%" class="timeText">XI</textPath></text>
+            <g transform="rotate(180)">
+              <text><textPath xlink:href="#timeTextPath" startOffset="50.0%" class="timeText">XII</textPath></text>
+            </g>
           </g>
-        </g>
-        <g *ngIf="southern" filter="url(#filterRelief)">
-          <text><textPath xlink:href="#timeTextPath" startOffset="4.2%" class="timeText">XI</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="8.3%" class="timeText">X</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="12.5%" class="timeText">IX</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="16.7%" class="timeText">VIII</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="20.8%" class="timeText">VII</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="25.0%" class="timeText">VI</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="29.2%" class="timeText">V</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="33.3%" class="timeText">IV</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="37.5%" class="timeText">III</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="41.7%" class="timeText">II</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="45.8%" class="timeText">I</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="50.0%" class="timeText">XII</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="54.2%" class="timeText">XI</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="58.3%" class="timeText">X</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="62.5%" class="timeText">IX</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="66.7%" class="timeText">VIII</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="70.8%" class="timeText">VII</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="75.0%" class="timeText">VI</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="79.2%" class="timeText">V</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="83.3%" class="timeText">IV</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="87.5%" class="timeText">III</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="91.7%" class="timeText">II</textPath></text>
-          <text><textPath xlink:href="#timeTextPath" startOffset="95.8%" class="timeText">I</textPath></text>
-          <g transform="rotate(180)">
+          <g *ngIf="southern" filter="url(#filterRelief)">
+            <text><textPath xlink:href="#timeTextPath" startOffset="4.2%" class="timeText">XI</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="8.3%" class="timeText">X</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="12.5%" class="timeText">IX</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="16.7%" class="timeText">VIII</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="20.8%" class="timeText">VII</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="25.0%" class="timeText">VI</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="29.2%" class="timeText">V</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="33.3%" class="timeText">IV</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="37.5%" class="timeText">III</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="41.7%" class="timeText">II</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="45.8%" class="timeText">I</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="50.0%" class="timeText">XII</textPath></text>
-          </g>
-        </g>
-      </g>
-      <g id="unequalHourBorders" mask="url(#dayArea)" filter="url(#filterRelief)" [attr.stroke-width]="hourStroke + 'px'">
-        <path [attr.d]="hourArcs[1]" class="unequalHourBorder"/>
-        <path [attr.d]="hourArcs[2]" class="unequalHourBorder"/>
-        <path [attr.d]="hourArcs[3]" class="unequalHourBorder"/>
-        <path [attr.d]="hourArcs[4]" class="unequalHourBorder"/>
-        <path [attr.d]="hourArcs[5]" class="unequalHourBorder"/>
-        <path [attr.d]="hourArcs[7]" class="unequalHourBorder"/>
-        <path [attr.d]="hourArcs[8]" class="unequalHourBorder"/>
-        <path [attr.d]="hourArcs[9]" class="unequalHourBorder"/>
-        <path [attr.d]="hourArcs[10]" class="unequalHourBorder"/>
-        <path [attr.d]="hourArcs[11]" class="unequalHourBorder"/>
-        <path d="M0 0L0 -400" class="unequalHourBorder"/>
-      </g>
-      <g id="horizonBorder" mask="url(#baseArea)" filter="url(#filterRelief)">
-        <circle *ngIf="midnightSunR" [attr.r]="midnightSunR" cx="0" cy="0" class="midnightSunCircle"/>
-        <circle id="horizonBorder" [attr.r]="horizonR" cx="0" [attr.cy]="horizonCy" class="baseCircle"/>
-      </g>
-      <g id="baseCircles" filter="url(#filterRelief)">
-        <circle cx="0" cy="0" r="107.7" class="baseCircle innerCircle"/>
-        <circle cx="0" cy="0" r="164.1" class="baseCircle"/>
-        <circle cx="0" cy="0" r="250" class="baseCircle"/>
-      </g>
-      <g id="worldMap" mask="url(#mapArea)" transform="scale(-1, -1)">
-        <foreignObject x="-90" y="-90" width="180" height="180">
-          <div id="globe-host"></div>
-        </foreignObject>
-        <image *ngIf="buggyForeignObject" id="globe-host-image" x="-90" y="-90" width="180" height="180"/>
-      </g>
-    </g>
-    <g id="outerRing">
-      <path id="outerRingBackground" d="M0.0 -291.5C-161.0 -291.5 -291.5 -161.0 -291.5 0.0C-291.5 161.0 -161.0 291.5 0.0 291.5C161.0 291.5 291.5 161.0 291.5 0.0C291.5 -161.0 161.0 -291.5 0.0 -291.5M0.0 -258.8C142.9 -258.8 258.8 -142.9 258.8 0.0C258.8 142.9 142.9 258.8 0.0 258.8C-142.9 258.8 -258.8 142.9 -258.8 0.0C-258.8 -142.9 -142.9 -258.8 0.0 -258.8" class="outerRingBackground"/>
-      <path id="outerRingTextPath" d="M0.0 -258.8C142.9 -258.8 258.8 -142.9 258.8 0.0C258.8 142.9 142.9 258.8 0.0 258.8C-142.9 258.8 -258.8 142.9 -258.8 0.0C-258.8 -142.9 -142.9 -258.8 0.0 -258.8" class="textPath"/>
-      <g filter="url(#filterRelief)">
-        <path id="outerCircle" d="M0.0 -291.5C-161.0 -291.5 -291.5 -161.0 -291.5 0.0C-291.5 161.0 -161.0 291.5 0.0 291.5C161.0 291.5 291.5 161.0 291.5 0.0C291.5 -161.0 161.0 -291.5 0.0 -291.5" class="outerRingBorder"/>
-        <path id="innerCircle" d="M0.0 -258.8C142.9 -258.8 258.8 -142.9 258.8 0.0C258.8 142.9 142.9 258.8 0.0 258.8C-142.9 258.8 -258.8 142.9 -258.8 0.0C-258.8 -142.9 -142.9 -258.8 0.0 -258.8" class="outerRingBorder"/>
-        <g *ngIf="!southern" id="outerRingNumbers" [attr.transform]="rotate(outerRingAngle)">
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="4.2%" class="outerRingText">ɰ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="8.3%" class="outerRingText">ɱ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="12.5%" class="outerRingText">ɲ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="16.7%" class="outerRingText">ɳ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="20.8%" class="outerRingText">ɴ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="25.0%" class="outerRingText">ɵ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="29.2%" class="outerRingText">ɶ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="33.3%" class="outerRingText">ɷ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="37.5%" class="outerRingText">ɸ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="41.7%" class="outerRingText">ɹ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="45.8%" class="outerRingText">ɺ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="50.0%" class="outerRingText">ɻ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="54.2%" class="outerRingText">ɼ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="58.3%" class="outerRingText">ɽ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="62.5%" class="outerRingText">ɾ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="66.7%" class="outerRingText">ɿ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="70.8%" class="outerRingText">ʀ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="75.0%" class="outerRingText">ʁ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="79.2%" class="outerRingText">ʂ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="83.3%" class="outerRingText">ʃ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="87.5%" class="outerRingText">ʄ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="91.7%" class="outerRingText">ʅ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="95.8%" class="outerRingText">ʆ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="0.0%" class="outerRingText">ʇ</textPath></text>
-        </g>
-        <g *ngIf="southern" id="outerRingNumbers" [attr.transform]="rotate(-outerRingAngle)">
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="95.8%" class="outerRingText">ɰ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="91.7%" class="outerRingText">ɱ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="87.5%" class="outerRingText">ɲ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="83.3%" class="outerRingText">ɳ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="79.2%" class="outerRingText">ɴ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="75.0%" class="outerRingText">ɵ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="70.8%" class="outerRingText">ɶ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="66.7%" class="outerRingText">ɷ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="62.5%" class="outerRingText">ɸ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="58.3%" class="outerRingText">ɹ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="54.2%" class="outerRingText">ɺ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="50.0%" class="outerRingText">ɻ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="45.8%" class="outerRingText">ɼ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="41.7%" class="outerRingText">ɽ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="37.5%" class="outerRingText">ɾ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="33.3%" class="outerRingText">ɿ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="29.2%" class="outerRingText">ʀ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="25.0%" class="outerRingText">ʁ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="20.8%" class="outerRingText">ʂ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="16.7%" class="outerRingText">ʃ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="12.5%" class="outerRingText">ʄ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="8.3%" class="outerRingText">ʅ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="4.2%" class="outerRingText">ʆ</textPath></text>
-          <text><textPath xlink:href="#outerRingTextPath" startOffset="0.0%" class="outerRingText">ʇ</textPath></text>
-        </g>
-      </g>
-    </g>
-    <g id="frontPart">
-      <g filter="url(#filterHand)">
-        <g filter="url(#filterRelief)">
-          <g id="hand" [attr.transform]="rotate(handAngle * rotateSign)">
-            <use xlink:href="#leverRafieSymbol" class="leverRafieSymbol"/>
-            <path d="M0 0L0 -250.0" class="leverRafieGolden"/>
-            <g transform="translate(0,-250.0)">
-              <use xlink:href="#handSymbol"/>
+            <text><textPath xlink:href="#timeTextPath" startOffset="54.2%" class="timeText">XI</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="58.3%" class="timeText">X</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="62.5%" class="timeText">IX</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="66.7%" class="timeText">VIII</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="70.8%" class="timeText">VII</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="75.0%" class="timeText">VI</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="79.2%" class="timeText">V</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="83.3%" class="timeText">IV</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="87.5%" class="timeText">III</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="91.7%" class="timeText">II</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="95.8%" class="timeText">I</textPath></text>
+            <g transform="rotate(180)">
+              <text><textPath xlink:href="#timeTextPath" startOffset="50.0%" class="timeText">XII</textPath></text>
             </g>
           </g>
         </g>
+        <g id="unequalHourBorders" mask="url(#dayArea)" filter="url(#filterRelief)" [attr.stroke-width]="hourStroke + 'px'">
+          <path [attr.d]="hourArcs[1]" class="unequalHourBorder"/>
+          <path [attr.d]="hourArcs[2]" class="unequalHourBorder"/>
+          <path [attr.d]="hourArcs[3]" class="unequalHourBorder"/>
+          <path [attr.d]="hourArcs[4]" class="unequalHourBorder"/>
+          <path [attr.d]="hourArcs[5]" class="unequalHourBorder"/>
+          <path [attr.d]="hourArcs[7]" class="unequalHourBorder"/>
+          <path [attr.d]="hourArcs[8]" class="unequalHourBorder"/>
+          <path [attr.d]="hourArcs[9]" class="unequalHourBorder"/>
+          <path [attr.d]="hourArcs[10]" class="unequalHourBorder"/>
+          <path [attr.d]="hourArcs[11]" class="unequalHourBorder"/>
+          <path d="M0 0L0 -400" class="unequalHourBorder"/>
+        </g>
+        <g id="horizonBorder" mask="url(#baseArea)" filter="url(#filterRelief)">
+          <circle *ngIf="midnightSunR" [attr.r]="midnightSunR" cx="0" cy="0" class="midnightSunCircle"/>
+          <circle id="horizonBorder" [attr.r]="horizonR" cx="0" [attr.cy]="horizonCy" class="baseCircle"/>
+        </g>
+        <g id="baseCircles" filter="url(#filterRelief)">
+          <circle cx="0" cy="0" r="107.7" class="baseCircle innerCircle"/>
+          <circle cx="0" cy="0" r="164.1" class="baseCircle"/>
+          <circle cx="0" cy="0" r="250" class="baseCircle"/>
+        </g>
       </g>
-      <g filter="url(#filterEcliptic)" class="eclipticWheel" [style.opacity]="translucentEcliptic ? '0.33' : '1'">
+      <g id="outerRing">
+        <path id="outerRingBackground" d="M0.0 -291.5C-161.0 -291.5 -291.5 -161.0 -291.5 0.0C-291.5 161.0 -161.0 291.5 0.0 291.5C161.0 291.5 291.5 161.0 291.5 0.0C291.5 -161.0 161.0 -291.5 0.0 -291.5M0.0 -258.8C142.9 -258.8 258.8 -142.9 258.8 0.0C258.8 142.9 142.9 258.8 0.0 258.8C-142.9 258.8 -258.8 142.9 -258.8 0.0C-258.8 -142.9 -142.9 -258.8 0.0 -258.8" class="outerRingBackground"/>
+        <path id="outerRingTextPath" d="M0.0 -258.8C142.9 -258.8 258.8 -142.9 258.8 0.0C258.8 142.9 142.9 258.8 0.0 258.8C-142.9 258.8 -258.8 142.9 -258.8 0.0C-258.8 -142.9 -142.9 -258.8 0.0 -258.8" class="textPath"/>
         <g filter="url(#filterRelief)">
-          <g id="ecliptic_positive_levers" [attr.transform]="rotate(siderealAngle * rotateSign)">
-            <use xlink:href="#leverSymbol" class="leverSymbol"/>
+          <path id="outerCircle" d="M0.0 -291.5C-161.0 -291.5 -291.5 -161.0 -291.5 0.0C-291.5 161.0 -161.0 291.5 0.0 291.5C161.0 291.5 291.5 161.0 291.5 0.0C291.5 -161.0 161.0 -291.5 0.0 -291.5" class="outerRingBorder"/>
+          <path id="innerCircle" d="M0.0 -258.8C142.9 -258.8 258.8 -142.9 258.8 0.0C258.8 142.9 142.9 258.8 0.0 258.8C-142.9 258.8 -258.8 142.9 -258.8 0.0C-258.8 -142.9 -142.9 -258.8 0.0 -258.8" class="outerRingBorder"/>
+          <g *ngIf="!southern" id="outerRingNumbers" [attr.transform]="rotate(outerRingAngle)">
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="4.2%" class="outerRingText">ɰ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="8.3%" class="outerRingText">ɱ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="12.5%" class="outerRingText">ɲ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="16.7%" class="outerRingText">ɳ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="20.8%" class="outerRingText">ɴ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="25.0%" class="outerRingText">ɵ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="29.2%" class="outerRingText">ɶ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="33.3%" class="outerRingText">ɷ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="37.5%" class="outerRingText">ɸ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="41.7%" class="outerRingText">ɹ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="45.8%" class="outerRingText">ɺ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="50.0%" class="outerRingText">ɻ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="54.2%" class="outerRingText">ɼ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="58.3%" class="outerRingText">ɽ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="62.5%" class="outerRingText">ɾ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="66.7%" class="outerRingText">ɿ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="70.8%" class="outerRingText">ʀ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="75.0%" class="outerRingText">ʁ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="79.2%" class="outerRingText">ʂ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="83.3%" class="outerRingText">ʃ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="87.5%" class="outerRingText">ʄ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="91.7%" class="outerRingText">ʅ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="95.8%" class="outerRingText">ʆ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="0.0%" class="outerRingText">ʇ</textPath></text>
+          </g>
+          <g *ngIf="southern" id="outerRingNumbers" [attr.transform]="rotate(-outerRingAngle)">
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="95.8%" class="outerRingText">ɰ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="91.7%" class="outerRingText">ɱ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="87.5%" class="outerRingText">ɲ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="83.3%" class="outerRingText">ɳ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="79.2%" class="outerRingText">ɴ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="75.0%" class="outerRingText">ɵ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="70.8%" class="outerRingText">ɶ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="66.7%" class="outerRingText">ɷ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="62.5%" class="outerRingText">ɸ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="58.3%" class="outerRingText">ɹ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="54.2%" class="outerRingText">ɺ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="50.0%" class="outerRingText">ɻ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="45.8%" class="outerRingText">ɼ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="41.7%" class="outerRingText">ɽ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="37.5%" class="outerRingText">ɾ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="33.3%" class="outerRingText">ɿ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="29.2%" class="outerRingText">ʀ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="25.0%" class="outerRingText">ʁ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="20.8%" class="outerRingText">ʂ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="16.7%" class="outerRingText">ʃ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="12.5%" class="outerRingText">ʄ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="8.3%" class="outerRingText">ʅ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="4.2%" class="outerRingText">ʆ</textPath></text>
+            <text><textPath xlink:href="#outerRingTextPath" startOffset="0.0%" class="outerRingText">ʇ</textPath></text>
           </g>
         </g>
-        <g filter="url(#filterRelief)">
-          <g id="ecliptic_positive_hourAngleStar" [attr.transform]="rotate(siderealAngle * rotateSign)">
-            <use xlink:href="#hourAngleStarSymbol" class="hourAngleStarSymbol"/>
-          </g>
-        </g>
-        <g id="ecliptic_positive_signsArea" [attr.transform]="rotate(siderealAngle * rotateSign)">
-          <g transform="translate(0, -71.1)">
-            <path d="M0.0 -161.0C88.9 -161.0 161.0 -88.9 161.0 0.0C161.0 88.9 88.9 161.0 0.0 161.0C-88.9 161.0 -161.0 88.9 -161.0 0.0C-161.0 -88.9 -88.9 -161.0 0.0 -161.0M0.0 -116.3C-64.2 -116.3 -116.3 -64.2 -116.3 0.0C-116.3 64.2 -64.2 116.3 0.0 116.3C64.2 116.3 116.3 64.2 116.3 0.0C116.3 -64.2 64.2 -116.3 0.0 -116.3" class="signsArea"/>
-          </g>
-        </g>
-        <g filter="url(#filterRelief)">
-          <g id="ecliptic_positive_ecliptic" [attr.transform]="rotate(siderealAngle * rotateSign)">
-            <g transform="translate(0, -71.1)">
-              <g id="disc">
-                <path d="M0.0 -178.9C98.8 -178.9 178.9 -98.8 178.9 0.0C178.9 98.8 98.8 178.9 0.0 178.9C-98.8 178.9 -178.9 98.8 -178.9 0.0C-178.9 -98.8 -98.8 -178.9 0.0 -178.9" class="eclipticCircle"/>
-                <path d="M0.0 -161.0C88.9 -161.0 161.0 -88.9 161.0 0.0C161.0 88.9 88.9 161.0 0.0 161.0C-88.9 161.0 -161.0 88.9 -161.0 0.0C-161.0 -88.9 -88.9 -161.0 0.0 -161.0" class="eclipticCircle"/>
-                <path d="M0.0 -116.3C64.2 -116.3 116.3 -64.2 116.3 0.0C116.3 64.2 64.2 116.3 0.0 116.3C-64.2 116.3 -116.3 64.2 -116.3 0.0C-116.3 -64.2 -64.2 -116.3 0.0 -116.3" class="eclipticCircle"/>
-                <mask id="maskSmall">
-                  <path d="M0.0 -178.9C98.8 -178.9 178.9 -98.8 178.9 0.0C178.9 98.8 98.8 178.9 0.0 178.9C-98.8 178.9 -178.9 98.8 -178.9 0.0C-178.9 -98.8 -98.8 -178.9 0.0 -178.9M0.0 -161.0C-88.9 -161.0 -161.0 -88.9 -161.0 0.0C-161.0 88.9 -88.9 161.0 0.0 161.0C88.9 161.0 161.0 88.9 161.0 0.0C161.0 -88.9 88.9 -161.0 0.0 -161.0" class="maskWhite"/>
-                </mask>
-                <mask id="maskLarge">
-                  <path d="M0.0 -178.9C98.8 -178.9 178.9 -98.8 178.9 0.0C178.9 98.8 98.8 178.9 0.0 178.9C-98.8 178.9 -178.9 98.8 -178.9 0.0C-178.9 -98.8 -98.8 -178.9 0.0 -178.9M0.0 -116.3C-64.2 -116.3 -116.3 -64.2 -116.3 0.0C-116.3 64.2 -64.2 116.3 0.0 116.3C64.2 116.3 116.3 64.2 116.3 0.0C116.3 -64.2 64.2 -116.3 0.0 -116.3" class="maskWhite"/>
-                </mask>
-                <g mask="url(#maskSmall)">
-                  <path d="M0 71.1L40.7 426.5" class="eclipticDial"/>
-                  <path d="M0 71.1L80.7 419.6" class="eclipticDial"/>
-                  <path d="M0 71.1L119.4 408.3" class="eclipticDial"/>
-                  <path d="M0 71.1L156.2 393.0" class="eclipticDial"/>
-                  <path d="M0 71.1L222.1 351.6" class="eclipticDial"/>
-                  <path d="M0 71.1L250.6 326.5" class="eclipticDial"/>
-                  <path d="M0 71.1L275.8 299.0" class="eclipticDial"/>
-                  <path d="M0 71.1L297.7 269.6" class="eclipticDial"/>
-                  <path d="M0 71.1L331.2 206.4" class="eclipticDial"/>
-                  <path d="M0 71.1L342.8 173.3" class="eclipticDial"/>
-                  <path d="M0 71.1L351.1 139.6" class="eclipticDial"/>
-                  <path d="M0 71.1L356.1 105.5" class="eclipticDial"/>
-                  <path d="M0 71.1L356.1 36.8" class="eclipticDial"/>
-                  <path d="M0 71.1L351.1 2.7" class="eclipticDial"/>
-                  <path d="M0 71.1L342.8 -31.1" class="eclipticDial"/>
-                  <path d="M0 71.1L331.2 -64.1" class="eclipticDial"/>
-                  <path d="M0 71.1L297.7 -127.3" class="eclipticDial"/>
-                  <path d="M0 71.1L275.8 -156.7" class="eclipticDial"/>
-                  <path d="M0 71.1L250.6 -184.2" class="eclipticDial"/>
-                  <path d="M0 71.1L222.1 -209.3" class="eclipticDial"/>
-                  <path d="M0 71.1L156.2 -250.7" class="eclipticDial"/>
-                  <path d="M0 71.1L119.4 -266.1" class="eclipticDial"/>
-                  <path d="M0 71.1L80.7 -277.4" class="eclipticDial"/>
-                  <path d="M0 71.1L40.7 -284.3" class="eclipticDial"/>
-                  <path d="M0 71.1L-40.7 -284.3" class="eclipticDial"/>
-                  <path d="M0 71.1L-80.7 -277.4" class="eclipticDial"/>
-                  <path d="M0 71.1L-119.4 -266.1" class="eclipticDial"/>
-                  <path d="M0 71.1L-156.2 -250.7" class="eclipticDial"/>
-                  <path d="M0 71.1L-222.1 -209.3" class="eclipticDial"/>
-                  <path d="M0 71.1L-250.6 -184.2" class="eclipticDial"/>
-                  <path d="M0 71.1L-275.8 -156.7" class="eclipticDial"/>
-                  <path d="M0 71.1L-297.7 -127.3" class="eclipticDial"/>
-                  <path d="M0 71.1L-331.2 -64.1" class="eclipticDial"/>
-                  <path d="M0 71.1L-342.8 -31.1" class="eclipticDial"/>
-                  <path d="M0 71.1L-351.1 2.7" class="eclipticDial"/>
-                  <path d="M0 71.1L-356.1 36.8" class="eclipticDial"/>
-                  <path d="M0 71.1L-356.1 105.5" class="eclipticDial"/>
-                  <path d="M0 71.1L-351.1 139.6" class="eclipticDial"/>
-                  <path d="M0 71.1L-342.8 173.3" class="eclipticDial"/>
-                  <path d="M0 71.1L-331.2 206.4" class="eclipticDial"/>
-                  <path d="M0 71.1L-297.7 269.6" class="eclipticDial"/>
-                  <path d="M0 71.1L-275.8 299.0" class="eclipticDial"/>
-                  <path d="M0 71.1L-250.6 326.5" class="eclipticDial"/>
-                  <path d="M0 71.1L-222.1 351.6" class="eclipticDial"/>
-                  <path d="M0 71.1L-156.2 393.0" class="eclipticDial"/>
-                  <path d="M0 71.1L-119.4 408.3" class="eclipticDial"/>
-                  <path d="M0 71.1L-80.7 419.6" class="eclipticDial"/>
-                  <path d="M0 71.1L-40.7 426.5" class="eclipticDial"/>
-                </g>
-                <g mask="url(#maskLarge)">
-                  <path d="M0 71.1L0.0 428.9" class="eclipticCircle"/>
-                  <path d="M0 71.1L190.5 373.9" class="eclipticCircle"/>
-                  <path d="M0 71.1L316.1 238.6" class="eclipticCircle"/>
-                  <path d="M0 71.1L357.7 71.1" class="eclipticCircle"/>
-                  <path d="M0 71.1L316.1 -96.3" class="eclipticCircle"/>
-                  <path d="M0 71.1L190.5 -231.6" class="eclipticCircle"/>
-                  <path d="M0 71.1L0.0 -286.6" class="eclipticCircle"/>
-                  <path d="M0 71.1L-190.5 -231.6" class="eclipticCircle"/>
-                  <path d="M0 71.1L-316.1 -96.3" class="eclipticCircle"/>
-                  <path d="M0 71.1L-357.7 71.1" class="eclipticCircle"/>
-                  <path d="M0 71.1L-316.1 238.6" class="eclipticCircle"/>
-                  <path d="M0 71.1L-190.5 373.9" class="eclipticCircle"/>
-                </g>
-              </g>
-              <g *ngIf="!southern" id="symbols" transform="translate(0, 71.1)">
-                <g transform="rotate(76.2) translate(0,-110.5)">
-                  <text class="eclipticSymbol">♈</text>
-                </g>
-                <g transform="rotate(47.5) translate(0,-151.9)">
-                  <text class="eclipticSymbol">♉</text>
-                </g>
-                <g transform="rotate(16.3) translate(0,-182.8)">
-                  <text class="eclipticSymbol">♊</text>
-                </g>
-                <g transform="rotate(-16.3) translate(0,-182.8)">
-                  <text class="eclipticSymbol">♋</text>
-                </g>
-                <g transform="rotate(-47.5) translate(0,-151.9)">
-                  <text class="eclipticSymbol">♌</text>
-                </g>
-                <g transform="rotate(-76.2) translate(0,-110.5)">
-                  <text class="eclipticSymbol">♍</text>
-                </g>
-                <g transform="rotate(256.2) translate(0,-76.5)">
-                  <text class="eclipticSymbol">♎</text>
-                </g>
-                <g transform="rotate(227.5) translate(0,-55.7)">
-                  <text class="eclipticSymbol">♏</text>
-                </g>
-                <g transform="rotate(196.3) translate(0,-46.3)">
-                  <text class="eclipticSymbol">♐</text>
-                </g>
-                <g transform="rotate(163.7) translate(0,-46.3)">
-                  <text class="eclipticSymbol">♑</text>
-                </g>
-                <g transform="rotate(132.5) translate(0,-55.7)">
-                  <text class="eclipticSymbol">♒</text>
-                </g>
-                <g transform="rotate(103.8) translate(0,-76.5)">
-                  <text class="eclipticSymbol">♓</text>
-                </g>
-              </g>
-              <g *ngIf="southern" id="symbols" transform="translate(0, 71.1)">
-                <g transform="rotate(-76.2) translate(0,-110.5) scale(-1, 1)">
-                  <text class="eclipticSymbol">♈</text>
-                </g>
-                <g transform="rotate(-47.5) translate(0,-151.9) scale(-1, 1)">
-                  <text class="eclipticSymbol">♉</text>
-                </g>
-                <g transform="rotate(-16.3) translate(0,-182.8) scale(-1, 1)">
-                  <text class="eclipticSymbol">♊</text>
-                </g>
-                <g transform="rotate(16.3) translate(0,-182.8) scale(-1, 1)">
-                  <text class="eclipticSymbol">♋</text>
-                </g>
-                <g transform="rotate(47.5) translate(0,-151.9) scale(-1, 1)">
-                  <text class="eclipticSymbol">♌</text>
-                </g>
-                <g transform="rotate(76.2) translate(0,-110.5) scale(-1, 1)">
-                  <text class="eclipticSymbol">♍</text>
-                </g>
-                <g transform="rotate(-256.2) translate(0,-76.5) scale(-1, 1)">
-                  <text class="eclipticSymbol">♎</text>
-                </g>
-                <g transform="rotate(-227.5) translate(0,-55.7) scale(-1, 1)">
-                  <text class="eclipticSymbol">♏</text>
-                </g>
-                <g transform="rotate(-196.3) translate(0,-46.3) scale(-1, 1)">
-                  <text class="eclipticSymbol">♐</text>
-                </g>
-                <g transform="rotate(-163.7) translate(0,-46.3) scale(-1, 1)">
-                  <text class="eclipticSymbol">♑</text>
-                </g>
-                <g transform="rotate(-132.5) translate(0,-55.7) scale(-1, 1)">
-                  <text class="eclipticSymbol">♒</text>
-                </g>
-                <g transform="rotate(-103.8) translate(0,-76.5) scale(-1, 1)">
-                  <text class="eclipticSymbol">♓</text>
-                </g>
-              </g>
-            </g>
-          </g>
-        </g>
-        <g id="sunGroup">
+      </g>
+    </g>
+  </svg>
+
+  <!-- I would have used <foreignObject> to host the map canvas, but the positioning and layering behavior weren't
+       consistent across browsers, with Safari and Chrome on Android having particular problems. -->
+  <div id="globe-host"></div>
+
+  <svg viewBox="0 0 600 600" xml:space="preserve" class="svg-overlay">
+    <g transform="translate(300, 300)" class="content">
+      <g id="frontPart">
+        <g filter="url(#filterHand)">
           <g filter="url(#filterRelief)">
-            <g id="ecliptic_positive_sunBeamLargeSymbol_A" [attr.transform]="rotate(siderealAngle * rotateSign)">
-              <g transform="translate(0, -71.1)">
-                <g id="sun_positive_sunBeamLargeSymbol_A" [attr.transform]="rotate(sunAngle * rotateSign)">
-                  <g id="sun_translate_sunBeamLargeSymbol_A" transform="translate(0,-161.0)">
-                    <use xlink:href="#sunBeamLargeSymbol"/>
-                  </g>
-                </g>
+            <g id="hand" [attr.transform]="rotate(handAngle * rotateSign)">
+              <use xlink:href="#leverRafieSymbol" class="leverRafieSymbol"/>
+              <path d="M0 0L0 -250.0" class="leverRafieGolden"/>
+              <g transform="translate(0,-250.0)">
+                <use xlink:href="#handSymbol"/>
               </g>
             </g>
           </g>
-          <g id="ecliptic_positive_sunBeamLargeSymbol_B0" [attr.transform]="rotate(siderealAngle * rotateSign)">
-            <g transform="translate(0, -71.1)">
-              <g id="sun_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(sunAngle * rotateSign)">
-                <g id="sun_translate_sunBeamLargeSymbol_B" transform="translate(0,-161.0)">
-                  <g id="sun_negative_sunBeamLargeSymbol_B" [attr.transform]="rotate(-sunAngle * rotateSign)">
-                    <g id="ecliptic_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(-siderealAngle * rotateSign)">
-                      <path d="M0.0 -9.6C5.3 -9.6 9.6 -5.3 9.6 0.0C9.6 5.3 5.3 9.6 0.0 9.6C-5.3 9.6 -9.6 5.3 -9.6 0.0C-9.6 -5.3 -5.3 -9.6 0.0 -9.6" class="sunSphere"/>
-                    </g>
-                  </g>
-                </g>
-              </g>
+        </g>
+        <g filter="url(#filterEcliptic)" class="eclipticWheel" [style.opacity]="translucentEcliptic ? '0.33' : '1'">
+          <g filter="url(#filterRelief)">
+            <g id="ecliptic_positive_levers" [attr.transform]="rotate(siderealAngle * rotateSign)">
+              <use xlink:href="#leverSymbol" class="leverSymbol"/>
             </g>
           </g>
           <g filter="url(#filterRelief)">
-            <g id="ecliptic_positive_sunBeamSmallSymbol_A" [attr.transform]="rotate(siderealAngle * rotateSign)">
+            <g id="ecliptic_positive_hourAngleStar" [attr.transform]="rotate(siderealAngle * rotateSign)">
+              <use xlink:href="#hourAngleStarSymbol" class="hourAngleStarSymbol"/>
+            </g>
+          </g>
+          <g id="ecliptic_positive_signsArea" [attr.transform]="rotate(siderealAngle * rotateSign)">
+            <g transform="translate(0, -71.1)">
+              <path d="M0.0 -161.0C88.9 -161.0 161.0 -88.9 161.0 0.0C161.0 88.9 88.9 161.0 0.0 161.0C-88.9 161.0 -161.0 88.9 -161.0 0.0C-161.0 -88.9 -88.9 -161.0 0.0 -161.0M0.0 -116.3C-64.2 -116.3 -116.3 -64.2 -116.3 0.0C-116.3 64.2 -64.2 116.3 0.0 116.3C64.2 116.3 116.3 64.2 116.3 0.0C116.3 -64.2 64.2 -116.3 0.0 -116.3" class="signsArea"/>
+            </g>
+          </g>
+          <g filter="url(#filterRelief)">
+            <g id="ecliptic_positive_ecliptic" [attr.transform]="rotate(siderealAngle * rotateSign)">
               <g transform="translate(0, -71.1)">
-                <g id="sun_positive_sunBeamSmallSymbol_A" [attr.transform]="rotate(sunAngle * rotateSign)">
-                  <g id="sun_translate_sunBeamSmallSymbol_A" transform="translate(0,-161.0)">
-                    <use xlink:href="#sunBeamSmallSymbol"/>
+                <g id="disc">
+                  <path d="M0.0 -178.9C98.8 -178.9 178.9 -98.8 178.9 0.0C178.9 98.8 98.8 178.9 0.0 178.9C-98.8 178.9 -178.9 98.8 -178.9 0.0C-178.9 -98.8 -98.8 -178.9 0.0 -178.9" class="eclipticCircle"/>
+                  <path d="M0.0 -161.0C88.9 -161.0 161.0 -88.9 161.0 0.0C161.0 88.9 88.9 161.0 0.0 161.0C-88.9 161.0 -161.0 88.9 -161.0 0.0C-161.0 -88.9 -88.9 -161.0 0.0 -161.0" class="eclipticCircle"/>
+                  <path d="M0.0 -116.3C64.2 -116.3 116.3 -64.2 116.3 0.0C116.3 64.2 64.2 116.3 0.0 116.3C-64.2 116.3 -116.3 64.2 -116.3 0.0C-116.3 -64.2 -64.2 -116.3 0.0 -116.3" class="eclipticCircle"/>
+                  <mask id="maskSmall">
+                    <path d="M0.0 -178.9C98.8 -178.9 178.9 -98.8 178.9 0.0C178.9 98.8 98.8 178.9 0.0 178.9C-98.8 178.9 -178.9 98.8 -178.9 0.0C-178.9 -98.8 -98.8 -178.9 0.0 -178.9M0.0 -161.0C-88.9 -161.0 -161.0 -88.9 -161.0 0.0C-161.0 88.9 -88.9 161.0 0.0 161.0C88.9 161.0 161.0 88.9 161.0 0.0C161.0 -88.9 88.9 -161.0 0.0 -161.0" class="maskWhite"/>
+                  </mask>
+                  <mask id="maskLarge">
+                    <path d="M0.0 -178.9C98.8 -178.9 178.9 -98.8 178.9 0.0C178.9 98.8 98.8 178.9 0.0 178.9C-98.8 178.9 -178.9 98.8 -178.9 0.0C-178.9 -98.8 -98.8 -178.9 0.0 -178.9M0.0 -116.3C-64.2 -116.3 -116.3 -64.2 -116.3 0.0C-116.3 64.2 -64.2 116.3 0.0 116.3C64.2 116.3 116.3 64.2 116.3 0.0C116.3 -64.2 64.2 -116.3 0.0 -116.3" class="maskWhite"/>
+                  </mask>
+                  <g mask="url(#maskSmall)">
+                    <path d="M0 71.1L40.7 426.5" class="eclipticDial"/>
+                    <path d="M0 71.1L80.7 419.6" class="eclipticDial"/>
+                    <path d="M0 71.1L119.4 408.3" class="eclipticDial"/>
+                    <path d="M0 71.1L156.2 393.0" class="eclipticDial"/>
+                    <path d="M0 71.1L222.1 351.6" class="eclipticDial"/>
+                    <path d="M0 71.1L250.6 326.5" class="eclipticDial"/>
+                    <path d="M0 71.1L275.8 299.0" class="eclipticDial"/>
+                    <path d="M0 71.1L297.7 269.6" class="eclipticDial"/>
+                    <path d="M0 71.1L331.2 206.4" class="eclipticDial"/>
+                    <path d="M0 71.1L342.8 173.3" class="eclipticDial"/>
+                    <path d="M0 71.1L351.1 139.6" class="eclipticDial"/>
+                    <path d="M0 71.1L356.1 105.5" class="eclipticDial"/>
+                    <path d="M0 71.1L356.1 36.8" class="eclipticDial"/>
+                    <path d="M0 71.1L351.1 2.7" class="eclipticDial"/>
+                    <path d="M0 71.1L342.8 -31.1" class="eclipticDial"/>
+                    <path d="M0 71.1L331.2 -64.1" class="eclipticDial"/>
+                    <path d="M0 71.1L297.7 -127.3" class="eclipticDial"/>
+                    <path d="M0 71.1L275.8 -156.7" class="eclipticDial"/>
+                    <path d="M0 71.1L250.6 -184.2" class="eclipticDial"/>
+                    <path d="M0 71.1L222.1 -209.3" class="eclipticDial"/>
+                    <path d="M0 71.1L156.2 -250.7" class="eclipticDial"/>
+                    <path d="M0 71.1L119.4 -266.1" class="eclipticDial"/>
+                    <path d="M0 71.1L80.7 -277.4" class="eclipticDial"/>
+                    <path d="M0 71.1L40.7 -284.3" class="eclipticDial"/>
+                    <path d="M0 71.1L-40.7 -284.3" class="eclipticDial"/>
+                    <path d="M0 71.1L-80.7 -277.4" class="eclipticDial"/>
+                    <path d="M0 71.1L-119.4 -266.1" class="eclipticDial"/>
+                    <path d="M0 71.1L-156.2 -250.7" class="eclipticDial"/>
+                    <path d="M0 71.1L-222.1 -209.3" class="eclipticDial"/>
+                    <path d="M0 71.1L-250.6 -184.2" class="eclipticDial"/>
+                    <path d="M0 71.1L-275.8 -156.7" class="eclipticDial"/>
+                    <path d="M0 71.1L-297.7 -127.3" class="eclipticDial"/>
+                    <path d="M0 71.1L-331.2 -64.1" class="eclipticDial"/>
+                    <path d="M0 71.1L-342.8 -31.1" class="eclipticDial"/>
+                    <path d="M0 71.1L-351.1 2.7" class="eclipticDial"/>
+                    <path d="M0 71.1L-356.1 36.8" class="eclipticDial"/>
+                    <path d="M0 71.1L-356.1 105.5" class="eclipticDial"/>
+                    <path d="M0 71.1L-351.1 139.6" class="eclipticDial"/>
+                    <path d="M0 71.1L-342.8 173.3" class="eclipticDial"/>
+                    <path d="M0 71.1L-331.2 206.4" class="eclipticDial"/>
+                    <path d="M0 71.1L-297.7 269.6" class="eclipticDial"/>
+                    <path d="M0 71.1L-275.8 299.0" class="eclipticDial"/>
+                    <path d="M0 71.1L-250.6 326.5" class="eclipticDial"/>
+                    <path d="M0 71.1L-222.1 351.6" class="eclipticDial"/>
+                    <path d="M0 71.1L-156.2 393.0" class="eclipticDial"/>
+                    <path d="M0 71.1L-119.4 408.3" class="eclipticDial"/>
+                    <path d="M0 71.1L-80.7 419.6" class="eclipticDial"/>
+                    <path d="M0 71.1L-40.7 426.5" class="eclipticDial"/>
+                  </g>
+                  <g mask="url(#maskLarge)">
+                    <path d="M0 71.1L0.0 428.9" class="eclipticCircle"/>
+                    <path d="M0 71.1L190.5 373.9" class="eclipticCircle"/>
+                    <path d="M0 71.1L316.1 238.6" class="eclipticCircle"/>
+                    <path d="M0 71.1L357.7 71.1" class="eclipticCircle"/>
+                    <path d="M0 71.1L316.1 -96.3" class="eclipticCircle"/>
+                    <path d="M0 71.1L190.5 -231.6" class="eclipticCircle"/>
+                    <path d="M0 71.1L0.0 -286.6" class="eclipticCircle"/>
+                    <path d="M0 71.1L-190.5 -231.6" class="eclipticCircle"/>
+                    <path d="M0 71.1L-316.1 -96.3" class="eclipticCircle"/>
+                    <path d="M0 71.1L-357.7 71.1" class="eclipticCircle"/>
+                    <path d="M0 71.1L-316.1 238.6" class="eclipticCircle"/>
+                    <path d="M0 71.1L-190.5 373.9" class="eclipticCircle"/>
+                  </g>
+                </g>
+                <g *ngIf="!southern" id="symbols" transform="translate(0, 71.1)">
+                  <g transform="rotate(76.2) translate(0,-110.5)">
+                    <text class="eclipticSymbol">♈</text>
+                  </g>
+                  <g transform="rotate(47.5) translate(0,-151.9)">
+                    <text class="eclipticSymbol">♉</text>
+                  </g>
+                  <g transform="rotate(16.3) translate(0,-182.8)">
+                    <text class="eclipticSymbol">♊</text>
+                  </g>
+                  <g transform="rotate(-16.3) translate(0,-182.8)">
+                    <text class="eclipticSymbol">♋</text>
+                  </g>
+                  <g transform="rotate(-47.5) translate(0,-151.9)">
+                    <text class="eclipticSymbol">♌</text>
+                  </g>
+                  <g transform="rotate(-76.2) translate(0,-110.5)">
+                    <text class="eclipticSymbol">♍</text>
+                  </g>
+                  <g transform="rotate(256.2) translate(0,-76.5)">
+                    <text class="eclipticSymbol">♎</text>
+                  </g>
+                  <g transform="rotate(227.5) translate(0,-55.7)">
+                    <text class="eclipticSymbol">♏</text>
+                  </g>
+                  <g transform="rotate(196.3) translate(0,-46.3)">
+                    <text class="eclipticSymbol">♐</text>
+                  </g>
+                  <g transform="rotate(163.7) translate(0,-46.3)">
+                    <text class="eclipticSymbol">♑</text>
+                  </g>
+                  <g transform="rotate(132.5) translate(0,-55.7)">
+                    <text class="eclipticSymbol">♒</text>
+                  </g>
+                  <g transform="rotate(103.8) translate(0,-76.5)">
+                    <text class="eclipticSymbol">♓</text>
+                  </g>
+                </g>
+                <g *ngIf="southern" id="symbols" transform="translate(0, 71.1)">
+                  <g transform="rotate(-76.2) translate(0,-110.5) scale(-1, 1)">
+                    <text class="eclipticSymbol">♈</text>
+                  </g>
+                  <g transform="rotate(-47.5) translate(0,-151.9) scale(-1, 1)">
+                    <text class="eclipticSymbol">♉</text>
+                  </g>
+                  <g transform="rotate(-16.3) translate(0,-182.8) scale(-1, 1)">
+                    <text class="eclipticSymbol">♊</text>
+                  </g>
+                  <g transform="rotate(16.3) translate(0,-182.8) scale(-1, 1)">
+                    <text class="eclipticSymbol">♋</text>
+                  </g>
+                  <g transform="rotate(47.5) translate(0,-151.9) scale(-1, 1)">
+                    <text class="eclipticSymbol">♌</text>
+                  </g>
+                  <g transform="rotate(76.2) translate(0,-110.5) scale(-1, 1)">
+                    <text class="eclipticSymbol">♍</text>
+                  </g>
+                  <g transform="rotate(-256.2) translate(0,-76.5) scale(-1, 1)">
+                    <text class="eclipticSymbol">♎</text>
+                  </g>
+                  <g transform="rotate(-227.5) translate(0,-55.7) scale(-1, 1)">
+                    <text class="eclipticSymbol">♏</text>
+                  </g>
+                  <g transform="rotate(-196.3) translate(0,-46.3) scale(-1, 1)">
+                    <text class="eclipticSymbol">♐</text>
+                  </g>
+                  <g transform="rotate(-163.7) translate(0,-46.3) scale(-1, 1)">
+                    <text class="eclipticSymbol">♑</text>
+                  </g>
+                  <g transform="rotate(-132.5) translate(0,-55.7) scale(-1, 1)">
+                    <text class="eclipticSymbol">♒</text>
+                  </g>
+                  <g transform="rotate(-103.8) translate(0,-76.5) scale(-1, 1)">
+                    <text class="eclipticSymbol">♓</text>
                   </g>
                 </g>
               </g>
             </g>
           </g>
-          <g id="ecliptic_positive_sunBeamSmallSymbol_B0" [attr.transform]="rotate(siderealAngle * rotateSign)">
-            <g transform="translate(0, -71.1)">
-              <g id="sun_positive_sunBeamSmallSymbol_B" [attr.transform]="rotate(sunAngle * rotateSign)">
-                <g id="sun_translate_sunBeamSmallSymbol_B" transform="translate(0,-161.0)">
-                  <g id="sun_negative_sunBeamSmallSymbol_B" [attr.transform]="rotate(sunAngle * rotateSign)">
-                    <g id="ecliptic_positive_sunBeamSmallSymbol_B" [attr.transform]="rotate(-sunAngle * rotateSign)">
-                      <path d="M0.0 -9.6C5.3 -9.6 9.6 -5.3 9.6 0.0C9.6 5.3 5.3 9.6 0.0 9.6C-5.3 9.6 -9.6 5.3 -9.6 0.0C-9.6 -5.3 -5.3 -9.6 0.0 -9.6" class="sunSphere"/>
+          <g id="sunGroup">
+            <g filter="url(#filterRelief)">
+              <g id="ecliptic_positive_sunBeamLargeSymbol_A" [attr.transform]="rotate(siderealAngle * rotateSign)">
+                <g transform="translate(0, -71.1)">
+                  <g id="sun_positive_sunBeamLargeSymbol_A" [attr.transform]="rotate(sunAngle * rotateSign)">
+                    <g id="sun_translate_sunBeamLargeSymbol_A" transform="translate(0,-161.0)">
+                      <use xlink:href="#sunBeamLargeSymbol"/>
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="ecliptic_positive_sunBeamLargeSymbol_B0" [attr.transform]="rotate(siderealAngle * rotateSign)">
+              <g transform="translate(0, -71.1)">
+                <g id="sun_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(sunAngle * rotateSign)">
+                  <g id="sun_translate_sunBeamLargeSymbol_B" transform="translate(0,-161.0)">
+                    <g id="sun_negative_sunBeamLargeSymbol_B" [attr.transform]="rotate(-sunAngle * rotateSign)">
+                      <g id="ecliptic_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(-siderealAngle * rotateSign)">
+                        <path d="M0.0 -9.6C5.3 -9.6 9.6 -5.3 9.6 0.0C9.6 5.3 5.3 9.6 0.0 9.6C-5.3 9.6 -9.6 5.3 -9.6 0.0C-9.6 -5.3 -5.3 -9.6 0.0 -9.6" class="sunSphere"/>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g filter="url(#filterRelief)">
+              <g id="ecliptic_positive_sunBeamSmallSymbol_A" [attr.transform]="rotate(siderealAngle * rotateSign)">
+                <g transform="translate(0, -71.1)">
+                  <g id="sun_positive_sunBeamSmallSymbol_A" [attr.transform]="rotate(sunAngle * rotateSign)">
+                    <g id="sun_translate_sunBeamSmallSymbol_A" transform="translate(0,-161.0)">
+                      <use xlink:href="#sunBeamSmallSymbol"/>
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="ecliptic_positive_sunBeamSmallSymbol_B0" [attr.transform]="rotate(siderealAngle * rotateSign)">
+              <g transform="translate(0, -71.1)">
+                <g id="sun_positive_sunBeamSmallSymbol_B" [attr.transform]="rotate(sunAngle * rotateSign)">
+                  <g id="sun_translate_sunBeamSmallSymbol_B" transform="translate(0,-161.0)">
+                    <g id="sun_negative_sunBeamSmallSymbol_B" [attr.transform]="rotate(sunAngle * rotateSign)">
+                      <g id="ecliptic_positive_sunBeamSmallSymbol_B" [attr.transform]="rotate(-sunAngle * rotateSign)">
+                        <path d="M0.0 -9.6C5.3 -9.6 9.6 -5.3 9.6 0.0C9.6 5.3 5.3 9.6 0.0 9.6C-5.3 9.6 -9.6 5.3 -9.6 0.0C-9.6 -5.3 -5.3 -9.6 0.0 -9.6" class="sunSphere"/>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </g>
+          <g filter="url(#filterRelief)">
+            <g id="ecliptic_positive_moonGroup" [attr.transform]="rotate(siderealAngle * rotateSign)">
+              <g transform="translate(0, -71.1)">
+                <g id="moon_positive" [attr.transform]="rotate(moonAngle * rotateSign)">
+                  <g transform="translate(0,-161.0)">
+                    <path d="M0.0 -12.0C6.6 -12.0 12.0 -6.6 12.0 0.0C12.0 6.6 6.6 12.0 0.0 12.0C-6.6 12.0 -12.0 6.6 -12.0 0.0C-12.0 -6.6 -6.6 -12.0 0.0 -12.0" class="moonDark"/>
+                    <path id="moonSunlit" [attr.d]="sunlitMoonPath()" class="moonSunlit"/>
+                  </g>
+                  <g transform="translate(0,-161.0)">
+                    <g id="moon_negative" [attr.transform]="rotate(moonAngle * rotateSign)">
+                      <g id="ecliptic_negative_moon" [attr.transform]="rotate(-moonAngle * rotateSign)">
+                        <path d="M0.0 -12.0C6.6 -12.0 12.0 -6.6 12.0 0.0C12.0 6.6 6.6 12.0 0.0 12.0C-6.6 12.0 -12.0 6.6 -12.0 0.0C-12.0 -6.6 -6.6 -12.0 0.0 -12.0" class="moonSphere"/>
+                      </g>
                     </g>
                   </g>
                 </g>
@@ -580,30 +599,12 @@
             </g>
           </g>
         </g>
-        <g filter="url(#filterRelief)">
-          <g id="ecliptic_positive_moonGroup" [attr.transform]="rotate(siderealAngle * rotateSign)">
-            <g transform="translate(0, -71.1)">
-              <g id="moon_positive" [attr.transform]="rotate(moonAngle * rotateSign)">
-                <g transform="translate(0,-161.0)">
-                  <path d="M0.0 -12.0C6.6 -12.0 12.0 -6.6 12.0 0.0C12.0 6.6 6.6 12.0 0.0 12.0C-6.6 12.0 -12.0 6.6 -12.0 0.0C-12.0 -6.6 -6.6 -12.0 0.0 -12.0" class="moonDark"/>
-                  <path id="moonSunlit" [attr.d]="sunlitMoonPath()" class="moonSunlit"/>
-                </g>
-                <g transform="translate(0,-161.0)">
-                  <g id="moon_negative" [attr.transform]="rotate(moonAngle * rotateSign)">
-                    <g id="ecliptic_negative_moon" [attr.transform]="rotate(-moonAngle * rotateSign)">
-                      <path d="M0.0 -12.0C6.6 -12.0 12.0 -6.6 12.0 0.0C12.0 6.6 6.6 12.0 0.0 12.0C-6.6 12.0 -12.0 6.6 -12.0 0.0C-12.0 -6.6 -6.6 -12.0 0.0 -12.0" class="moonSphere"/>
-                    </g>
-                  </g>
-                </g>
-              </g>
-            </g>
-          </g>
-        </g>
+        <path d="M0.0 -4.5C2.5 -4.5 4.5 -2.5 4.5 0.0C4.5 2.5 2.5 4.5 0.0 4.5C-2.5 4.5 -4.5 2.5 -4.5 0.0C-4.5 -2.5 -2.5 -4.5 0.0 -4.5" class="pin"/>
+        <path d="M0.0 -4.5C2.5 -4.5 4.5 -2.5 4.5 0.0C4.5 2.5 2.5 4.5 0.0 4.5C-2.5 4.5 -4.5 2.5 -4.5 0.0C-4.5 -2.5 -2.5 -4.5 0.0 -4.5" class="pinSphere"/>
       </g>
-      <path d="M0.0 -4.5C2.5 -4.5 4.5 -2.5 4.5 0.0C4.5 2.5 2.5 4.5 0.0 4.5C-2.5 4.5 -4.5 2.5 -4.5 0.0C-4.5 -2.5 -2.5 -4.5 0.0 -4.5" class="pin"/>
-      <path d="M0.0 -4.5C2.5 -4.5 4.5 -2.5 4.5 0.0C4.5 2.5 2.5 4.5 0.0 4.5C-2.5 4.5 -4.5 2.5 -4.5 0.0C-4.5 -2.5 -2.5 -4.5 0.0 -4.5" class="pinSphere"/>
     </g>
-  </g>
-</svg>
+  </svg>
+</div>
+
 <p-toast position="center"></p-toast>
 <p-confirmDialog header="Change time"></p-confirmDialog>

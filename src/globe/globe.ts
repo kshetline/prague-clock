@@ -2,8 +2,8 @@ import {
   BufferGeometry, CanvasTexture, CylinderGeometry, DoubleSide, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene,
   SphereGeometry, WebGLRenderer
 } from 'three';
-import { isChromeOS, isSafari, isString } from '@tubular/util';
-import { cos, floor, PI, sin, to_radian } from '@tubular/math';
+import { isString } from '@tubular/util';
+import { cos, PI, sin, to_radian } from '@tubular/math';
 import { mergeBufferGeometries } from '../three/three-utils';
 
 const MAP_HEIGHT = 500;
@@ -16,8 +16,6 @@ const LINE_THICKNESS = 0.03;
 const HAG = 0.02; // Sleight distance above globe that longitude/latitude lines are drawn.
 
 const GRID_COLOR = '#262F36';
-
-const BUGGY_FOREIGN_OBJECT = isChromeOS() || isSafari();
 
 export class Globe {
   private static mapCanvas: HTMLCanvasElement;
@@ -121,20 +119,10 @@ export class Globe {
 
       this.camera.position.z = VIEW_DISTANCE;
       this.renderer = new WebGLRenderer({ alpha: true, antialias: true });
-
-      if (BUGGY_FOREIGN_OBJECT) {
-        this.offscreen = document.createElement('div');
-        this.offscreen.style.height = '100%';
-        this.offscreen.style.width = '100%';
-        this.imageHost = document.getElementById(this.rendererHost.id + '-image') as any;
-        this.offscreen.appendChild(this.renderer.domElement);
-      }
-      else
-        this.rendererHost.appendChild(this.renderer.domElement);
+      this.rendererHost.appendChild(this.renderer.domElement);
     }
 
-    const currentPixelSize = floor(
-      (BUGGY_FOREIGN_OBJECT ? this.imageHost : this.renderer.domElement).getBoundingClientRect().width * 2) || DEFAULT_GLOBE_PIXEL_SIZE;
+    const currentPixelSize = (this.renderer.domElement.getBoundingClientRect().width * 2) || DEFAULT_GLOBE_PIXEL_SIZE;
 
     if (!this.initialized || this.lastPixelSize !== currentPixelSize) {
       this.renderer.setSize(currentPixelSize, currentPixelSize);
@@ -146,13 +134,6 @@ export class Globe {
     this.globeMesh.rotation.x = to_radian(lat);
     this.camera.rotation.z = (lat >= 0 ? PI : 0);
 
-    if (BUGGY_FOREIGN_OBJECT)
-      setTimeout(() => {
-        this.renderer.render(this.scene, this.camera);
-        // Much slower rendering due to the need to convert the image to a data URL.
-        this.imageHost.setAttribute('href', this.offscreen.querySelector('canvas').toDataURL());
-      });
-    else
-      requestAnimationFrame(() => this.renderer.render(this.scene, this.camera));
+    requestAnimationFrame(() => this.renderer.render(this.scene, this.camera));
   }
 }
