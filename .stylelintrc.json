@@ -1,0 +1,29 @@
+{
+  "extends": "stylelint-config-standard",
+  "plugins": [
+    "stylelint-scss"
+  ],
+  "rules": {
+    "at-rule-no-unknown": null,
+    "scss/at-rule-no-unknown": true,
+    "color-function-notation": null,
+    "color-hex-case": "upper",
+    "no-descending-specificity": null,
+    "no-empty-source": null,
+    "no-invalid-position-at-import-rule": null,
+    "selector-class-pattern": null,
+    "selector-descendant-combinator-no-non-space": null,
+    "selector-list-comma-newline-after": null,
+    "selector-pseudo-element-no-unknown": [
+      true,
+      {
+        "ignorePseudoElements": [
+          "ng-deep"
+        ]
+      }
+    ],
+    "selector-type-case": null,
+    "selector-type-no-unknown": null,
+    "value-keyword-case": null
+  }
+}

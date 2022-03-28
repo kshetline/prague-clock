@@ -1,6 +1,7 @@
 {
   "env": {
     "es2017": true,
+    "jasmine": true,
     "mocha": true,
     "node": true
   },
@@ -17,6 +18,10 @@
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2018,
+    "project": [
+      "tsconfig.json",
+      "tsconfig.spec.json"
+    ],
     "sourceType": "module"
   },
   "plugins": [

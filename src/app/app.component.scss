@@ -143,23 +143,23 @@ svg {
   width: 27.333%;
 }
 
-@media screen and (orientation:landscape) and (max-height: 420px),
-       screen and (orientation:portrait) and (max-height: 1000px)
-{
+@media
+  screen and (orientation: landscape) and (max-height: 420px),
+  screen and (orientation: portrait) and (max-height: 1000px) {
   .controls {
     margin: -20px;
     transform: scale(0.9);
   }
 }
 
-@media screen and (orientation:portrait) and (max-height: 380px) {
+@media screen and (orientation: portrait) and (max-height: 380px) {
   .controls {
     margin: -40px;
     transform: scale(0.8);
   }
 }
 
-@media screen and (orientation:portrait) {
+@media screen and (orientation: portrait) {
   :host {
     grid-template-columns: auto;
     grid-template-rows: auto 1fr;
@@ -227,7 +227,7 @@ svg {
 }
 
 .midnightSunCircle {
-  stroke: #BBCCDD;
+  stroke: #BCD;
   stroke-width: 3px;
   fill: none;
 }
@@ -269,7 +269,7 @@ svg {
 }
 
 .handSymbol {
-  stroke: #000000;
+  stroke: black;
   stroke-width: 0.25;
   fill: #EED68D;
 }
@@ -314,12 +314,12 @@ svg {
 
 .moonSphere {
   stroke: none;
-  fill: url(#gradientMoonSphere);
+  fill: url("#gradientMoonSphere");
 }
 
 .sunSphere {
   stroke: none;
-  fill: url(#gradientSunSphere);
+  fill: url("#gradientSunSphere");
 }
 
 .pin {
@@ -329,7 +329,7 @@ svg {
 
 .pinSphere {
   stroke: none;
-  fill: url(#gradientSunSphere);
+  fill: url("#gradientSunSphere");
 }
 
 .outerRingBackground {
@@ -382,7 +382,7 @@ svg {
 }
 
 .unequalHour4 {
-  fill: #1992b2;
+  fill: #1992B2;
 }
 
 .unequalHour3 {

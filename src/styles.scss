@@ -1,5 +1,6 @@
 @font-face {
-  font-family: "Horologium"; src: url("assets/Horologium.ttf");
+  font-family: Horologium;
+  src: url("assets/Horologium.ttf");
 }
 
 :root {
@@ -49,11 +50,11 @@ body {
   }
 }
 
-@media screen and (orientation:landscape) and (max-height: 340px),
-       screen and (orientation:landscape) and (max-width: 630px),
-       screen and (orientation:portrait) and (max-width: 360px),
-       screen and (orientation:portrait) and (max-height: 740px)
-{
+@media
+  screen and (orientation: landscape) and (max-height: 340px),
+  screen and (orientation: landscape) and (max-width: 630px),
+  screen and (orientation: portrait) and (max-width: 360px),
+  screen and (orientation: portrait) and (max-height: 740px) {
   html {
     overflow: auto;
   }

@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build --base-href /orloj/",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "lint": "eslint \"src/**/*.ts\" && stylelint --custom-syntax postcss-scss \"**/*.scss\"",
+    "lint-fix": "eslint \"src/**/*.ts\" --fix"
   },
   "private": true,
   "dependencies": {
@@ -51,6 +53,7 @@
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-jasmine": "^4.1.3",
     "eslint-plugin-node": "^11.1.0",
     "jasmine-core": "~4.0.0",
     "karma": "~6.3.0",
@@ -58,6 +61,10 @@
     "karma-coverage": "~2.1.0",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "~1.7.0",
+    "postcss-scss": "^4.0.3",
+    "stylelint": "^14.6.1",
+    "stylelint-config-standard": "^25.0.0",
+    "stylelint-scss": "^4.2.0",
     "typescript": "~4.5.2"
   }
 }
