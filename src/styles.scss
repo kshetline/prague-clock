@@ -64,6 +64,20 @@ body {
   }
 }
 
+input {
+  background-color: #121212;
+  color: #DDD;
+}
+
+::placeholder {
+  color: rgba(255, 255, 255, 0.33);
+  font-style: italic;
+}
+
+.p-checkbox .p-checkbox-box, .p-dropdown, .p-inputtext, .p-radiobutton .p-radiobutton-box {
+  border-color: #555;
+}
+
 .p-menu {
   width: 18em;
 }
@@ -76,6 +90,17 @@ body {
 
 .p-dialog-content {
   max-width: 95vw;
+}
+
+.p-button {
+  font-weight: bold;
+  padding: 0.33rem 0.66rem;
+}
+
+.p-checkbox-label, .p-radiobutton-label {
+  line-height: unset;
+  margin-left: 0.33em !important;
+  margin-right: 0.5em !important;
 }
 
 span.p-menuitem-text {
@@ -97,4 +122,59 @@ span.p-menuitem-text {
   display: inline-block;
   margin: -0.33em;
   padding: 0.33em;
+}
+
+.tbw-dark-mode {
+  .tbw-dse-header {
+    background-color: #121212;
+    border-color: #555;
+  }
+
+  .tbw-dse-closer {
+    background-color: #121212;
+  }
+
+  .tbw-dse-footer {
+    background-color: #242424;
+  }
+
+  .tbw-dse-wrapper:not(.tbw-dse-explicit-focus-outline) {
+    border-color: #555;
+  }
+
+  .tbw-dse-divider {
+    background-color: #999;
+  }
+
+  .tbw-dse-bad-value {
+    color: #C00 !important;
+  }
+
+  .tbw-disabled-arrow-color { color: #060; stroke: #060; }
+  .tbw-disabled-background { background-color: #242424; fill: #242424; }
+  .tbw-disabled-text { color: #777; stroke: #777; }
+  .tbw-indicator-text { color: #64B5F6; stroke: #64B5F6; }
+  .tbw-normal-background { background-color: #121212; fill: #121212; }
+  .tbw-normal-text { color: #DDD; stroke: #DDD; }
+  .tbw-selected-background { background-color: #DDD; fill: #DDD; }
+  .tbw-selected-text { color: #121212; stroke: #121212; }
+  .tbw-spinner-fill { background-color: #444; fill: #444; }
+  .tbw-view-only-background { background-color: #0A0; fill: #0A0; }
+  .tbw-view-only-text { color: black; stroke: black; }
+  .tbw-warning-text { color: #E45; stroke: #E45; }
+  .tbw-warning-background { background-color: #B80; fill: #B80; }
+
+  .tbw-dse-fade { opacity: 0.28; }
+  .tbw-view-only-text.tbw-dse-fade { opacity: 0.2; }
+
+  @keyframes tbw-dse-blinker-dark {
+    from, to { background-color: #DDD; color: #121212; }
+    10%, 20% { background-color: #DDD; color: #121212; }
+    50%, 60%, 70% { background-color: transparent; color: #DDD; }
+  }
+
+  .tbw-dse-steady-cursor {
+    background-color: #DDD;
+    color: #121212;
+  }
 }

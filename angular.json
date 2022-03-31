@@ -31,7 +31,7 @@
               "src/assets"
             ],
             "styles": [
-              "node_modules/primeng/resources/themes/nova/theme.css",
+              "node_modules/primeng/resources/themes/arya-blue/theme.css",
               "node_modules/primeng/resources/primeng.min.css",
               "node_modules/primeicons/primeicons.css",
               "node_modules/@tubular/ng-widgets/assets/styles.css",

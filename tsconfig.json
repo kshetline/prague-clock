@@ -22,8 +22,13 @@
       "dom"
     ]
   },
-  "include": ["./ambient.d.ts", "./src/**/*"],
-  "exclude": ["node_modules", "**/*.spec.ts"],
+  "include": [
+    "./ambient.d.ts",
+    "./src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
