@@ -30,7 +30,7 @@
     <i class="pi pi-caret-right" (click)="skipToEvent()"></i>
   </div>
   <div class="button-row">
-    <p-checkbox [(ngModel)]="isoFormat" [binary]="true" label="ISO input format"></p-checkbox>
+    <p-checkbox [(ngModel)]="isoFormat" [binary]="true" label="ISO time format"></p-checkbox>
     <p-checkbox [(ngModel)]="disableDst" [binary]="true" label="Disable DST on clock" (onChange)="updateTime(true)"></p-checkbox>
   </div>
   <tze-zone-selector [(ngModel)]="zone" [recents]="recentLocations" (clearItem)='clearItem($event)' (clearRecents)="clearRecents()"
@@ -46,8 +46,6 @@
         [disabled]="canSaveName" [options]="{ angleStyle: DDD, compass: true, decimalPrecision: 1 }"></tbw-angle-editor>
   </div>
 </div>
-
-<div id="graphics-credit">Original SVG clock graphics by Jan Tošovský</div>
 
 <div id="svg-wrapper">
   <svg viewBox="0 0 600 600" xml:space="preserve">
@@ -168,6 +166,7 @@
           <path id="sunrisePath" [attr.d]="sunriseLabelPath" class="textPath"/>
           <path id="sunsetPath" [attr.d]="sunsetLabelPath" class="textPath"/>
           <path id="solNoctis" [attr.d]="solNoctisPath" class="textPath"/>
+          <!-- cspell:disable -->
           <text>
             <textPath xlink:href="#sunrisePath" [attr.startOffset]="southern ? '40%' : '54%'" class="eventText">
               <tspan [style.font-size]="riseSetFontSize">ɐɑɒɓɔ</tspan><!-- ORTUS -->
@@ -193,6 +192,7 @@
               <tspan dy="-2" [style.font-size]="'12px'">ⓈⓄⓁ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ⓃⓄⒸⓉⒾⓈ</tspan><!-- CREPUSCULUM -->
             </textPath>
           </text>
+          <!-- cspell:enable -->
         </g>
         <g id="time">
           <path id="timeTextPath" d="M0.0 -221.0C122.0 -221.0 221.0 -122.0 221.0 0.0C221.0 122.0 122.0 221.0 0.0 221.0C-122.0 221.0 -221.0 122.0 -221.0 0.0C-221.0 -122.0 -122.0 -221.0 0.0 -221.0" class="textPath"/>
@@ -608,6 +608,8 @@
     </g>
   </svg>
 </div>
+
+<div id="graphics-credit">Original SVG clock graphics by Jan Tošovský</div>
 
 <p-toast position="center"></p-toast>
 <p-confirmDialog header="Change time"></p-confirmDialog>

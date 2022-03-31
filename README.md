@@ -1,27 +1,9 @@
-# PragueClock
+# Prague Astronomical Clock Simulator
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.2.5.
+This is a simulation of the world-famous Prague Astronomical Clock *(Pražský Orloj)*, a medieval astronomical clock first installed in 1410, and still running today (with periods of disrepair and various renovations over that span of time).
 
-## Development server
+The real, physical clock is designed to run at the particular latitude of Prague, which is about 50°N. This simulator, however, can be set for any location on Earth, and you can either show the current time, or set a particular time to see how that time would be displayed.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+The positioning of the simulator’s clock hands, hour dial, sun, moon, and ecliptic wheel are done using your computer’s clock and modern astronomical calculations, rather than simulating the internal gearing of the mechanical clock.
 
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+The original SVG clock graphics and font used here were originally developed by Jan Tošovský, as found on [this website](https://drifted.in/horologium-app/).

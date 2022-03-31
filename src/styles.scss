@@ -64,6 +64,16 @@ body {
   }
 }
 
+input {
+  background-color: #121212;
+  color: #DDD;
+}
+
+::placeholder {
+  color: rgba(255, 255, 255, 0.33);
+  font-style: italic;
+}
+
 .p-checkbox .p-checkbox-box, .p-dropdown, .p-inputtext, .p-radiobutton .p-radiobutton-box {
   border-color: #555;
 }
