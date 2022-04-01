@@ -20,7 +20,7 @@
       wideSpinner
       (click)="checkIfTimeIsEditable()"
       i18n-pTooltip
-      pTooltip='Uncheck on "Track current time" to modify the time'
+      pTooltip='Uncheck "Track current time" to modify the time'
       tooltipPosition="bottom"
       [tooltipDisabled]="!trackTime"
       [options]="isoFormat ? ISO_OPTS : LOCAL_OPTS"
@@ -45,9 +45,9 @@
   </div>
   <div class="button-row">
     <tbw-angle-editor wideSpinner [(ngModel)]="latitude" [disableMobileKeyboard]="suppressOsKeyboard"
-        [disabled]="canSaveName" [options]="{ angleStyle: DD, compass: true, decimalPrecision: 1 }"></tbw-angle-editor>
+        [disabled]="canSaveName" [options]="{ angleStyle: DD, compass: SOUTH_NORTH, decimalPrecision: 1 }"></tbw-angle-editor>
     <tbw-angle-editor wideSpinner [(ngModel)]="longitude" [disableMobileKeyboard]="suppressOsKeyboard"
-        [disabled]="canSaveName" [options]="{ angleStyle: DDD, compass: true, decimalPrecision: 1 }"></tbw-angle-editor>
+        [disabled]="canSaveName" [options]="{ angleStyle: DDD, compass: WEST_EAST, decimalPrecision: 1 }"></tbw-angle-editor>
   </div>
 </div>
 

@@ -16,10 +16,19 @@
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
+      "i18n": {
+        "sourceLocale": "en-US",
+        "locales": {
+          "es": {
+            "translation": "src/locales/messages.es.xlf"
+          }
+        }
+      },
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "localize": true,
             "outputPath": "dist/prague-clock",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -68,6 +77,12 @@
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
+            },
+            "es": {
+              "localize": ["es"]
+            },
+            "en-US": {
+              "localize": ["en-US"]
             }
           },
           "defaultConfiguration": "production"
@@ -80,6 +95,12 @@
             },
             "development": {
               "browserTarget": "prague-clock:build:development"
+            },
+            "es": {
+              "browserTarget": "prague-clock:build:es"
+            },
+            "en-US": {
+              "browserTarget": "prague-clock:build:en-US"
             }
           },
           "defaultConfiguration": "development"

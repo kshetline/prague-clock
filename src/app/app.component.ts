@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService, PrimeNGConfig } from 'primeng/api';
 import { abs, atan2_deg, atan_deg, cos_deg, floor, max, mod, PI, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
 import { clone, getCssValue, isChromeOS, isEqual, isLikelyMobile, isSafari, processMillis } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
@@ -9,7 +9,7 @@ import {
 } from '@tubular/astronomy';
 import ttime, { DateTime, utToTdt } from '@tubular/time';
 import julianDay = ttime.julianDay;
-import { TzsLocation } from '../timezone-selector/timezone-selector.component';
+import { SOUTH_NORTH, TzsLocation, WEST_EAST } from '../timezone-selector/timezone-selector.component';
 import { Globe } from '../globe/globe';
 
 const CLOCK_RADIUS = 250;
@@ -152,6 +152,8 @@ export class AppComponent implements OnInit {
   DDD = AngleStyle.DDD;
   MAX_YEAR = 2399;
   MIN_YEAR = 1400;
+  SOUTH_NORTH = SOUTH_NORTH;
+  WEST_EAST = WEST_EAST;
 
   LOCAL_OPTS: TimeEditorOptions = {
     dateTimeStyle: DateTimeStyle.DATE_AND_TIME,
@@ -245,7 +247,8 @@ export class AppComponent implements OnInit {
 
   constructor(
     private confirmService: ConfirmationService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private primeNgConfig: PrimeNGConfig
   ) {
     let settings: any;
 
@@ -275,6 +278,11 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.primeNgConfig.setTranslation({
+      accept: $localize`:for dialog button:Yes`,
+      reject: $localize`:for dialog button:No`
+    });
+
     const placeName = this.placeName;
 
     this.initDone = true;

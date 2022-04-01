@@ -97,21 +97,21 @@ function toDisplayOffset(offset: string): string {
     dst = $[2] ?? '';
 
     if (dst === '§')
-      dst = 'DST';
+      dst = $localize`:Abbreviation for Daylight Saving Time:DST`;
     else if (dst === '#')
-      dst = 'two-hour DST';
+      dst = $localize`:two-hour Daylight Saving Time:two-hour DST`;
     else if (dst === '^')
-      dst = 'half-hour DST';
+      dst = $localize`:half-hour Daylight Saving Time:half-hour DST`;
     else if (dst === '\u2744')
-      dst = 'negative DST';
+      dst = $localize`:negative Daylight Saving Time:negative DST`;
     else if (dst === '~')
-      dst = 'non-standard DST';
+      dst = $localize`:non-standard Daylight Saving Time:non-standard DST`;
 
     if (dst)
-      dst = ' with ' + dst;
+      dst = ' ' + $localize`:word following UTC offset, preceding form of DST :with` + ' ' + dst;
   }
 
-  return `UTC${off}${dst}`;
+  return $localize`:UTC offset, abbreviation for UTC, form of DST (if any):UTC${off}${dst}`;
 }
 
 function toDisplayZone(zone: string): string {
