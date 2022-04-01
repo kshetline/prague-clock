@@ -1,7 +1,7 @@
 <div class="controls tbw-dark-mode" [class.short]="lastHeight <= 420 && lastHeight > 380" [class.extra-short]="lastHeight <= 380">
   <div class="place-name-group">
     <span *ngIf="!canSaveName && placeName" class="place-name">{{placeName}}</span>
-    <span *ngIf="!canSaveName && !placeName" class="no-name">No name provided</span>
+    <span i18n *ngIf="!canSaveName && !placeName" class="no-name">No name provided</span>
     <input *ngIf="canSaveName" id="name-input" class="name-input" [value]="inputName"
         (input)="inputChanged($event)" (keydown.enter)="saveName()">
     <span *ngIf="canSaveName" class="height-holder">&nbsp;</span>
@@ -19,6 +19,7 @@
       [min]="MIN_YEAR + '-01-01'"
       wideSpinner
       (click)="checkIfTimeIsEditable()"
+      i18n-pTooltip
       pTooltip='Uncheck on "Track current time" to modify the time'
       tooltipPosition="bottom"
       [tooltipDisabled]="!trackTime"
@@ -30,14 +31,17 @@
     <i class="pi pi-caret-right" (click)="skipToEvent()"></i>
   </div>
   <div class="button-row">
-    <p-checkbox [(ngModel)]="isoFormat" [binary]="true" label="ISO time format"></p-checkbox>
-    <p-checkbox [(ngModel)]="disableDst" [binary]="true" label="Disable DST on clock" (onChange)="updateTime(true)"></p-checkbox>
+    <p-checkbox [(ngModel)]="isoFormat" [binary]="true"
+        i18n-label label="ISO time format"></p-checkbox>
+    <p-checkbox [(ngModel)]="disableDst" [binary]="true"
+        i18n-label label="Disable DST on clock" (onChange)="updateTime(true)"></p-checkbox>
   </div>
   <tze-zone-selector [(ngModel)]="zone" [recents]="recentLocations" (clearItem)='clearItem($event)' (clearRecents)="clearRecents()"
       [autofocus]="false" [disabled]="canSaveName" (location)="changeLocation($event)"></tze-zone-selector>
   <div class="button-row time-row">
-    <p-checkbox [(ngModel)]="trackTime" [binary]="true" label="Track current time"></p-checkbox><span>&nbsp;&nbsp;</span>
-    <button type="button" pButton (click)="setNow()" [disabled]="trackTime">Now</button>
+    <p-checkbox [(ngModel)]="trackTime" [binary]="true"
+        i18n-label label="Track current time"></p-checkbox><span>&nbsp;&nbsp;</span>
+    <button i18n type="button" pButton (click)="setNow()" [disabled]="trackTime">Now</button>
   </div>
   <div class="button-row">
     <tbw-angle-editor wideSpinner [(ngModel)]="latitude" [disableMobileKeyboard]="suppressOsKeyboard"
@@ -609,7 +613,7 @@
   </svg>
 </div>
 
-<div id="graphics-credit">Original SVG clock graphics by Jan Tošovský</div>
+<div i18n id="graphics-credit">Original SVG clock graphics by Jan Tošovský</div>
 
 <p-toast position="center"></p-toast>
-<p-confirmDialog header="Change time"></p-confirmDialog>
+<p-confirmDialog i18n-header header="Change time"></p-confirmDialog>

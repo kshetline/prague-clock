@@ -15,10 +15,19 @@ const SVC_ZONE_SELECTOR_VALUE_ACCESSOR: any = {
   multi: true,
 };
 
-const MISC_OPTION = '- Miscellaneous -';
-const UT_OPTION   = '- UTC hour offsets -';
-const OS_OPTION   = '- Your OS timezone -';
-const LMT_OPTION  = '- Local Mean Time -';
+export const SOUTH_NORTH = [
+  $localize`:Single-letter abbreviation for South:S`,
+  $localize`:Single-letter abbreviation for North:N`
+];
+export const WEST_EAST = [
+  $localize`:Single-letter abbreviation for West:W`,
+  $localize`:Single-letter abbreviation for East:E`
+];
+
+const MISC_OPTION = $localize`- Miscellaneous -`;
+const UT_OPTION   = $localize`- UTC hour offsets -`;
+const OS_OPTION   = $localize`- Your OS timezone -`;
+const LMT_OPTION  = $localize`- Local Mean Time -`;
 
 const MISC = 'MISC';
 const UT   = 'UT';
@@ -115,8 +124,8 @@ function formatSearchResult(location: AtlasLocation): string {
   if (s.length > 40)
     s = s.replace(/^[^,]+/, match => match.substr(0, max(match.length - s.length + 39, 8)) + '…');
 
-  s += ` (${abs(location.latitude).toFixed(1)}°${location.latitude < 0 ? 'S' : 'N'},` +
-       ` ${abs(location.longitude).toFixed(1)}°${location.longitude < 0 ? 'W' : 'E'})`;
+  s += ` (${abs(location.latitude).toFixed(1)}°${SOUTH_NORTH[location.latitude < 0 ? 0 : 1]},` +
+       ` ${abs(location.longitude).toFixed(1)}°${WEST_EAST[location.longitude < 0 ? 0 : 1]})`;
 
   return s;
 }
@@ -180,7 +189,7 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
                                 command: () => this.recentLocationSelected(i) });
 
       if (value.length > 1) {
-        this.recentItems.push({ label: 'Clear recent locations', style: { 'font-style': 'italic' },
+        this.recentItems.push({ label: $localize`Clear recent locations`, style: { 'font-style': 'italic' },
                                 command: () => this.clearRecents.emit() });
 
         if (this.recentsOpen)
@@ -228,7 +237,7 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
               newMatches.push(...this.matchZones, ...matches.map(match => formatSearchResult(match)));
               this.autoComplete.loading = true;
               this.matchZones = newMatches;
-              this.emptyMessage = 'No matching cites/timezones';
+              this.emptyMessage = $localize`No matching cites/timezones`;
             }
           },
           error: err => { this.searching = false; console.error(err); }
@@ -254,11 +263,14 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
   set value(newValue: string) {
     let $ = /\s+\([^)]+\)$/.exec(newValue);
     const zone = toCanonicalZone(newValue);
+    const sn = SOUTH_NORTH.join('');
+    const ew = WEST_EAST.join('');
+    const matcher = new RegExp(`^(.+?):\\xA0.*?([0-9.]+).([${sn}]).+?([0-9.]+).([${ew}])`);
 
-    if ($ && ($ = /^(.+?):\xA0.*?([0-9.]+).([NS]).+?([0-9.]+).([EW])/.exec(newValue)))
+    if ($ && ($ = matcher.exec(newValue)))
       this.location.emit({
-        latitude: toNumber($[2]) * ($[3] === 'S' ? -1 : 1),
-        longitude: toNumber($[4]) * ($[5] === 'W' ? -1 : 1),
+        latitude: toNumber($[2]) * ($[3] === SOUTH_NORTH[0] ? -1 : 1),
+        longitude: toNumber($[4]) * ($[5] === WEST_EAST[0] ? -1 : 1),
         name: $[1],
         zone
       });
@@ -486,11 +498,11 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
     }
 
     if (remoteQuery.length > 3) {
-      this.emptyMessage = 'Searching...';
+      this.emptyMessage = $localize`Searching...`;
       this.searches.next(remoteQuery);
     }
     else
-      this.emptyMessage = 'No matching timezones';
+      this.emptyMessage = $localize`No matching timezones`;
   }
 
   checkForEnter(evt: KeyboardEvent): void {

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { abs, atan2_deg, atan_deg, cos_deg, floor, max, mod, PI, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
-import { clone, getCssValue, isChromeOS, isEqual, isLikelyMobile, isSafari, processMillis, toMixedCase } from '@tubular/util';
+import { clone, getCssValue, isChromeOS, isEqual, isLikelyMobile, isSafari, processMillis } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import {
   AstroEvent, EventFinder, FALL_EQUINOX, FIRST_QUARTER, FULL_MOON, LAST_QUARTER, MOON, NEW_MOON, RISE_EVENT, SET_EVENT,
@@ -39,12 +39,12 @@ const defaultSettings = {
   isoFormat: false,
   latitude: 50.0870,
   longitude: 14.4185,
-  placeName: 'Prague, CZE',
+  placeName: $localize`Prague, CZE`,
   recentLocations: [{
     lastTimeUsed: 0,
     latitude: 50.0870,
     longitude: 14.4185,
-    name: 'Prague, CZE',
+    name: $localize`Prague, CZE`,
     zone: 'Europe/Prague'
   }] as TzsLocation[],
   suppressOsKeyboard: false,
@@ -187,19 +187,19 @@ export class AppComponent implements OnInit {
   private _zone = 'Europe/Prague';
 
   menuItems: MenuItem[] = [
-    { label: '↔ Equinox/solstice', icon: 'pi pi-check',
+    { label: $localize`↔ Equinox/solstice`, icon: 'pi pi-check',
       command: (): void => this.setEventType(EventType.EQUISOLSTICE) },
-    { label: '↔ Moon phase', icon: 'pi pi-circle',
+    { label: $localize`↔ Moon phase`, icon: 'pi pi-circle',
       command: (): void => this.setEventType(EventType.MOON_PHASE) },
-    { label: '↔ Sunrise/transit/sunset', icon: 'pi pi-circle',
+    { label: $localize`↔ Sunrise/transit/sunset`, icon: 'pi pi-circle',
       command: (): void => this.setEventType(EventType.RISE_SET) },
     { separator : true },
-    { label: 'Translucent ecliptic', icon: 'pi pi-circle', id: 'tec',
+    { label: $localize`Translucent ecliptic`, icon: 'pi pi-circle', id: 'tec',
       command: (): boolean => this.translucentEcliptic = !this.translucentEcliptic },
-    { label: 'Code on GitHub', icon: 'pi pi-github', url: 'https://github.com/kshetline/prague-clock' },
-    { label: 'About the real clock', icon: 'pi pi-info-circle',
+    { label: $localize`Code on GitHub`, icon: 'pi pi-github', url: 'https://github.com/kshetline/prague-clock' },
+    { label: $localize`About the real clock`, icon: 'pi pi-info-circle',
       url: 'https://en.wikipedia.org/wiki/Prague_astronomical_clock' },
-    { label: 'About this simulator', icon: 'pi pi-info-circle',
+    { label: $localize`About this simulator`, icon: 'pi pi-info-circle',
       url: 'assets/about.html' }
   ];
 
@@ -251,7 +251,7 @@ export class AppComponent implements OnInit {
 
     if (isLikelyMobile()) {
       this.menuItems.push({ separator: true });
-      this.menuItems.push({ label: 'Suppress onscreen keyboard', icon: 'pi pi-circle', id: 'sok',
+      this.menuItems.push({ label: $localize`Suppress onscreen keyboard`, icon: 'pi pi-circle', id: 'sok',
                             command: (): boolean => this.suppressOsKeyboard = !this.suppressOsKeyboard });
     }
 
@@ -845,7 +845,7 @@ export class AppComponent implements OnInit {
       return;
 
     this.confirmService.confirm({
-      message: 'Turn off "Track current time" so you can edit the time?',
+      message: $localize`Turn off "Track current time" so you can edit the time?`,
       accept: () => this.trackTime = false
     });
   }
@@ -923,7 +923,7 @@ export class AppComponent implements OnInit {
   skipToEvent(previous = false): void {
     if (this.trackTime) {
       this.confirmService.confirm({
-        message: 'Turn off "Track current time" and change the clock time?',
+        message: $localize`Turn off "Track current time" and change the clock time?`,
         accept: () => {
           this.trackTime = false;
           this.skipToEvent(previous);
@@ -962,16 +962,43 @@ export class AppComponent implements OnInit {
 
     if (eventsFound.length > 0) {
       const evt = eventsFound[0];
-      const eventText = toMixedCase(evt.eventText).replace('Rise', 'Sunrise').replace('Set', 'Sunset');
+      const eventText = AppComponent.translateEvent(evt.eventText);
       const year = new DateTime(evt.eventTime.utcMillis, this.zone).wallTime.year;
 
       if (year < this.MIN_YEAR || year > this.MAX_YEAR)
-        this.messageService.add({ severity: 'error', summary:'Event',
-                                  detail: `Event outside of ${this.MIN_YEAR}-${this.MAX_YEAR} year range.` });
+        this.messageService.add({ severity: 'error', summary: $localize`Event`,
+                                  detail: $localize`Event outside of ${this.MIN_YEAR}-${this.MAX_YEAR} year range.` });
       else {
         this.time = evt.eventTime.utcMillis;
-        this.messageService.add({ severity: 'info', summary:'Event', detail: eventText });
+        this.messageService.add({ severity: 'info', summary: $localize`Event`, detail: eventText });
       }
     }
+  }
+
+  private static translateEvent(text: string): string {
+    if (text.match(/\brise\b/i))
+      return $localize`Sunrise`;
+    else if (text.match(/\bset\b/i))
+      return $localize`Sunset`;
+    else if (text.match(/\btransit\b/i))
+      return $localize`Transit`;
+    else if (text.match(/\bvernal equinox\b/i))
+      return $localize`Vernal equinox`;
+    else if (text.match(/\bsummer solstice\b/i))
+      return $localize`Summer solstice`;
+    else if (text.match(/\bautumnal equinox\b/i))
+      return $localize`Autumnal equinox`;
+    else if (text.match(/\bwinter solstice\b/i))
+      return $localize`Winter Solstice`;
+    else if (text.match(/\bnew moon\b/i))
+      return $localize`New moon`;
+    else if (text.match(/\b(1st|first)\b/i))
+      return $localize`First quarter`;
+    else if (text.match(/\bfull moon\b/i))
+      return $localize`Full moon`;
+    else if (text.match(/\b(3rd|third)\b/i))
+      return $localize`Third quarter`;
+    else
+      return text;
   }
 }
