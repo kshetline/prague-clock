@@ -33,18 +33,19 @@ enum EventType { EQUISOLSTICE, MOON_PHASE, RISE_SET }
 
 const MAX_SAVED_LOCATIONS = 10;
 
+const prague = $localize`Prague, CZE`;
 const defaultSettings = {
   disableDst: true,
   eventType: EventType.EQUISOLSTICE,
   isoFormat: false,
   latitude: 50.0870,
   longitude: 14.4185,
-  placeName: $localize`Prague, CZE`,
+  placeName: prague,
   recentLocations: [{
     lastTimeUsed: 0,
     latitude: 50.0870,
     longitude: 14.4185,
-    name: $localize`Prague, CZE`,
+    name: prague,
     zone: 'Europe/Prague'
   }] as TzsLocation[],
   suppressOsKeyboard: false,

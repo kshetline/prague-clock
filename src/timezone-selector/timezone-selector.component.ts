@@ -56,28 +56,10 @@ export interface TzsLocation {
   zone: string;
 }
 
+const displayOffsetToCanonical = new Map<string, string>();
+
 function toCanonicalOffset(offset: string): string {
-  let off = offset;
-  let dst = '';
-  const $ = /([-+]\d+(?::\d+)?)(.+)?/.exec(offset);
-
-  if ($) {
-    off = $[1];
-    dst = ($[2] ?? '').replace('with', '').trim();
-
-    if (dst.includes('two'))
-      dst = '#';
-    else if (dst.includes('half'))
-      dst = '^';
-    else if (dst.includes('negative'))
-      dst = '\u2744';
-    else if (dst === 'DST')
-      dst = '§';
-    else if (dst)
-      dst = '~';
-  }
-
-  return off + dst;
+  return displayOffsetToCanonical.get(offset);
 }
 
 function toCanonicalZone(zone: string): string {
@@ -111,7 +93,11 @@ function toDisplayOffset(offset: string): string {
       dst = ' ' + $localize`:word following UTC offset, preceding form of DST :with` + ' ' + dst;
   }
 
-  return $localize`:UTC offset, abbreviation for UTC, form of DST (if any):UTC${off}${dst}`;
+  const displayOffset = $localize`:UTC offset, abbreviation for UTC, form of DST (if any):UTC${off}${dst}`;
+
+  displayOffsetToCanonical.set(displayOffset, offset);
+
+  return displayOffset;
 }
 
 function toDisplayZone(zone: string): string {

@@ -62,74 +62,70 @@
         <source>Prague, CZE</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">42</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">36</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8682509701325907552" datatype="html">
         <source>↔ Equinox/solstice</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">192</context>
+          <context context-type="linenumber">193</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3762481572658671790" datatype="html">
         <source>↔ Moon phase</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">194</context>
+          <context context-type="linenumber">195</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7956486165830795688" datatype="html">
         <source>↔ Sunrise/transit/sunset</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">196</context>
+          <context context-type="linenumber">197</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6279790077821649421" datatype="html">
         <source>Translucent ecliptic</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">199</context>
+          <context context-type="linenumber">200</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6195195247247362503" datatype="html">
         <source>Code on GitHub</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">201</context>
+          <context context-type="linenumber">202</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1316081974854732948" datatype="html">
         <source>About the real clock</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">202</context>
+          <context context-type="linenumber">203</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8936045027758548398" datatype="html">
         <source>About this simulator</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">204</context>
+          <context context-type="linenumber">205</context>
         </context-group>
       </trans-unit>
       <trans-unit id="399827913225042410" datatype="html">
         <source>Suppress onscreen keyboard</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">257</context>
+          <context context-type="linenumber">258</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2807800733729323332" datatype="html">
         <source>Yes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">282</context>
+          <context context-type="linenumber">283</context>
         </context-group>
         <note priority="1" from="description">for dialog button</note>
       </trans-unit>
@@ -137,7 +133,7 @@
         <source>No</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">283</context>
+          <context context-type="linenumber">284</context>
         </context-group>
         <note priority="1" from="description">for dialog button</note>
       </trans-unit>
@@ -145,109 +141,109 @@
         <source>Turn off &quot;Track current time&quot; so you can edit the time?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">856</context>
+          <context context-type="linenumber">857</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1653085740327060302" datatype="html">
         <source>Turn off &quot;Track current time&quot; and change the clock time?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">934</context>
+          <context context-type="linenumber">935</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3304972143698843178" datatype="html">
         <source>Event</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">977</context>
+          <context context-type="linenumber">978</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">981</context>
+          <context context-type="linenumber">982</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5379240220330466138" datatype="html">
         <source>Event outside of <x id="PH" equiv-text="this.MIN_YEAR"/>-<x id="PH_1" equiv-text="this.MAX_YEAR"/> year range.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">978</context>
+          <context context-type="linenumber">979</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7225188300874994693" datatype="html">
         <source>Sunrise</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">988</context>
+          <context context-type="linenumber">989</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6447558907113574235" datatype="html">
         <source>Sunset</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">990</context>
+          <context context-type="linenumber">991</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6054510843574670830" datatype="html">
         <source>Transit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">992</context>
+          <context context-type="linenumber">993</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5740316636928173013" datatype="html">
         <source>Vernal equinox</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">994</context>
+          <context context-type="linenumber">995</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2020422354780153562" datatype="html">
         <source>Summer solstice</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">996</context>
+          <context context-type="linenumber">997</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7383670398589052638" datatype="html">
         <source>Autumnal equinox</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">998</context>
+          <context context-type="linenumber">999</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3382598256887949674" datatype="html">
         <source>Winter Solstice</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1000</context>
+          <context context-type="linenumber">1001</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5087039501580395567" datatype="html">
         <source>New moon</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1002</context>
+          <context context-type="linenumber">1003</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5246077877231873167" datatype="html">
         <source>First quarter</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1004</context>
+          <context context-type="linenumber">1005</context>
         </context-group>
       </trans-unit>
       <trans-unit id="315285506816329608" datatype="html">
         <source>Full moon</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1006</context>
+          <context context-type="linenumber">1007</context>
         </context-group>
       </trans-unit>
       <trans-unit id="409860942378561532" datatype="html">
         <source>Third quarter</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1008</context>
+          <context context-type="linenumber">1009</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3084183756871665369" datatype="html">
@@ -360,7 +356,7 @@
         <source>DST</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/timezone-selector/timezone-selector.component.ts</context>
-          <context context-type="linenumber">100</context>
+          <context context-type="linenumber">82</context>
         </context-group>
         <note priority="1" from="description">Abbreviation for Daylight Saving Time</note>
       </trans-unit>
@@ -368,7 +364,7 @@
         <source>two-hour DST</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/timezone-selector/timezone-selector.component.ts</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">84</context>
         </context-group>
         <note priority="1" from="description">two-hour Daylight Saving Time</note>
       </trans-unit>
@@ -376,7 +372,7 @@
         <source>half-hour DST</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/timezone-selector/timezone-selector.component.ts</context>
-          <context context-type="linenumber">104</context>
+          <context context-type="linenumber">86</context>
         </context-group>
         <note priority="1" from="description">half-hour Daylight Saving Time</note>
       </trans-unit>
@@ -384,7 +380,7 @@
         <source>negative DST</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/timezone-selector/timezone-selector.component.ts</context>
-          <context context-type="linenumber">106</context>
+          <context context-type="linenumber">88</context>
         </context-group>
         <note priority="1" from="description">negative Daylight Saving Time</note>
       </trans-unit>
@@ -392,7 +388,7 @@
         <source>non-standard DST</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/timezone-selector/timezone-selector.component.ts</context>
-          <context context-type="linenumber">108</context>
+          <context context-type="linenumber">90</context>
         </context-group>
         <note priority="1" from="description">non-standard Daylight Saving Time</note>
       </trans-unit>
@@ -400,7 +396,7 @@
         <source>with</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/timezone-selector/timezone-selector.component.ts</context>
-          <context context-type="linenumber">111</context>
+          <context context-type="linenumber">93</context>
         </context-group>
         <note priority="1" from="description">word following UTC offset, preceding form of DST </note>
       </trans-unit>
@@ -408,7 +404,7 @@
         <source>UTC<x id="PH" equiv-text="off"/><x id="PH_1" equiv-text="dst"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/timezone-selector/timezone-selector.component.ts</context>
-          <context context-type="linenumber">114</context>
+          <context context-type="linenumber">96</context>
         </context-group>
         <note priority="1" from="description">UTC offset, abbreviation for UTC, form of DST (if any)</note>
       </trans-unit>
@@ -416,28 +412,28 @@
         <source>Clear recent locations</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/timezone-selector/timezone-selector.component.ts</context>
-          <context context-type="linenumber">192</context>
+          <context context-type="linenumber">178</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8028424299272123929" datatype="html">
         <source>No matching cites/timezones</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/timezone-selector/timezone-selector.component.ts</context>
-          <context context-type="linenumber">240</context>
+          <context context-type="linenumber">226</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8162787379579842000" datatype="html">
         <source>Searching...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/timezone-selector/timezone-selector.component.ts</context>
-          <context context-type="linenumber">501</context>
+          <context context-type="linenumber">487</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3580243715904209712" datatype="html">
         <source>No matching timezones</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/timezone-selector/timezone-selector.component.ts</context>
-          <context context-type="linenumber">505</context>
+          <context context-type="linenumber">491</context>
         </context-group>
       </trans-unit>
     </body>
