@@ -170,6 +170,7 @@ export class AppComponent implements OnInit {
   private baseMoonAngle: number;
   private baseSunAngle: number;
   private _collapsed = false;
+  private delayedCollapse = false;
   private eventFinder = new EventFinder();
   private eventType = EventType.EQUISOLSTICE;
   private globe: Globe
@@ -295,6 +296,9 @@ export class AppComponent implements OnInit {
     this.setNow();
     this.placeName = placeName;
 
+    if (this.delayedCollapse)
+      setTimeout(() => this.collapsed = true);
+
     const docElem = document.documentElement;
     const doResize = (): void => {
       this.graphicsRateChangeCheck();
@@ -374,7 +378,18 @@ export class AppComponent implements OnInit {
   set collapsed(value: boolean) {
     if (this._collapsed !== value) {
       this._collapsed = value;
-      this.saveSettings();
+
+      if (this.initDone) {
+        if ((document.activeElement as any)?.blur)
+          (document.activeElement as any).blur();
+
+        this.graphicsRateChangeCheck(true);
+        this.saveSettings();
+      }
+      else {
+        this.collapsed = false;
+        this.delayedCollapse = true;
+      }
     }
   }
 
@@ -675,7 +690,7 @@ export class AppComponent implements OnInit {
     this.updateGlobe();
   }
 
-  private graphicsRateChangeCheck(): void {
+  private graphicsRateChangeCheck(suppressFilteringImmediately = false): void {
     const now = processMillis();
     const resumeFiltering = (): void => {
       this.svgFilteringOn = true;
@@ -684,9 +699,10 @@ export class AppComponent implements OnInit {
     };
 
     if (this.svgFilteringOn) {
-      if (this.graphicsChangeStartTime < 0 || now > this.graphicsChangeLastTime  + STOP_FILTERING_DELAY)
+      if (!suppressFilteringImmediately &&
+          (this.graphicsChangeStartTime < 0 || now > this.graphicsChangeLastTime  + STOP_FILTERING_DELAY))
         this.graphicsChangeStartTime = now;
-      else if (now > this.graphicsChangeStartTime + STOP_FILTERING_DELAY) {
+      else if (now > this.graphicsChangeStartTime + STOP_FILTERING_DELAY || suppressFilteringImmediately) {
         this.graphicsChangeStartTime = -1;
         this.svgFilteringOn = false;
         this.graphicsChangeStopTimer = setTimeout(resumeFiltering, RESUME_FILTERING_DELAY);

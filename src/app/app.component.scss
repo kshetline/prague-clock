@@ -41,15 +41,6 @@ p-toast, p-confirmDialog {
     transform: scale(0.8);
   }
 
-  &.collapsed {
-    height: 2em;
-    margin-left: -2em;
-    min-height: 2em;
-    min-width: 2em;
-    width: 2em;
-    overflow: hidden;
-  }
-
   .place-name-group {
     align-items: center;
     display: flex;
@@ -62,6 +53,7 @@ p-toast, p-confirmDialog {
 
     &.collapsed {
       opacity: 0;
+      pointer-events: none;
     }
 
     .place-name {
@@ -146,12 +138,28 @@ p-toast, p-confirmDialog {
   tze-zone-selector {
     margin: 0.5em 0;
   }
+
+  &.collapsed {
+    height: 2.25em;
+    margin-left: -2em;
+    min-height: 2.25em;
+    min-width: 2em;
+    width: 2em;
+    overflow: hidden;
+
+    .button-row,
+    .time-row,
+    tze-zone-selector {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
 }
 
 svg {
   align-self: start;
   grid-area: 1 / 1;
-  height: calc(max(min(calc(100vw - 400px), var(--mfvh)) - 16px, 320px));
+  height: calc(max(min(calc(100vw - 400px), var(--mfvh)) - 28px, 320px));
   min-height: 320px;
   min-width: 320px;
   margin: 0;
@@ -193,16 +201,24 @@ svg {
 @media
   screen and (orientation: landscape) and (max-height: 420px),
   screen and (orientation: portrait) and (max-height: 1000px) {
-  .controls:not(.collapsed) {
+  .controls {
     margin: -20px;
     transform: scale(0.9);
+
+    &.collapsed {
+      margin: -2px -2px;
+    }
   }
 }
 
 @media screen and (orientation: portrait) and (max-height: 380px) {
-  .controls:not(.collapsed) {
+  .controls {
     margin: -40px;
     transform: scale(0.8);
+
+    &.collapsed {
+      margin: -4px -40px;
+    }
   }
 }
 
@@ -229,12 +245,12 @@ svg {
 
   svg {
     grid-area: unset;
-    height: unset;
-    width: calc(min(calc(100vw - 16px), calc(var(--mfvh) - 416px)));
+    height: calc(min(calc(100vw - 16px), calc(var(--mfvh) - 428px)));
+    width: calc(min(calc(100vw - 16px), calc(var(--mfvh) - 428px)));
 
     &.controls-collapsed {
-      height: calc(max(100vw - 28px - 2em, 320px));
-      width: calc(max(100vw - 16px, 320px));
+      height: calc(max(min(var(--mfvh) - 28px - 2.25em, 100vw - 16px), 320px));
+      width: calc(max(min(var(--mfvh) - 28px - 2.25em, 100vw - 16px), 320px));
     }
   }
 }
