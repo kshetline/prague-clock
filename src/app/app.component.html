@@ -48,10 +48,10 @@
     <button i18n type="button" pButton (click)="setNow()" [disabled]="trackTime">Now</button>
   </div>
   <div class="button-row">
-    <tbw-angle-editor wideSpinner [(ngModel)]="latitude" [disableMobileKeyboard]="suppressOsKeyboard"
-        [disabled]="canSaveName" [options]="{ angleStyle: DD, compass: SOUTH_NORTH, decimalPrecision: 1 }"></tbw-angle-editor>
-    <tbw-angle-editor wideSpinner [(ngModel)]="longitude" [disableMobileKeyboard]="suppressOsKeyboard"
-        [disabled]="canSaveName" [options]="{ angleStyle: DDD, compass: WEST_EAST, decimalPrecision: 1 }"></tbw-angle-editor>
+    <tbw-angle-editor wideSpinner [(ngModel)]="latitude" [disableMobileKeyboard]="suppressOsKeyboard" [disabled]="canSaveName"
+        [options]="{ angleStyle: DD, compass: SOUTH_NORTH, decimalPrecision: 1, locale: specificLocale }"></tbw-angle-editor>
+    <tbw-angle-editor wideSpinner [(ngModel)]="longitude" [disableMobileKeyboard]="suppressOsKeyboard" [disabled]="canSaveName"
+        [options]="{ angleStyle: DDD, compass: WEST_EAST, decimalPrecision: 1, locale: specificLocale }"></tbw-angle-editor>
   </div>
 </div>
 

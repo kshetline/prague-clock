@@ -19,6 +19,9 @@
       "i18n": {
         "sourceLocale": "en-US",
         "locales": {
+          "cs": {
+            "translation": "src/locales/messages.cs.xlf"
+          },
           "es": {
             "translation": "src/locales/messages.es.xlf"
           }
@@ -78,6 +81,9 @@
               "sourceMap": true,
               "namedChunks": true
             },
+            "cs": {
+              "localize": ["cs"]
+            },
             "es": {
               "localize": ["es"]
             },
@@ -95,6 +101,9 @@
             },
             "development": {
               "browserTarget": "prague-clock:build:development"
+            },
+            "cs": {
+              "browserTarget": "prague-clock:build:cs"
             },
             "es": {
               "browserTarget": "prague-clock:build:es"

@@ -156,6 +156,7 @@ export class AppComponent implements OnInit {
   MAX_YEAR = 2399;
   MIN_YEAR = 1400;
   SOUTH_NORTH = SOUTH_NORTH;
+  specificLocale = specificLocale;
   WEST_EAST = WEST_EAST;
 
   LOCAL_OPTS: TimeEditorOptions = {
@@ -267,8 +268,10 @@ export class AppComponent implements OnInit {
     try {
       settings = JSON.parse(localStorage.getItem('pac-settings') ?? 'null');
 
-      if (settings?.recentLocations)
-        settings?.recentLocations.forEach((loc: any) => { loc.name = loc.name || loc.placeName; delete loc.placeName; });
+      if (settings?.recentLocations && settings.recentLocations.length > 0) {
+        settings.recentLocations.forEach((loc: any) => { loc.name = loc.name || loc.placeName; delete loc.placeName; });
+        settings.recentLocations[0].name = prague;
+      }
     }
     catch {
       settings = null;
