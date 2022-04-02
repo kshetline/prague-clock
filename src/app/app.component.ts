@@ -11,7 +11,7 @@ import ttime, { DateTime, utToTdt } from '@tubular/time';
 import julianDay = ttime.julianDay;
 import { TzsLocation } from '../timezone-selector/timezone-selector.component';
 import { Globe } from '../globe/globe';
-import { localeSuffix, SOUTH_NORTH, WEST_EAST } from '../locales/locale-info';
+import { localeSuffix, SOUTH_NORTH, specificLocale, WEST_EAST } from '../locales/locale-info';
 
 const CLOCK_RADIUS = 250;
 const INCLINATION = 23.5;
@@ -160,6 +160,7 @@ export class AppComponent implements OnInit {
 
   LOCAL_OPTS: TimeEditorOptions = {
     dateTimeStyle: DateTimeStyle.DATE_AND_TIME,
+    locale: specificLocale,
     twoDigitYear: false,
     showDstSymbol: true,
     showSeconds: false

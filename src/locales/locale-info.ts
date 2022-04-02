@@ -8,9 +8,10 @@ export const WEST_EAST = [
 ];
 
 export let currentLocale = 'en-US';
-export let specificLocale = 'en-US';
+export let specificLocale: string;
 export let localeSuffix = '';
 
+const urlLocale = (/\borloj\/([^/]+)/.exec(window.location.href) ?? [])[1];
 let locales: string[] = [];
 
 if (navigator.languages)
@@ -18,12 +19,22 @@ if (navigator.languages)
 else if (navigator.language)
   locales = [navigator.language];
 
+if (urlLocale) {
+  for (const locale of locales) {
+    if (locale.startsWith(urlLocale)) {
+      specificLocale = locale;
+      locales = [locale];
+      break;
+    }
+  }
+}
+
 for (const locale of locales) {
   if (locale.startsWith('es')) {
     currentLocale = 'es';
     break;
   }
-  else if (locale.startsWith('en')) {
+  else if (!specificLocale && locale.startsWith('en')) {
     specificLocale = locale;
     break;
   }
