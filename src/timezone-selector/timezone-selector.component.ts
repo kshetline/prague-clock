@@ -8,21 +8,13 @@ import { throttleTime } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { AutoComplete } from 'primeng/autocomplete';
 import { MenuItem } from 'primeng/api';
+import { SOUTH_NORTH, WEST_EAST } from '../locales/locale-info';
 
 const SVC_ZONE_SELECTOR_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
   useExisting: forwardRef(() => TimezoneSelectorComponent),
   multi: true,
 };
-
-export const SOUTH_NORTH = [
-  $localize`:Single-letter abbreviation for South:S`,
-  $localize`:Single-letter abbreviation for North:N`
-];
-export const WEST_EAST = [
-  $localize`:Single-letter abbreviation for West:W`,
-  $localize`:Single-letter abbreviation for East:E`
-];
 
 const MISC_OPTION = $localize`- Miscellaneous -`;
 const UT_OPTION   = $localize`- UTC hour offsets -`;

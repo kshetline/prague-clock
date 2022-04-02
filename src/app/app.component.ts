@@ -9,8 +9,9 @@ import {
 } from '@tubular/astronomy';
 import ttime, { DateTime, utToTdt } from '@tubular/time';
 import julianDay = ttime.julianDay;
-import { SOUTH_NORTH, TzsLocation, WEST_EAST } from '../timezone-selector/timezone-selector.component';
+import { TzsLocation } from '../timezone-selector/timezone-selector.component';
 import { Globe } from '../globe/globe';
+import { localeSuffix, SOUTH_NORTH, WEST_EAST } from '../locales/locale-info';
 
 const CLOCK_RADIUS = 250;
 const INCLINATION = 23.5;
@@ -201,9 +202,9 @@ export class AppComponent implements OnInit {
       command: (): boolean => this.translucentEcliptic = !this.translucentEcliptic },
     { label: $localize`Code on GitHub`, icon: 'pi pi-github', url: 'https://github.com/kshetline/prague-clock' },
     { label: $localize`About the real clock`, icon: 'pi pi-info-circle',
-      url: 'https://en.wikipedia.org/wiki/Prague_astronomical_clock' },
+      url: $localize`:Language-specific Wikipedia URL:https://en.wikipedia.org/wiki/Prague_astronomical_clock` },
     { label: $localize`About this simulator`, icon: 'pi pi-info-circle',
-      url: 'assets/about.html' }
+      url: `assets/about${localeSuffix}.html` }
   ];
 
   canEditName = false;
