@@ -55,6 +55,7 @@
   </app-root></div>
   <script>
     (() => {
+      const urlLocale = (/\borloj\/([^/]+)/.exec(window.location.href) || [])[1];
       let locales = [];
 
       if (navigator.languages)
@@ -62,13 +63,25 @@
       else if (navigator.language)
         locales = [navigator.language];
 
+      if (urlLocale) {
+        for (const locale of locales) {
+          if (locale.startsWith(urlLocale)) {
+            locales = [locale];
+            break;
+          }
+        }
+      }
+
       for (const locale of locales) {
         if (locale.startsWith('es')) {
           // noinspection SpellCheckingInspection
           document.querySelector('title').innerText = 'Pražský Orloj - Simulador de Reloj Astronómico de Praga';
           // noinspection SpellCheckingInspection
           document.getElementById('loading').innerText = 'Cargando...';
+          break;
         }
+        else if (locale.startsWith('en'))
+          break;
       }
     })();
   </script>
