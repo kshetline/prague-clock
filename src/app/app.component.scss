@@ -4,7 +4,7 @@
   font-family: Horologium, sans-serif;
   gap: 12px;
   grid-template-columns: 1fr auto;
-  min-height: var(--mfh);
+  min-height: var(--mfvh);
   place-items: center;
   padding: 8px;
 }
@@ -151,7 +151,7 @@ p-toast, p-confirmDialog {
 svg {
   align-self: start;
   grid-area: 1 / 1;
-  height: calc(max(min(calc(100vw - 400px), var(--mfh)) - 16px, 320px));
+  height: calc(max(min(calc(100vw - 400px), var(--mfvh)) - 16px, 320px));
   min-height: 320px;
   min-width: 320px;
   margin: 0;
@@ -159,11 +159,11 @@ svg {
   transition-property: height, width;
   transition-timing-function: ease-in-out;
   user-select: none;
-  width: calc(max(min(calc(100vw - 400px), var(--mfh)) - 28px, 320px));
+  width: calc(max(min(calc(100vw - 400px), var(--mfvh)) - 28px, 320px));
 
   &.controls-collapsed {
-    height: calc(max(var(--mfh) - 16px, 320px));
-    width: calc(max(var(--mfh) - 16px, 320px));
+    height: calc(max(var(--mfvh) - 16px, 320px));
+    width: calc(max(var(--mfvh) - 16px, 320px));
   }
 }
 
@@ -230,7 +230,7 @@ svg {
   svg {
     grid-area: unset;
     height: unset;
-    width: calc(min(calc(100vw - 16px), calc(var(--mfh) - 416px)));
+    width: calc(min(calc(100vw - 16px), calc(var(--mfvh) - 416px)));
 
     &.controls-collapsed {
       height: calc(max(100vw - 28px - 2em, 320px));

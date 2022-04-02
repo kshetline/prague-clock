@@ -302,7 +302,7 @@ export class AppComponent implements OnInit {
         const height = window.innerHeight;
         const disallowScroll = getCssValue(docElem, 'overflow') === 'hidden';
 
-        docElem.style.setProperty('--mfh', height + 'px');
+        docElem.style.setProperty('--mfvh', height + 'px');
         docElem.style.setProperty('--mvh', (height * 0.01) + 'px');
 
         if (disallowScroll && (docElem.scrollTop !== 0 || docElem.scrollLeft !== 0)) {
