@@ -67,12 +67,18 @@
       if (specificLocale)
         locales = [specificLocale];
       else if (urlLocale) {
+        let matched = false;
+
         for (const locale of locales) {
           if (locale.startsWith(urlLocale)) {
             locales = [locale];
+            matched = true;
             break;
           }
         }
+
+        if (!matched)
+          locales = [urlLocale];
       }
 
       for (const locale of locales) {
