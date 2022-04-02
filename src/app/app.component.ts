@@ -36,6 +36,7 @@ const MAX_SAVED_LOCATIONS = 10;
 
 const prague = $localize`Prague, CZE`;
 const defaultSettings = {
+  collapsed: false,
   disableDst: true,
   eventType: EventType.EQUISOLSTICE,
   isoFormat: false,
@@ -168,6 +169,7 @@ export class AppComponent implements OnInit {
 
   private baseMoonAngle: number;
   private baseSunAngle: number;
+  private _collapsed = false;
   private eventFinder = new EventFinder();
   private eventType = EventType.EQUISOLSTICE;
   private globe: Globe
@@ -366,6 +368,14 @@ export class AppComponent implements OnInit {
         this.canEditName = true;
       }
     });
+  }
+
+  get collapsed(): boolean { return this._collapsed; }
+  set collapsed(value: boolean) {
+    if (this._collapsed !== value) {
+      this._collapsed = value;
+      this.saveSettings();
+    }
   }
 
   clearItem(index: number): void {

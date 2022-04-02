@@ -8,6 +8,7 @@ export const WEST_EAST = [
 ];
 
 export let currentLocale = 'en-US';
+export let specificLocale = 'en-US';
 export let localeSuffix = '';
 
 let locales: string[] = [];
@@ -18,8 +19,14 @@ else if (navigator.language)
   locales = [navigator.language];
 
 for (const locale of locales) {
-  if (locale.startsWith('es'))
+  if (locale.startsWith('es')) {
     currentLocale = 'es';
+    break;
+  }
+  else if (locale.startsWith('en')) {
+    specificLocale = locale;
+    break;
+  }
 }
 
 if (currentLocale !== 'en-US')

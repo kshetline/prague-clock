@@ -2,8 +2,8 @@
   box-sizing: border-box;
   display: grid;
   font-family: Horologium, sans-serif;
-  grid-template-columns: 1fr auto;
   gap: 12px;
+  grid-template-columns: 1fr auto;
   min-height: var(--mfh);
   place-items: center;
   padding: 8px;
@@ -21,12 +21,15 @@ p-toast, p-confirmDialog {
   display: flex;
   flex-direction: column;
   font: 14px sans-serif;
+  gap: 4px;
   grid-area: 1 / 2;
   min-height: 400px;
   min-width: 400px;
   padding: 1em 0.5em;
   position: relative;
-  gap: 4px;
+  transition-duration: 0.5s;
+  transition-property: height, margin, min-height, min-width, transform, width;
+  transition-timing-function: ease-in-out;
 
   &.short {
     margin: -20px;
@@ -38,12 +41,28 @@ p-toast, p-confirmDialog {
     transform: scale(0.8);
   }
 
+  &.collapsed {
+    height: 2em;
+    margin-left: -2em;
+    min-height: 2em;
+    min-width: 2em;
+    width: 2em;
+    overflow: hidden;
+  }
+
   .place-name-group {
     align-items: center;
     display: flex;
     margin: 0 2em;
     padding-bottom: 0.5em;
+    opacity: 1;
     position: relative;
+    transition: opacity 0.5s ease-in-out;
+    top: 0;
+
+    &.collapsed {
+      opacity: 0;
+    }
 
     .place-name {
       font-weight: bold;
@@ -89,8 +108,27 @@ p-toast, p-confirmDialog {
     cursor: pointer;
     padding: 0.5em;
     position: absolute;
+    left: 0;
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+    top: 0;
+
+    &.collapsed {
+      opacity: 0;
+    }
+  }
+
+  i.pi-chevron-down {
+    cursor: pointer;
+    padding: 0.5em;
+    position: absolute;
     right: 0;
     top: 0;
+    transition: transform 0.5s ease-in-out;
+
+    &.collapsed {
+      transform: rotate(90deg);
+    }
   }
 
   ::ng-deep .p-checkbox-label {
@@ -117,8 +155,16 @@ svg {
   min-height: 320px;
   min-width: 320px;
   margin: 0;
+  transition-duration: 0.5s;
+  transition-property: height, width;
+  transition-timing-function: ease-in-out;
   user-select: none;
-  width: calc(max(min(calc(100vw - 400px), var(--mfh)) - 16px, 320px));
+  width: calc(max(min(calc(100vw - 400px), var(--mfh)) - 28px, 320px));
+
+  &.controls-collapsed {
+    height: calc(max(var(--mfh) - 16px, 320px));
+    width: calc(max(var(--mfh) - 16px, 320px));
+  }
 }
 
 #svg-wrapper {
@@ -147,14 +193,14 @@ svg {
 @media
   screen and (orientation: landscape) and (max-height: 420px),
   screen and (orientation: portrait) and (max-height: 1000px) {
-  .controls {
+  .controls:not(.collapsed) {
     margin: -20px;
     transform: scale(0.9);
   }
 }
 
 @media screen and (orientation: portrait) and (max-height: 380px) {
-  .controls {
+  .controls:not(.collapsed) {
     margin: -40px;
     transform: scale(0.8);
   }
@@ -169,12 +215,27 @@ svg {
 
   .controls {
     grid-area: unset;
+
+    &.collapsed {
+      margin-left: 0;
+      min-width: 400px;
+      width: 400px;
+    }
+
+    i.pi-bars.collapsed {
+      opacity: 1;
+    }
   }
 
   svg {
     grid-area: unset;
     height: unset;
-    width: calc(min(calc(100vw - 16px), calc(var(--mfh) - 428px)));
+    width: calc(min(calc(100vw - 16px), calc(var(--mfh) - 416px)));
+
+    &.controls-collapsed {
+      height: calc(max(100vw - 28px - 2em, 320px));
+      width: calc(max(100vw - 16px, 320px));
+    }
   }
 }
 
