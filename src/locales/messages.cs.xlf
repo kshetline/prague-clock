@@ -361,7 +361,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="3686883075052786952" datatype="html">
-        <source>Letní čas</source>
+        <source>letní čas</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/timezone-selector/timezone-selector.component.ts</context>
           <context context-type="linenumber">74</context>
