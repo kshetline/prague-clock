@@ -255,7 +255,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="3251116876185403930" datatype="html">
-        <source>J</source>
+        <source>S</source> <!-- (Z)ápad in Czech, but using English anyway -->
         <context-group purpose="location">
           <context context-type="sourcefile">src/locales/locale-info.ts</context>
           <context context-type="linenumber">2</context>
@@ -263,7 +263,7 @@
         <note priority="1" from="description">Single-letter abbreviation for South</note>
       </trans-unit>
       <trans-unit id="2986159287834234807" datatype="html">
-        <source>S</source>
+        <source>N</source> <!-- (S)everní in Czech, but using English anyway -->
         <context-group purpose="location">
           <context context-type="sourcefile">src/locales/locale-info.ts</context>
           <context context-type="linenumber">3</context>
@@ -271,7 +271,7 @@
         <note priority="1" from="description">Single-letter abbreviation for North</note>
       </trans-unit>
       <trans-unit id="6896217175159042594" datatype="html">
-        <source>Z</source>
+        <source>W</source> <!-- (Z)ápad in Czech, but using English anyway -->
         <context-group purpose="location">
           <context context-type="sourcefile">src/locales/locale-info.ts</context>
           <context context-type="linenumber">6</context>
@@ -279,7 +279,7 @@
         <note priority="1" from="description">Single-letter abbreviation for West</note>
       </trans-unit>
       <trans-unit id="2566834560864089198" datatype="html">
-        <source>V</source>
+        <source>E</source> <!-- (V)ýchodní in Czech, but using English anyway -->
         <context-group purpose="location">
           <context context-type="sourcefile">src/locales/locale-info.ts</context>
           <context context-type="linenumber">7</context>

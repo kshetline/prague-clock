@@ -8,7 +8,7 @@ import { throttleTime } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { AutoComplete } from 'primeng/autocomplete';
 import { MenuItem } from 'primeng/api';
-import { SOUTH_NORTH, WEST_EAST } from '../locales/locale-info';
+import { SOUTH_NORTH, specificLocale, WEST_EAST } from '../locales/locale-info';
 
 const SVC_ZONE_SELECTOR_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -196,7 +196,7 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
 
       const params = urlEncodeParams({
         client: 'web',
-        pt: 'false',
+        pt: 'false', lang: specificLocale || '',
         q: search
       });
       const timer = setTimeout(() => this.searching = true, 500);
