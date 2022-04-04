@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>O Pražském Orlojovém Simulátoru</title>
+  <base href="./">
+<style>
+  body {
+    align-items: center;
+    background: rgb(212,150,76);
+    background: linear-gradient(90deg,
+      rgba(212, 150, 76, 0.33) 0%, rgba(176, 186, 177, 0.33) 8%, rgba(140, 168, 167, 0.33) 17%, rgba(71, 153, 174, 0.33) 25%,
+      rgba(24, 146, 178, 0.33) 33%, rgba(11, 138, 176, 0.33) 42%, rgba(18, 133, 174, 0.33) 50%, rgba(11, 138, 176, 0.33) 58%,
+      rgba(24, 146, 178, 0.33) 67%, rgba(71, 153, 174, 0.33) 75%, rgba(140, 168, 167, 0.33) 83%, rgba(176, 186, 177, 0.33) 92%,
+      rgba(212, 150, 76, 0.33) 100%);
+    color: #444;
+    display: flex;
+    flex-direction: column;
+    font: 14px Arial, Helvetica, sans-serif;
+    margin: 1em;
+    width: calc(100vw - 2em);
+  }
+
+  .page {
+    background: none;
+    width: calc(min(800px, calc(100vw - 2em)));
+  }
+
+  #clock {
+    left: calc(50% - 217px);
+    position: relative;
+  }
+
+  h1 {
+    font: bold 18px Arial, Helvetica, sans-serif;
+    text-align: center;
+  }
+
+  h2 {
+    font: bold 16px Arial, Helvetica, sans-serif;
+  }
+
+  li {
+    padding-left: 0.6em;
+    padding-bottom: 0.6em;
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <h1>Simulátor Pražského Orloje</h1>
+    <img id="clock" src="clock.jpg" width="435" height="435" alt="clock face">
+
+    <h2>Animace</h2>
+    <p>Chcete-li vidět, jak se hodiny rychle mění prostřednictvím změn času nebo místa, klikněte na číslici v polích
+      času, zeměpisné délky nebo zeměpisné šířky, poté klikněte a podržte na souvisejících ikonách šipek nahoru/dolů
+      nebo použijte šipky nahoru/dolů a hodiny budou rychle postupovat řadou časů nebo míst.
+
+    <h2>Grafický design</h2>
+    <p>Původní grafika hodin SVG a písmo zde použité byly původně vyvinuty Janem Tošovským, jak je najdete na
+      <a href="https://drifted.in/horologium-app/" target="_blank">těchto stránkách</a>.</p>
+    <p>Barevné schéma zde bylo změněno, grafika byla upravena tak, aby pokryla celou škálu zeměpisných šířek, a grafiku
+      lze nyní rychle aktualizovat ve webovém prohlížeči, spíše než se spoléhat na aktualizace na serveru. Byla přidána
+      centrální mapa světa podobná té na původních pražských hodinách.</p>
+
+    <h2>Rozdíly mezi simulátorem a Pražským orlojem</h2>
+    <ul>
+      <li>Polohování orlojových ručiček, hodinového ciferníku, slunce, měsíce a ekliptického kola simulátoru se provádí
+        pomocí hodin vašeho počítače a moderních astronomických výpočtů, spíše než simulací vnitřního ozubení
+        mechanického orloje.</li>
+      <li>Původní orloj ukazuje ve středu ciferníku orloje mapu světa, provedenou pomocí
+        <a href="https://cs.wikipedia.org/wiki/Kartografie#Stereografick.C3.A1_pol.C3.A1rn.C3.AD_projekce" target="_blank">stereografické projekce</a>,
+        s jižním pólem nahoře se středem na Prahu. Vzhledem k tomu, že tuto simulaci lze nastavit na libovolné místo na
+        Zemi, nejen na Prahu, bude se mapa otáčet tak, aby se vycentrovala na aktuálně nastavenou zeměpisnou šířku a
+        délku.</li>
+      <li>Simulátor může fungovat v polárních a antarktických kruzích. To vede k možnosti celodenní tmy a celodenního
+        světla. V těchto extrémních zeměpisných šířkách se objeví nová oblast ciferníku označená „SOL NOCTIS“ (latinsky
+        „večerní slunce“). Hranice nestejných hodin se mohou velmi zúžit a mohou být úplně vypuštěny.</li>
+      <li>Čas mezi jedním a druhým západem slunce je vždy rozdělen do dvaceti čtyř hodin
+        <a href="https://www.theflorentine.net/2016/03/03/the-duomo-clock/" target="_blank">„Staročeský čas“</a>
+        (také známého jako italský čas), včetně časových úseků, kdy mezi západy slunce mohou uplynout dny nebo dokonce
+        měsíce.</li>
+      <li>Simulátor může fungovat na jižní polokouli. Když je zeměpisná šířka nastavena na jih od rovníku, orlojové
+        značky a pohyb ručičky orloje se obrátí a stanou se proti směru hodinových ručiček.</li>
+    </ul>
+  </div>
+</body>
+</html>

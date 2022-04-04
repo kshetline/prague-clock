@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService, PrimeNGConfig } from 'primeng/api';
 import { abs, atan2_deg, atan_deg, cos_deg, floor, max, mod, PI, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
-import { clone, getCssValue, isChromeOS, isEqual, isLikelyMobile, isSafari, processMillis, toMixedCase } from '@tubular/util';
+import { clone, getCssValue, isChromeOS, isEqual, isLikelyMobile, isSafari, processMillis } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import {
   AstroEvent, EventFinder, FALL_EQUINOX, FIRST_QUARTER, FULL_MOON, LAST_QUARTER, MOON, NEW_MOON, RISE_EVENT, SET_EVENT,
@@ -11,6 +11,7 @@ import ttime, { DateTime, utToTdt } from '@tubular/time';
 import julianDay = ttime.julianDay;
 import { TzsLocation } from '../timezone-selector/timezone-selector.component';
 import { Globe } from '../globe/globe';
+import { localeSuffix, SOUTH_NORTH, specificLocale, WEST_EAST } from '../locales/locale-info';
 
 const CLOCK_RADIUS = 250;
 const INCLINATION = 23.5;
@@ -33,18 +34,20 @@ enum EventType { EQUISOLSTICE, MOON_PHASE, RISE_SET }
 
 const MAX_SAVED_LOCATIONS = 10;
 
+const prague = $localize`Prague, CZE`;
 const defaultSettings = {
+  collapsed: false,
   disableDst: true,
   eventType: EventType.EQUISOLSTICE,
   isoFormat: false,
   latitude: 50.0870,
   longitude: 14.4185,
-  placeName: 'Prague, CZE',
+  placeName: prague,
   recentLocations: [{
     lastTimeUsed: 0,
     latitude: 50.0870,
     longitude: 14.4185,
-    name: 'Prague, CZE',
+    name: prague,
     zone: 'Europe/Prague'
   }] as TzsLocation[],
   suppressOsKeyboard: false,
@@ -152,9 +155,13 @@ export class AppComponent implements OnInit {
   DDD = AngleStyle.DDD;
   MAX_YEAR = 2399;
   MIN_YEAR = 1400;
+  SOUTH_NORTH = SOUTH_NORTH;
+  specificLocale = specificLocale;
+  WEST_EAST = WEST_EAST;
 
   LOCAL_OPTS: TimeEditorOptions = {
     dateTimeStyle: DateTimeStyle.DATE_AND_TIME,
+    locale: specificLocale,
     twoDigitYear: false,
     showDstSymbol: true,
     showSeconds: false
@@ -164,6 +171,8 @@ export class AppComponent implements OnInit {
 
   private baseMoonAngle: number;
   private baseSunAngle: number;
+  private _collapsed = false;
+  private delayedCollapse = false;
   private eventFinder = new EventFinder();
   private eventType = EventType.EQUISOLSTICE;
   private globe: Globe
@@ -187,20 +196,20 @@ export class AppComponent implements OnInit {
   private _zone = 'Europe/Prague';
 
   menuItems: MenuItem[] = [
-    { label: '↔ Equinox/solstice', icon: 'pi pi-check',
+    { label: $localize`↔ Equinox/solstice`, icon: 'pi pi-check',
       command: (): void => this.setEventType(EventType.EQUISOLSTICE) },
-    { label: '↔ Moon phase', icon: 'pi pi-circle',
+    { label: $localize`↔ Moon phase`, icon: 'pi pi-circle',
       command: (): void => this.setEventType(EventType.MOON_PHASE) },
-    { label: '↔ Sunrise/transit/sunset', icon: 'pi pi-circle',
+    { label: $localize`↔ Sunrise/transit/sunset`, icon: 'pi pi-circle',
       command: (): void => this.setEventType(EventType.RISE_SET) },
     { separator : true },
-    { label: 'Translucent ecliptic', icon: 'pi pi-circle', id: 'tec',
+    { label: $localize`Translucent ecliptic`, icon: 'pi pi-circle', id: 'tec',
       command: (): boolean => this.translucentEcliptic = !this.translucentEcliptic },
-    { label: 'Code on GitHub', icon: 'pi pi-github', url: 'https://github.com/kshetline/prague-clock' },
-    { label: 'About the real clock', icon: 'pi pi-info-circle',
-      url: 'https://en.wikipedia.org/wiki/Prague_astronomical_clock' },
-    { label: 'About this simulator', icon: 'pi pi-info-circle',
-      url: 'assets/about.html' }
+    { label: $localize`Code on GitHub`, icon: 'pi pi-github', url: 'https://github.com/kshetline/prague-clock' },
+    { label: $localize`About the real clock`, icon: 'pi pi-info-circle',
+      url: $localize`:Language-specific Wikipedia URL:https://en.wikipedia.org/wiki/Prague_astronomical_clock` },
+    { label: $localize`About this simulator`, icon: 'pi pi-info-circle',
+      url: `assets/about${localeSuffix}.html` }
   ];
 
   canEditName = false;
@@ -245,21 +254,24 @@ export class AppComponent implements OnInit {
 
   constructor(
     private confirmService: ConfirmationService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private primeNgConfig: PrimeNGConfig
   ) {
     let settings: any;
 
     if (isLikelyMobile()) {
       this.menuItems.push({ separator: true });
-      this.menuItems.push({ label: 'Suppress onscreen keyboard', icon: 'pi pi-circle', id: 'sok',
+      this.menuItems.push({ label: $localize`Suppress onscreen keyboard`, icon: 'pi pi-circle', id: 'sok',
                             command: (): boolean => this.suppressOsKeyboard = !this.suppressOsKeyboard });
     }
 
     try {
       settings = JSON.parse(localStorage.getItem('pac-settings') ?? 'null');
 
-      if (settings?.recentLocations)
-        settings?.recentLocations.forEach((loc: any) => { loc.name = loc.name || loc.placeName; delete loc.placeName; });
+      if (settings?.recentLocations && settings.recentLocations.length > 0) {
+        settings.recentLocations.forEach((loc: any) => { loc.name = loc.name || loc.placeName; delete loc.placeName; });
+        settings.recentLocations[0].name = prague;
+      }
     }
     catch {
       settings = null;
@@ -275,6 +287,11 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.primeNgConfig.setTranslation({
+      accept: $localize`:for dialog button:Yes`,
+      reject: $localize`:for dialog button:No`
+    });
+
     const placeName = this.placeName;
 
     this.initDone = true;
@@ -283,6 +300,9 @@ export class AppComponent implements OnInit {
     this.setNow();
     this.placeName = placeName;
 
+    if (this.delayedCollapse)
+      setTimeout(() => this.collapsed = true);
+
     const docElem = document.documentElement;
     const doResize = (): void => {
       this.graphicsRateChangeCheck();
@@ -290,7 +310,7 @@ export class AppComponent implements OnInit {
         const height = window.innerHeight;
         const disallowScroll = getCssValue(docElem, 'overflow') === 'hidden';
 
-        docElem.style.setProperty('--mfh', height + 'px');
+        docElem.style.setProperty('--mfvh', height + 'px');
         docElem.style.setProperty('--mvh', (height * 0.01) + 'px');
 
         if (disallowScroll && (docElem.scrollTop !== 0 || docElem.scrollLeft !== 0)) {
@@ -356,6 +376,25 @@ export class AppComponent implements OnInit {
         this.canEditName = true;
       }
     });
+  }
+
+  get collapsed(): boolean { return this._collapsed; }
+  set collapsed(value: boolean) {
+    if (this._collapsed !== value) {
+      this._collapsed = value;
+
+      if (this.initDone) {
+        if ((document.activeElement as any)?.blur)
+          (document.activeElement as any).blur();
+
+        this.graphicsRateChangeCheck(true);
+        this.saveSettings();
+      }
+      else {
+        this.collapsed = false;
+        this.delayedCollapse = true;
+      }
+    }
   }
 
   clearItem(index: number): void {
@@ -655,7 +694,7 @@ export class AppComponent implements OnInit {
     this.updateGlobe();
   }
 
-  private graphicsRateChangeCheck(): void {
+  private graphicsRateChangeCheck(suppressFilteringImmediately = false): void {
     const now = processMillis();
     const resumeFiltering = (): void => {
       this.svgFilteringOn = true;
@@ -664,9 +703,10 @@ export class AppComponent implements OnInit {
     };
 
     if (this.svgFilteringOn) {
-      if (this.graphicsChangeStartTime < 0 || now > this.graphicsChangeLastTime  + STOP_FILTERING_DELAY)
+      if (!suppressFilteringImmediately &&
+          (this.graphicsChangeStartTime < 0 || now > this.graphicsChangeLastTime  + STOP_FILTERING_DELAY))
         this.graphicsChangeStartTime = now;
-      else if (now > this.graphicsChangeStartTime + STOP_FILTERING_DELAY) {
+      else if (now > this.graphicsChangeStartTime + STOP_FILTERING_DELAY || suppressFilteringImmediately) {
         this.graphicsChangeStartTime = -1;
         this.svgFilteringOn = false;
         this.graphicsChangeStopTimer = setTimeout(resumeFiltering, RESUME_FILTERING_DELAY);
@@ -845,7 +885,7 @@ export class AppComponent implements OnInit {
       return;
 
     this.confirmService.confirm({
-      message: 'Turn off "Track current time" so you can edit the time?',
+      message: $localize`Turn off "Track current time" so you can edit the time?`,
       accept: () => this.trackTime = false
     });
   }
@@ -923,7 +963,7 @@ export class AppComponent implements OnInit {
   skipToEvent(previous = false): void {
     if (this.trackTime) {
       this.confirmService.confirm({
-        message: 'Turn off "Track current time" and change the clock time?',
+        message: $localize`Turn off "Track current time" and change the clock time?`,
         accept: () => {
           this.trackTime = false;
           this.skipToEvent(previous);
@@ -962,16 +1002,43 @@ export class AppComponent implements OnInit {
 
     if (eventsFound.length > 0) {
       const evt = eventsFound[0];
-      const eventText = toMixedCase(evt.eventText).replace('Rise', 'Sunrise').replace('Set', 'Sunset');
+      const eventText = AppComponent.translateEvent(evt.eventText);
       const year = new DateTime(evt.eventTime.utcMillis, this.zone).wallTime.year;
 
       if (year < this.MIN_YEAR || year > this.MAX_YEAR)
-        this.messageService.add({ severity: 'error', summary:'Event',
-                                  detail: `Event outside of ${this.MIN_YEAR}-${this.MAX_YEAR} year range.` });
+        this.messageService.add({ severity: 'error', summary: $localize`Event`,
+                                  detail: $localize`Event outside of ${this.MIN_YEAR}-${this.MAX_YEAR} year range.` });
       else {
         this.time = evt.eventTime.utcMillis;
-        this.messageService.add({ severity: 'info', summary:'Event', detail: eventText });
+        this.messageService.add({ severity: 'info', summary: $localize`Event`, detail: eventText });
       }
     }
+  }
+
+  private static translateEvent(text: string): string {
+    if (text.match(/\brise\b/i))
+      return $localize`Sunrise`;
+    else if (text.match(/\bset\b/i))
+      return $localize`Sunset`;
+    else if (text.match(/\btransit\b/i))
+      return $localize`Transit`;
+    else if (text.match(/\bvernal equinox\b/i))
+      return $localize`Vernal equinox`;
+    else if (text.match(/\bsummer solstice\b/i))
+      return $localize`Summer solstice`;
+    else if (text.match(/\bautumnal equinox\b/i))
+      return $localize`Autumnal equinox`;
+    else if (text.match(/\bwinter solstice\b/i))
+      return $localize`Winter Solstice`;
+    else if (text.match(/\bnew moon\b/i))
+      return $localize`New moon`;
+    else if (text.match(/\b(1st|first)\b/i))
+      return $localize`First quarter`;
+    else if (text.match(/\bfull moon\b/i))
+      return $localize`Full moon`;
+    else if (text.match(/\b(3rd|third)\b/i))
+      return $localize`Third quarter`;
+    else
+      return text;
   }
 }

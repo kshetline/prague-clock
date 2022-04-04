@@ -5,6 +5,7 @@
   <title>Pražský Orloj - Prague Astronomical Clock Simulator</title>
   <meta name="description" content="A simulation of the Prague Astronomical Clock (Pražský Orloj), configurable for any location on Earth, with user-settable time.">
   <meta name="keywords" content="astronomy, astronomical clocks, prague, pražský, clocks, medieval, horology, timekeeping">
+  <meta name="author" content="Kerry Shetline">
   <meta property="og:title" content="Pražský Orloj - Prague Astronomical Clock Simulator">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://shetline.com/orloj/">
@@ -40,18 +41,66 @@
   </style>
 </head>
 <body>
-    <div class="app-wrapper"><app-root>
-      <div style="font: 14px Arial, Helvetica, sans-serif; text-align: center;
-        position: absolute; top: 0; bottom: 0; left: 0; right: 0; margin: auto; height: 3em;">
-        <svg role="img" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="spinner"
-             class="startup-spinner" xmlns="http://www.w3.org/2000/svg"
-             viewBox="0 0 512 512"><path fill="currentColor" d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48
-                48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51
-                0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49
-                48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49
-                48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49
-                48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49
-                48-48-21.491-48-48-48z"></path></svg>&nbsp; Loading...</div>
-    </app-root></div>
+  <div class="app-wrapper"><app-root>
+    <div style="font: 14px Arial, Helvetica, sans-serif; text-align: center;
+      position: absolute; top: 0; bottom: 0; left: 0; right: 0; margin: auto; height: 3em;">
+      <svg role="img" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="spinner"
+           class="startup-spinner" xmlns="http://www.w3.org/2000/svg"
+           viewBox="0 0 512 512"><path fill="currentColor" d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48
+              48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51
+              0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49
+              48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49
+              48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49
+              48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49
+              48-48-21.491-48-48-48z"></path></svg>&nbsp;&nbsp;<span id="loading">Loading...</span></div>
+  </app-root></div>
+  <script>
+    (() => {
+      const specificLocale = (/\?(.*)\blang=([^&]+)/.exec(window.location.href) ?? [])[2];
+      const urlLocale = (/\borloj\/([^/]+)/.exec(window.location.href) || [])[1];
+      let locales = [];
+
+      if (navigator.languages)
+        locales = navigator.languages;
+      else if (navigator.language)
+        locales = [navigator.language];
+
+      if (specificLocale)
+        locales = [specificLocale];
+      else if (urlLocale) {
+        let matched = false;
+
+        for (const locale of locales) {
+          if (locale.startsWith(urlLocale)) {
+            locales = [locale];
+            matched = true;
+            break;
+          }
+        }
+
+        if (!matched)
+          locales = [urlLocale];
+      }
+
+      for (const locale of locales) {
+        if (locale.startsWith('cs')) {
+          // noinspection SpellCheckingInspection
+          document.querySelector('title').innerText = 'Simulátor pražského orloje';
+          // noinspection SpellCheckingInspection
+          document.getElementById('loading').innerText = 'Načítání...';
+          break;
+        }
+        else if (locale.startsWith('es')) {
+          // noinspection SpellCheckingInspection
+          document.querySelector('title').innerText = 'Pražský Orloj - Simulador de Reloj Astronómico de Praga';
+          // noinspection SpellCheckingInspection
+          document.getElementById('loading').innerText = 'Cargando...';
+          break;
+        }
+        else if (locale.startsWith('en'))
+          break;
+      }
+    })();
+  </script>
 </body>
 </html>

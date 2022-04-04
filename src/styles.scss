@@ -4,7 +4,7 @@
 }
 
 :root {
-  --mfh: 100vh; // mobile full height
+  --mfvh: 100vh; // mobile full height
   --mvh: 1vh; // mobile vh-like unit
 }
 
@@ -18,7 +18,7 @@ html {
 body {
   background-color: #4D4D4D;
   font: 14px sans-serif;
-  height: var(--mfh);
+  height: var(--mfvh);
   left: 0;
   margin: 0;
   position: absolute;
@@ -79,12 +79,12 @@ input {
 }
 
 .p-menu {
-  width: 18em;
+  width: 20em;
 }
 
 .p-menu-list {
-  min-width: 18em;
-  max-height: calc(90 * var(--mvh));
+  min-width: 20em;
+  max-height: calc(90 * var(--mfvh));
   overflow-y: auto;
 }
 

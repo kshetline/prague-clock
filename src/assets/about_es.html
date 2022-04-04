@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pražský Orloj - Sobre el Simulador de Reloj Astronómico de Praga</title>
+  <base href="./">
+<style>
+  body {
+    align-items: center;
+    background: rgb(212,150,76);
+    background: linear-gradient(90deg,
+      rgba(212, 150, 76, 0.33) 0%, rgba(176, 186, 177, 0.33) 8%, rgba(140, 168, 167, 0.33) 17%, rgba(71, 153, 174, 0.33) 25%,
+      rgba(24, 146, 178, 0.33) 33%, rgba(11, 138, 176, 0.33) 42%, rgba(18, 133, 174, 0.33) 50%, rgba(11, 138, 176, 0.33) 58%,
+      rgba(24, 146, 178, 0.33) 67%, rgba(71, 153, 174, 0.33) 75%, rgba(140, 168, 167, 0.33) 83%, rgba(176, 186, 177, 0.33) 92%,
+      rgba(212, 150, 76, 0.33) 100%);
+    color: #444;
+    display: flex;
+    flex-direction: column;
+    font: 14px Arial, Helvetica, sans-serif;
+    margin: 1em;
+    width: calc(100vw - 2em);
+  }
+
+  .page {
+    background: none;
+    width: calc(min(800px, calc(100vw - 2em)));
+  }
+
+  #clock {
+    left: calc(50% - 217px);
+    position: relative;
+  }
+
+  h1 {
+    font: bold 18px Arial, Helvetica, sans-serif;
+    text-align: center;
+  }
+
+  h2 {
+    font: bold 16px Arial, Helvetica, sans-serif;
+  }
+
+  li {
+    padding-left: 0.6em;
+    padding-bottom: 0.6em;
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <h1>Simulador de Reloj Astronómico de Praga</h1>
+    <img id="clock" src="clock.jpg" width="435" height="435" alt="clock face">
+
+    <h2>Animación</h2>
+    <p>Para ver el reloj cambiar rápidamente a través de cambios de hora o ubicación, haga clic en un dígito en la
+      hora, longitud, o campos de latitud, luego haga clic y mantenga presionados los íconos de flecha arriba/abajo
+      asociados, o use las teclas de flecha arriba/abajo, y el reloj avanzará rápidamente a través de una serie de
+      horas o ubicaciones.
+
+    <h2>Diseño gráfico</h2>
+    <p>La fuente y los gráficos de reloj SVG originales utilizados aquí fueron desarrollados originalmente por
+      Jan Tošovský, como se encuentran
+      <a href="https://drifted.in/horologium-app/" target="_blank">en este sitio web</a>.</p>
+    <p>El esquema de color aquí se ha alterado, los gráficos se han modificado para cubrir una amplia gama de latitudes,
+      y los gráficos ahora se pueden actualizar rápidamente dentro de un navegador web, en lugar de depender de las
+      actualizaciones basadas en el servidor. Se ha agregado un mapa del mundo central, similar al que aparece en el
+      reloj original de Praga.</p>
+
+    <h2>Diferencias entre el simulador y el reloj de Praga original</h2>
+    <ul>
+      <li>El posicionamiento de las manecillas del reloj, la esfera de la hora, el sol, la luna y la rueda de la
+        eclíptica del simulador se realizan mediante el reloj de su computadora y los cálculos astronómicos modernos,
+        en lugar de simular el engranaje interno de el reloj mecanico.</li>
+      <li>El reloj original muestra un mapa del mundo en el centro de la esfera del reloj, realizado mediante una
+        <a href="https://es.wikipedia.org/wiki/Proyecci%C3%B3n_estereogr%C3%A1fica" target="_blank">proyección estereográfica</a>,
+        con el polo sur hacia la parte superior, centrado en Praga. Dado que esta simulación se puede configurar en
+        cualquier lugar de la Tierra, no solo en Praga, el mapa girará para centrarse en la latitud y longitud
+        establecidas actualmente.</li>
+      <li>El simulador puede operar dentro de los círculos árticos y antárticos. Esto lleva a la posibilidad de
+        oscuridad durante todo el día y luz durante todo el día. En estas latitudes extremas aparecerá una nueva región
+        de la esfera del reloj, marcada como “SOL NOCTIS” (<em>sol de la noche</em> en latín). Las líneas de horas
+        desiguales pueden volverse muy estrechas y pueden eliminarse por completo.</li>
+      <li>El tiempo entre una puesta de sol y la siguiente siempre se divide en veinticuatro horas de
+        <a href="https://es.wikipedia.org/wiki/Hora_it%C3%A1lica" target="_blank">la hora bohemia</a>
+        (también conocida como hora itálica), incluidos los períodos de tiempo en los que pueden pasar días o incluso
+        meses entre las puestas de sol.</li>
+      <li>El simulador puede operar en el hemisferio sur. Cuando la latitud se establece al sur del ecuador, las marcas
+        del reloj y el movimiento de la manecilla del reloj se invierten y se vuelven en sentido antihorario.</li>
+    </ul>
+  </div>
+</body>
+</html>

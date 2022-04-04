@@ -8,6 +8,7 @@ import { throttleTime } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { AutoComplete } from 'primeng/autocomplete';
 import { MenuItem } from 'primeng/api';
+import { SOUTH_NORTH, specificLocale, WEST_EAST } from '../locales/locale-info';
 
 const SVC_ZONE_SELECTOR_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -15,10 +16,10 @@ const SVC_ZONE_SELECTOR_VALUE_ACCESSOR: any = {
   multi: true,
 };
 
-const MISC_OPTION = '- Miscellaneous -';
-const UT_OPTION   = '- UTC hour offsets -';
-const OS_OPTION   = '- Your OS timezone -';
-const LMT_OPTION  = '- Local Mean Time -';
+const MISC_OPTION = $localize`- Miscellaneous -`;
+const UT_OPTION   = $localize`- UTC hour offsets -`;
+const OS_OPTION   = $localize`- Your OS timezone -`;
+const LMT_OPTION  = $localize`- Local Mean Time -`;
 
 const MISC = 'MISC';
 const UT   = 'UT';
@@ -47,28 +48,10 @@ export interface TzsLocation {
   zone: string;
 }
 
+const displayOffsetToCanonical = new Map<string, string>();
+
 function toCanonicalOffset(offset: string): string {
-  let off = offset;
-  let dst = '';
-  const $ = /([-+]\d+(?::\d+)?)(.+)?/.exec(offset);
-
-  if ($) {
-    off = $[1];
-    dst = ($[2] ?? '').replace('with', '').trim();
-
-    if (dst.includes('two'))
-      dst = '#';
-    else if (dst.includes('half'))
-      dst = '^';
-    else if (dst.includes('negative'))
-      dst = '\u2744';
-    else if (dst === 'DST')
-      dst = '§';
-    else if (dst)
-      dst = '~';
-  }
-
-  return off + dst;
+  return displayOffsetToCanonical.get(offset);
 }
 
 function toCanonicalZone(zone: string): string {
@@ -88,21 +71,25 @@ function toDisplayOffset(offset: string): string {
     dst = $[2] ?? '';
 
     if (dst === '§')
-      dst = 'DST';
+      dst = $localize`:Abbreviation for Daylight Saving Time:DST`;
     else if (dst === '#')
-      dst = 'two-hour DST';
+      dst = $localize`:two-hour Daylight Saving Time:two-hour DST`;
     else if (dst === '^')
-      dst = 'half-hour DST';
+      dst = $localize`:half-hour Daylight Saving Time:half-hour DST`;
     else if (dst === '\u2744')
-      dst = 'negative DST';
+      dst = $localize`:negative Daylight Saving Time:negative DST`;
     else if (dst === '~')
-      dst = 'non-standard DST';
+      dst = $localize`:non-standard Daylight Saving Time:non-standard DST`;
 
     if (dst)
-      dst = ' with ' + dst;
+      dst = ' ' + $localize`:word following UTC offset, preceding form of DST :with` + ' ' + dst;
   }
 
-  return `UTC${off}${dst}`;
+  const displayOffset = $localize`:UTC offset, abbreviation for UTC, form of DST (if any):UTC${off}${dst}`;
+
+  displayOffsetToCanonical.set(displayOffset, offset);
+
+  return displayOffset;
 }
 
 function toDisplayZone(zone: string): string {
@@ -115,8 +102,8 @@ function formatSearchResult(location: AtlasLocation): string {
   if (s.length > 40)
     s = s.replace(/^[^,]+/, match => match.substr(0, max(match.length - s.length + 39, 8)) + '…');
 
-  s += ` (${abs(location.latitude).toFixed(1)}°${location.latitude < 0 ? 'S' : 'N'},` +
-       ` ${abs(location.longitude).toFixed(1)}°${location.longitude < 0 ? 'W' : 'E'})`;
+  s += ` (${abs(location.latitude).toFixed(1)}°${SOUTH_NORTH[location.latitude < 0 ? 0 : 1]},` +
+       ` ${abs(location.longitude).toFixed(1)}°${WEST_EAST[location.longitude < 0 ? 0 : 1]})`;
 
   return s;
 }
@@ -180,7 +167,7 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
                                 command: () => this.recentLocationSelected(i) });
 
       if (value.length > 1) {
-        this.recentItems.push({ label: 'Clear recent locations', style: { 'font-style': 'italic' },
+        this.recentItems.push({ label: $localize`Clear recent locations`, style: { 'font-style': 'italic' },
                                 command: () => this.clearRecents.emit() });
 
         if (this.recentsOpen)
@@ -209,7 +196,7 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
 
       const params = urlEncodeParams({
         client: 'web',
-        pt: 'false',
+        pt: 'false', lang: specificLocale || '',
         q: search
       });
       const timer = setTimeout(() => this.searching = true, 500);
@@ -228,7 +215,7 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
               newMatches.push(...this.matchZones, ...matches.map(match => formatSearchResult(match)));
               this.autoComplete.loading = true;
               this.matchZones = newMatches;
-              this.emptyMessage = 'No matching cites/timezones';
+              this.emptyMessage = $localize`No matching cites/timezones`;
             }
           },
           error: err => { this.searching = false; console.error(err); }
@@ -254,11 +241,14 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
   set value(newValue: string) {
     let $ = /\s+\([^)]+\)$/.exec(newValue);
     const zone = toCanonicalZone(newValue);
+    const sn = SOUTH_NORTH.join('');
+    const ew = WEST_EAST.join('');
+    const matcher = new RegExp(`^(.+?):\\xA0.*?([0-9.]+).([${sn}]).+?([0-9.]+).([${ew}])`);
 
-    if ($ && ($ = /^(.+?):\xA0.*?([0-9.]+).([NS]).+?([0-9.]+).([EW])/.exec(newValue)))
+    if ($ && ($ = matcher.exec(newValue)))
       this.location.emit({
-        latitude: toNumber($[2]) * ($[3] === 'S' ? -1 : 1),
-        longitude: toNumber($[4]) * ($[5] === 'W' ? -1 : 1),
+        latitude: toNumber($[2]) * ($[3] === SOUTH_NORTH[0] ? -1 : 1),
+        longitude: toNumber($[4]) * ($[5] === WEST_EAST[0] ? -1 : 1),
         name: $[1],
         zone
       });
@@ -486,11 +476,11 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
     }
 
     if (remoteQuery.length > 3) {
-      this.emptyMessage = 'Searching...';
+      this.emptyMessage = $localize`Searching...`;
       this.searches.next(remoteQuery);
     }
     else
-      this.emptyMessage = 'No matching timezones';
+      this.emptyMessage = $localize`No matching timezones`;
   }
 
   checkForEnter(evt: KeyboardEvent): void {
