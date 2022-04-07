@@ -11,10 +11,12 @@ const MAP_WIDTH = 1000;
 const DEFAULT_GLOBE_PIXEL_SIZE = 500;
 const GLOBE_RADIUS = 5;
 const FIELD_OF_VIEW = 91;
+const FIELD_OF_VIEW_2018 = 29;
 const VIEW_DISTANCE = 4.975;
+const VIEW_DISTANCE_2018 = 20;
 const LINE_THICKNESS = 0.03;
 const LINE_THICKNESS_2018 = 0.09;
-const HAG = 0.02; // Sleight distance above globe that longitude/latitude lines are drawn.
+const HAG = -0.02; // Sleight distance above globe that longitude/latitude lines are drawn.
 const HAG_2018 = 0.05;
 
 const GRID_COLOR = '#262F36';
@@ -105,11 +107,14 @@ export class Globe {
       await new Promise<void>((resolve, reject) => Globe.waitList.push({ resolve, reject }));
 
     if (!this.initialized || this.was2018 !== post2018) {
-      this.camera = new PerspectiveCamera(FIELD_OF_VIEW, 1);
+      this.camera = new PerspectiveCamera(post2018 ? FIELD_OF_VIEW_2018 : FIELD_OF_VIEW, 1);
       this.scene = new Scene();
       const globe = new SphereGeometry(GLOBE_RADIUS, 50, 50);
       globe.rotateY(-PI / 2);
-      globe.scale(-1, -1, -1);
+
+      if (!post2018)
+        globe.scale(-1, -1, -1);
+
       this.globeMesh = new Mesh(globe,
         new MeshBasicMaterial({ map: new CanvasTexture(post2018 ? Globe.mapCanvas2018 : Globe.mapCanvas), side: DoubleSide }));
       this.scene.add(this.globeMesh);
@@ -117,11 +122,12 @@ export class Globe {
       const lines: BufferGeometry[] = [];
       const thickness = post2018 ? LINE_THICKNESS_2018 : LINE_THICKNESS;
       const hag = post2018 ? HAG_2018 : HAG;
+      const arcAdjust = 0.02;
 
       // Lines of longitude
       for (let n = 0; n < 24; ++n) {
-        const line = new CylinderGeometry(GLOBE_RADIUS - hag, GLOBE_RADIUS - hag, thickness, 50, 1, true,
-          PI / 12, PI * 5 / 6);
+        const line = new CylinderGeometry(GLOBE_RADIUS + hag, GLOBE_RADIUS + hag, thickness, 50, 1, true,
+          PI / 12 + arcAdjust, PI * 5 / 6 - arcAdjust * 2);
         line.translate(0, -thickness / 2, 0);
         line.rotateX(PI / 2);
         line.rotateY(n * PI / 12);
@@ -135,7 +141,7 @@ export class Globe {
         const y = GLOBE_RADIUS * sin(lat);
         const r1 = r - thickness * sin(lat) / 2;
         const r2 = r + thickness * sin(lat) / 2;
-        const line = new CylinderGeometry(r1 - hag, r2 - hag, cos(lat) * thickness, 50, 8, true);
+        const line = new CylinderGeometry(r1 + hag, r2 + hag, cos(lat) * thickness, 50, 8, true);
         line.translate(0, -cos(lat) * thickness / 2 + y, 0);
         lines.push(line);
       }
@@ -143,7 +149,7 @@ export class Globe {
       this.globeMesh.add(new Mesh(mergeBufferGeometries(lines),
         new MeshBasicMaterial({ color: post2018 ? GRID_COLOR_P2018 : GRID_COLOR, side: DoubleSide })));
 
-      this.camera.position.z = VIEW_DISTANCE;
+      this.camera.position.z = post2018 ? VIEW_DISTANCE_2018 : VIEW_DISTANCE;
       this.renderer = new WebGLRenderer({ alpha: true, antialias: true });
 
       if (this.lastRenderer)
