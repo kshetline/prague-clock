@@ -55,7 +55,7 @@
   </div>
 </div>
 
-<div id="svg-wrapper">
+<div id="svg-wrapper" [class.post-2018]="post2018">
   <svg viewBox="0 0 600 600" xml:space="preserve" [class.controls-collapsed]="collapsed">
     <defs>
       <filter id="filterHand" x="0" y="0" width="200%" height="200%">
@@ -147,6 +147,11 @@
       <clipPath id="backgroundArea">
         <rect x="521.317" y="233.188" width="1024" height="768"/>
       </clipPath>
+      <radialGradient id="dawn-dusk-gradient">
+        <stop offset="0%" stop-color="#4A374F"/>
+        <stop offset="75%" stop-color="#4A374F"/>
+        <stop offset="100%" stop-color="#AF1C2A"/>
+      </radialGradient>
     </defs>
 
     <g transform="translate(300, 300)" class="content">

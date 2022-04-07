@@ -43,6 +43,7 @@ const defaultSettings = {
   latitude: 50.0870,
   longitude: 14.4185,
   placeName: prague,
+  post2018: false,
   recentLocations: [{
     lastTimeUsed: 0,
     latitude: 50.0870,
@@ -184,7 +185,7 @@ export class AppComponent implements OnInit {
   private _latitude = 50.0870;
   private _longitude = 14.4185;
   private observer: SkyObserver;
-  private zoneFixTimeout: any;
+  private _post2018 = false;
   private solarSystem = new SolarSystem();
   private sunsetA: AstroEvent = null;
   private sunsetB: AstroEvent = null;
@@ -194,6 +195,7 @@ export class AppComponent implements OnInit {
   private _trackTime = false;
   private _translucentEcliptic = false;
   private _zone = 'Europe/Prague';
+  private zoneFixTimeout: any;
 
   menuItems: MenuItem[] = [
     { label: $localize`↔ Equinox/solstice`, icon: 'pi pi-check',
@@ -203,8 +205,11 @@ export class AppComponent implements OnInit {
     { label: $localize`↔ Sunrise/transit/sunset`, icon: 'pi pi-circle',
       command: (): void => this.setEventType(EventType.RISE_SET) },
     { separator : true },
+    { label: $localize`Post-2018 colors`, icon: 'pi pi-circle', id: 'p18',
+      command: (): boolean => this.post2018 = !this.post2018 },
     { label: $localize`Translucent ecliptic`, icon: 'pi pi-circle', id: 'tec',
       command: (): boolean => this.translucentEcliptic = !this.translucentEcliptic },
+    { separator : true },
     { label: $localize`Code on GitHub`, icon: 'pi pi-github', url: 'https://github.com/kshetline/prague-clock' },
     { label: $localize`About the real clock`, icon: 'pi pi-info-circle',
       url: $localize`:Language-specific Wikipedia URL:https://en.wikipedia.org/wiki/Prague_astronomical_clock` },
@@ -394,6 +399,17 @@ export class AppComponent implements OnInit {
         this.collapsed = false;
         this.delayedCollapse = true;
       }
+    }
+  }
+
+  get post2018(): boolean { return this._post2018; }
+  set post2018(value: boolean) {
+    if (this._post2018 !== value) {
+      this._post2018 = value;
+      this.updateMenu();
+
+      if (this.initDone)
+        this.updateGlobe();
     }
   }
 
@@ -721,7 +737,7 @@ export class AppComponent implements OnInit {
   }
 
   private updateGlobe(): void {
-    this.globe.orient(this._longitude, this.latitude).finally();
+    this.globe.orient(this._longitude, this.latitude, this.post2018).finally();
   }
 
   private createDayAreaMask(outerR: number): void {
@@ -903,6 +919,9 @@ export class AppComponent implements OnInit {
       if (index < 3)
         item.icon = (index === this.eventType ? 'pi pi-check' : 'pi pi-circle');
     });
+
+    if (this.menuItemById('p18'))
+      this.menuItemById('p18').icon = (this.post2018 ? 'pi pi-check' : 'pi pi-circle');
 
     if (this.menuItemById('tec'))
       this.menuItemById('tec').icon = (this.translucentEcliptic ? 'pi pi-check' : 'pi pi-circle');

@@ -446,12 +446,6 @@ svg {
   fill: none;
 }
 
-.unequalHourBorder2 {
-  stroke: red;
-  stroke-width: 2px;
-  fill: none;
-}
-
 .unequalHour6 {
   fill: #1085AE;
 }
@@ -482,4 +476,58 @@ svg {
 
 .darkArea {
   fill: #05304F;
+}
+
+.post-2018 {
+  .midnightSunColor {
+    fill: #2F9DE7;
+  }
+
+  .innerCircle {
+    fill: #2F9DE7;
+  }
+
+  .signsArea {
+    fill: #132539;
+  }
+
+  .outerRingBackground {
+    fill: #132539;
+  }
+
+  .unequalHour6 {
+    fill: #2F9DE7;
+  }
+
+  .unequalHour5 {
+    fill: #2F9DE7;
+  }
+
+  .unequalHour4 {
+    fill: #2F9DE7;
+  }
+
+  .unequalHour3 {
+    fill: #2F9DE7;
+  }
+
+  .unequalHour2 {
+    fill: #2F9DE7;
+  }
+
+  .unequalHour1 {
+    fill: #2F9DE7;
+  }
+
+  .horizonArea {
+    fill: url("#dawn-dusk-gradient");
+  }
+
+  .darkArea {
+    fill: #132539;
+  }
+
+  #globe-host {
+    border: 2px #FFE696 solid;
+  }
 }
