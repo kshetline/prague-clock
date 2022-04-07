@@ -153,14 +153,15 @@
       </clipPath>
       <radialGradient id="dawn-dusk-gradient">
         <stop offset="0%" stop-color="#4A374F"/>
-        <stop offset="75%" stop-color="#4A374F"/>
-        <stop offset="100%" stop-color="#AF1C2A"/>
+        <stop [attr.offset]="duskGradientAdjustment + '%'" stop-color="#4A374F"/>
+        <stop [attr.offset]="((100 + duskGradientAdjustment) / 2) + '%'" stop-color="#A92237"/>
+        <stop offset="100%" stop-color="#C81B2F"/>
       </radialGradient>
     </defs>
 
     <g transform="translate(300, 300)" class="content">
       <g id="base">
-        <g id="unequalHourAreas" mask="url(#baseArea)">
+        <g id="unequalHourAreas" mask="url('#baseArea')">
           <circle *ngIf="midnightSunR" cx="0" cy="0" r="250" class="midnightSunColor"/>
           <circle cx="0" cy="0" [attr.r]="midnightSunR ? midnightSunR : 250" class="unequalHour6"/>
           <path [attr.d]="hourWedges[1]"  class="unequalHourArea unequalHour1"/>
@@ -213,7 +214,7 @@
         </g>
         <g id="time">
           <path id="timeTextPath" d="M0.0 -221.0C122.0 -221.0 221.0 -122.0 221.0 0.0C221.0 122.0 122.0 221.0 0.0 221.0C-122.0 221.0 -221.0 122.0 -221.0 0.0C-221.0 -122.0 -122.0 -221.0 0.0 -221.0" class="textPath"/>
-          <g *ngIf="!southern" [attr.filter]="svgFilteringOn ? 'url(#filterRelief)' : null">
+          <g *ngIf="!southern" [attr.filter]="filterRelief">
             <text><textPath xlink:href="#timeTextPath" startOffset="4.2%" class="timeText">I</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="8.3%" class="timeText">II</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="12.5%" class="timeText">III</textPath></text>
@@ -241,7 +242,7 @@
               <text><textPath xlink:href="#timeTextPath" startOffset="50.0%" class="timeText">XII</textPath></text>
             </g>
           </g>
-          <g *ngIf="southern" [attr.filter]="svgFilteringOn ? 'url(#filterRelief)' : null">
+          <g *ngIf="southern" [attr.filter]="filterRelief">
             <text><textPath xlink:href="#timeTextPath" startOffset="4.2%" class="timeText">XI</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="8.3%" class="timeText">X</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="12.5%" class="timeText">IX</textPath></text>
@@ -270,7 +271,7 @@
             </g>
           </g>
         </g>
-        <g id="unequalHourBorders" mask="url(#dayArea)" [attr.filter]="svgFilteringOn ? 'url(#filterRelief)' : null"
+        <g id="unequalHourBorders" mask="url(#dayArea)" [attr.filter]="filterRelief"
             [attr.stroke-width]="hourStroke + 'px'">
           <path [attr.d]="hourArcs[1]" class="unequalHourBorder"/>
           <path [attr.d]="hourArcs[2]" class="unequalHourBorder"/>
@@ -284,11 +285,11 @@
           <path [attr.d]="hourArcs[11]" class="unequalHourBorder"/>
           <path d="M0 0L0 -400" class="unequalHourBorder"/>
         </g>
-        <g id="horizonBorder" mask="url(#baseArea)" [attr.filter]="svgFilteringOn ? 'url(#filterRelief)' : null">
+        <g id="horizonBorder" mask="url(#baseArea)" [attr.filter]="filterRelief">
           <circle *ngIf="midnightSunR" [attr.r]="midnightSunR" cx="0" cy="0" class="midnightSunCircle"/>
           <circle id="horizonBorder" [attr.r]="horizonR" cx="0" [attr.cy]="horizonCy" class="baseCircle"/>
         </g>
-        <g id="baseCircles" [attr.filter]="svgFilteringOn ? 'url(#filterRelief)' : null">
+        <g id="baseCircles" [attr.filter]="filterRelief">
           <circle cx="0" cy="0" r="107.7" class="baseCircle innerCircle"/>
           <circle cx="0" cy="0" r="164.1" class="baseCircle"/>
           <circle cx="0" cy="0" r="250" class="baseCircle"/>
@@ -297,7 +298,7 @@
       <g id="outerRing">
         <path id="outerRingBackground" d="M0.0 -291.5C-161.0 -291.5 -291.5 -161.0 -291.5 0.0C-291.5 161.0 -161.0 291.5 0.0 291.5C161.0 291.5 291.5 161.0 291.5 0.0C291.5 -161.0 161.0 -291.5 0.0 -291.5M0.0 -258.8C142.9 -258.8 258.8 -142.9 258.8 0.0C258.8 142.9 142.9 258.8 0.0 258.8C-142.9 258.8 -258.8 142.9 -258.8 0.0C-258.8 -142.9 -142.9 -258.8 0.0 -258.8" class="outerRingBackground"/>
         <path id="outerRingTextPath" d="M0.0 -258.8C142.9 -258.8 258.8 -142.9 258.8 0.0C258.8 142.9 142.9 258.8 0.0 258.8C-142.9 258.8 -258.8 142.9 -258.8 0.0C-258.8 -142.9 -142.9 -258.8 0.0 -258.8" class="textPath"/>
-        <g [attr.filter]="svgFilteringOn ? 'url(#filterRelief)' : null">
+        <g [attr.filter]="filterRelief">
           <path id="outerCircle" d="M0.0 -291.5C-161.0 -291.5 -291.5 -161.0 -291.5 0.0C-291.5 161.0 -161.0 291.5 0.0 291.5C161.0 291.5 291.5 161.0 291.5 0.0C291.5 -161.0 161.0 -291.5 0.0 -291.5" class="outerRingBorder"/>
           <path id="innerCircle" d="M0.0 -258.8C142.9 -258.8 258.8 -142.9 258.8 0.0C258.8 142.9 142.9 258.8 0.0 258.8C-142.9 258.8 -258.8 142.9 -258.8 0.0C-258.8 -142.9 -142.9 -258.8 0.0 -258.8" class="outerRingBorder"/>
           <g *ngIf="!southern" id="outerRingNumbers" [attr.transform]="rotate(outerRingAngle)">
@@ -364,8 +365,8 @@
   <svg viewBox="0 0 600 600" xml:space="preserve" class="svg-overlay" [class.controls-collapsed]="collapsed">
     <g transform="translate(300, 300)" class="content">
       <g id="frontPart">
-        <g [attr.filter]="svgFilteringOn ? 'url(#filterHand)' : null">
-          <g [attr.filter]="svgFilteringOn ? 'url(#filterRelief)' : null">
+        <g [attr.filter]="svgFilteringOn ? 'url(&quot;#filterHand&quot;)' : null">
+          <g [attr.filter]="filterRelief">
             <g id="hand" [attr.transform]="rotate(handAngle * rotateSign)">
               <use xlink:href="#leverRafieSymbol" class="leverRafieSymbol"/>
               <path d="M0 0L0 -250.0" class="leverRafieGolden"/>
@@ -375,14 +376,14 @@
             </g>
           </g>
         </g>
-        <g [attr.filter]="svgFilteringOn ? 'url(#filterEcliptic)' : null" class="eclipticWheel"
+        <g [attr.filter]="svgFilteringOn ? 'url(&quot;#filterEcliptic&quot;)' : null" class="eclipticWheel"
             [style.opacity]="translucentEcliptic ? '0.33' : '1'">
-          <g [attr.filter]="svgFilteringOn ? 'url(#filterRelief)' : null">
+          <g [attr.filter]="filterRelief">
             <g id="ecliptic_positive_levers" [attr.transform]="rotate(siderealAngle * rotateSign)">
               <use xlink:href="#leverSymbol" class="leverSymbol"/>
             </g>
           </g>
-          <g [attr.filter]="svgFilteringOn ? 'url(#filterRelief)' : null">
+          <g [attr.filter]="filterRelief">
             <g id="ecliptic_positive_hourAngleStar" [attr.transform]="rotate(siderealAngle * rotateSign)">
               <use xlink:href="#hourAngleStarSymbol" class="hourAngleStarSymbol"/>
             </g>
@@ -392,7 +393,7 @@
               <path d="M0.0 -161.0C88.9 -161.0 161.0 -88.9 161.0 0.0C161.0 88.9 88.9 161.0 0.0 161.0C-88.9 161.0 -161.0 88.9 -161.0 0.0C-161.0 -88.9 -88.9 -161.0 0.0 -161.0M0.0 -116.3C-64.2 -116.3 -116.3 -64.2 -116.3 0.0C-116.3 64.2 -64.2 116.3 0.0 116.3C64.2 116.3 116.3 64.2 116.3 0.0C116.3 -64.2 64.2 -116.3 0.0 -116.3" class="signsArea"/>
             </g>
           </g>
-          <g [attr.filter]="svgFilteringOn ? 'url(#filterRelief)' : null">
+          <g [attr.filter]="filterRelief">
             <g id="ecliptic_positive_ecliptic" [attr.transform]="rotate(siderealAngle * rotateSign)">
               <g transform="translate(0, -71.1)">
                 <g id="disc">
@@ -405,7 +406,7 @@
                   <mask id="maskLarge">
                     <path d="M0.0 -178.9C98.8 -178.9 178.9 -98.8 178.9 0.0C178.9 98.8 98.8 178.9 0.0 178.9C-98.8 178.9 -178.9 98.8 -178.9 0.0C-178.9 -98.8 -98.8 -178.9 0.0 -178.9M0.0 -116.3C-64.2 -116.3 -116.3 -64.2 -116.3 0.0C-116.3 64.2 -64.2 116.3 0.0 116.3C64.2 116.3 116.3 64.2 116.3 0.0C116.3 -64.2 64.2 -116.3 0.0 -116.3" class="maskWhite"/>
                   </mask>
-                  <g mask="url(#maskSmall)">
+                  <g mask="url('#maskSmall')">
                     <path d="M0 71.1L40.7 426.5" class="eclipticDial"/>
                     <path d="M0 71.1L80.7 419.6" class="eclipticDial"/>
                     <path d="M0 71.1L119.4 408.3" class="eclipticDial"/>
@@ -455,7 +456,7 @@
                     <path d="M0 71.1L-80.7 419.6" class="eclipticDial"/>
                     <path d="M0 71.1L-40.7 426.5" class="eclipticDial"/>
                   </g>
-                  <g mask="url(#maskLarge)">
+                  <g mask="url('#maskLarge')">
                     <path d="M0 71.1L0.0 428.9" class="eclipticCircle"/>
                     <path d="M0 71.1L190.5 373.9" class="eclipticCircle"/>
                     <path d="M0 71.1L316.1 238.6" class="eclipticCircle"/>
@@ -550,7 +551,7 @@
             </g>
           </g>
           <g id="sunGroup">
-            <g [attr.filter]="svgFilteringOn ? 'url(#filterRelief)' : null">
+            <g [attr.filter]="filterRelief">
               <g id="ecliptic_positive_sunBeamLargeSymbol_A" [attr.transform]="rotate(siderealAngle * rotateSign)">
                 <g transform="translate(0, -71.1)">
                   <g id="sun_positive_sunBeamLargeSymbol_A" [attr.transform]="rotate(sunAngle * rotateSign)">
@@ -574,7 +575,7 @@
                 </g>
               </g>
             </g>
-            <g [attr.filter]="svgFilteringOn ? 'url(#filterRelief)' : null">
+            <g [attr.filter]="filterRelief">
               <g id="ecliptic_positive_sunBeamSmallSymbol_A" [attr.transform]="rotate(siderealAngle * rotateSign)">
                 <g transform="translate(0, -71.1)">
                   <g id="sun_positive_sunBeamSmallSymbol_A" [attr.transform]="rotate(sunAngle * rotateSign)">
@@ -599,7 +600,7 @@
               </g>
             </g>
           </g>
-          <g [attr.filter]="svgFilteringOn ? 'url(#filterRelief)' : null">
+          <g [attr.filter]="filterRelief">
             <g id="ecliptic_positive_moonGroup" [attr.transform]="rotate(siderealAngle * rotateSign)">
               <g transform="translate(0, -71.1)">
                 <g id="moon_positive" [attr.transform]="rotate(moonAngle * rotateSign)">

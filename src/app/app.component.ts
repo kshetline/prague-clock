@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService, PrimeNGConfig } from 'primeng/api';
-import { abs, atan2_deg, atan_deg, cos_deg, floor, max, mod, PI, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
+import { abs, atan2_deg, atan_deg, cos_deg, floor, max, min, mod, PI, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
 import { clone, getCssValue, isChromeOS, isEqual, isLikelyMobile, isSafari, processMillis } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import {
@@ -226,6 +226,7 @@ export class AppComponent implements OnInit {
   dawnLabelPath: string;
   dawnTextOffset: number;
   disableDst = true;
+  duskGradientAdjustment = 80;
   duskLabelPath: string;
   duskTextOffset: number;
   equatorSunriseAngle: number = null;
@@ -256,6 +257,8 @@ export class AppComponent implements OnInit {
   sunriseLabelPath: string;
   sunsetLabelPath: string;
   svgFilteringOn = true;
+
+  get filterRelief(): string { return this.svgFilteringOn ? 'url("#filterRelief")' : null; }
 
   constructor(
     private confirmService: ConfirmationService,
@@ -706,8 +709,24 @@ export class AppComponent implements OnInit {
       hourLabels.innerHTML = html;
     }
 
+    this.adjustDawnDuskGradient();
     this.updateTime(true);
     this.updateGlobe();
+  }
+
+  private adjustDawnDuskGradient(): void {
+    // Adjust radial gradient based on the rough distance between the horizon circle and then
+    // absolute night circle, in comparison to the horizon circle radius.
+    const gp1 = (circleIntersections(0, 0, EQUATOR_RADIUS, 0, this.horizonCy, this.horizonR) ?? [])[0];
+    const gp2 = (circleIntersections(0, 0, EQUATOR_RADIUS, 0, this.darkCy, this.darkR) ?? [])[0];
+    let span = this.horizonR / 3;
+
+    if (gp1 && gp2)
+      span = sqrt((gp2.x - gp1.x) ** 2 + (gp2.y - gp1.y) ** 2);
+
+    span = min(span, this.horizonR - this.darkR);
+    this.duskGradientAdjustment = max(min((1 - span / this.horizonR) * 100, 99.6), 80);
+    console.log(this.duskGradientAdjustment);
   }
 
   private graphicsRateChangeCheck(suppressFilteringImmediately = false): void {

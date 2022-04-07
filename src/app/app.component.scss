@@ -1,3 +1,9 @@
+$controls-background: #121212;
+$controls-text: rgba(white, 0.87);
+$dark-background-2018: #132532;
+$gold-trim: #FFE696;
+$sky-color-2018: #2F9DE7;
+
 :host {
   box-sizing: border-box;
   display: grid;
@@ -16,8 +22,8 @@ p-toast, p-confirmDialog {
 .controls {
   align-items: center;
   align-self: start;
-  background-color: #121212;
-  color: rgba(white, 0.87);
+  background-color: $controls-background;
+  color: $controls-text;
   display: flex;
   flex-direction: column;
   font: 14px sans-serif;
@@ -296,11 +302,11 @@ svg {
 .timeText {
   font-size: 50px;
   text-anchor: middle;
-  fill: #FFE696;
+  fill: $gold-trim;
 }
 
 .baseCircle {
-  stroke: #FFE696;
+  stroke:$gold-trim;
   stroke-width: 3px;
   fill: none;
 }
@@ -325,13 +331,13 @@ svg {
 }
 
 .eclipticDial {
-  stroke: #FFE696;
+  stroke: $gold-trim;
   stroke-width: 3px;
   fill: none;
 }
 
 .eclipticCircle {
-  stroke: #FFE696;
+  stroke: $gold-trim;
   stroke-width: 4px;
   fill: none;
 }
@@ -339,7 +345,7 @@ svg {
 .eclipticSymbol {
   font-size: 85px;
   text-anchor: middle;
-  fill: #FFE696;
+  fill:$gold-trim;
 }
 
 .signsArea {
@@ -354,11 +360,11 @@ svg {
 }
 
 .sunBeamLargeSymbol {
-  fill: #FFE696;
+  fill: $gold-trim;
 }
 
 .sunBeamSmallSymbol {
-  fill: #FFE696;
+  fill: $gold-trim;
 }
 
 .leverRafieSymbol {
@@ -367,18 +373,18 @@ svg {
 }
 
 .leverRafieGolden {
-  stroke: #FFE696;
+  stroke: $gold-trim;
   stroke-width: 5px;
 }
 
 .leverSymbol {
   stroke: none;
-  fill: #575652;
+  fill: $gold-trim;
 }
 
 .hourAngleStarSymbol {
   stroke: none;
-  fill: #FFE696;
+  fill: $gold-trim;
 }
 
 .moonDark {
@@ -417,7 +423,7 @@ svg {
 }
 
 .outerRingBorder {
-  stroke: #FFE696;
+  stroke: $gold-trim;
   stroke-width: 4px;
   fill: none;
 }
@@ -425,7 +431,7 @@ svg {
 .outerRingText {
   font-size: 60px;
   text-anchor: middle;
-  fill: #FFE696;
+  fill: $gold-trim;
 }
 
 .eventText {
@@ -442,7 +448,7 @@ svg {
 }
 
 .unequalHourBorder {
-  stroke: #FFE696;
+  stroke: $gold-trim;
   fill: none;
 }
 
@@ -480,43 +486,43 @@ svg {
 
 .post-2018 {
   .midnightSunColor {
-    fill: #2F9DE7;
+    fill: $sky-color-2018;
   }
 
   .innerCircle {
-    fill: #2F9DE7;
+    fill: $sky-color-2018;
   }
 
   .signsArea {
-    fill: #132539;
+    fill: $dark-background-2018;
   }
 
   .outerRingBackground {
-    fill: #132539;
+    fill: $dark-background-2018;
   }
 
   .unequalHour6 {
-    fill: #2F9DE7;
+    fill: $sky-color-2018;
   }
 
   .unequalHour5 {
-    fill: #2F9DE7;
+    fill: $sky-color-2018;
   }
 
   .unequalHour4 {
-    fill: #2F9DE7;
+    fill: $sky-color-2018;
   }
 
   .unequalHour3 {
-    fill: #2F9DE7;
+    fill: $sky-color-2018;
   }
 
   .unequalHour2 {
-    fill: #2F9DE7;
+    fill: $sky-color-2018;
   }
 
   .unequalHour1 {
-    fill: #2F9DE7;
+    fill: $sky-color-2018;
   }
 
   .horizonArea {
@@ -524,10 +530,11 @@ svg {
   }
 
   .darkArea {
-    fill: #132539;
+    fill: $dark-background-2018;
   }
 
   #globe-host {
-    border: 2px #FFE696 solid;
+    border: 2px $gold-trim solid;
+    transform: scale(1, 1);
   }
 }
