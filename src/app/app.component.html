@@ -131,8 +131,12 @@
         <stop offset="100%" style="stop-color: rgb(99, 99, 99); stop-opacity: 1"/>
       </radialGradient>
       <radialGradient id="gradientMoonSphere" cx="50%" cy="50%" r="55%" fx="30%" fy="30%">
-        <stop offset="0%" style="stop-color: rgb(255, 255, 255); stop-opacity: 0.2"/>
-        <stop offset="100%" style="stop-color: rgb(99, 99, 99); stop-opacity: 1"/>
+        <stop offset="0%" style="stop-color: white; stop-opacity: 0.2"/>
+        <stop offset="100%" style="stop-color: #888; stop-opacity: 0.4"/>
+      </radialGradient>
+      <radialGradient id="gradientMoonSphereDark" cx="50%" cy="50%" r="55%" fx="30%" fy="30%">
+        <stop offset="0%" style="stop-color: #AAA; stop-opacity: 1"/>
+        <stop offset="100%" style="stop-color: black; stop-opacity: 0.2"/>
       </radialGradient>
       <mask id="baseArea">
         <g class="maskWhite">
@@ -600,13 +604,14 @@
               <g transform="translate(0, -71.1)">
                 <g id="moon_positive" [attr.transform]="rotate(moonAngle * rotateSign)">
                   <g transform="translate(0,-161.0)">
-                    <path d="M0.0 -12.0C6.6 -12.0 12.0 -6.6 12.0 0.0C12.0 6.6 6.6 12.0 0.0 12.0C-6.6 12.0 -12.0 6.6 -12.0 0.0C-12.0 -6.6 -6.6 -12.0 0.0 -12.0" class="moonDark"/>
+                    <circle cx="0" cy="0" r="12" fill="black"/>
+                    <circle cx="0" cy="0" r="12" class="moonDark"/>
                     <path id="moonSunlit" [attr.d]="sunlitMoonPath()" class="moonSunlit"/>
                   </g>
                   <g transform="translate(0,-161.0)">
                     <g id="moon_negative" [attr.transform]="rotate(moonAngle * rotateSign)">
                       <g id="ecliptic_negative_moon" [attr.transform]="rotate(-moonAngle * rotateSign)">
-                        <path d="M0.0 -12.0C6.6 -12.0 12.0 -6.6 12.0 0.0C12.0 6.6 6.6 12.0 0.0 12.0C-6.6 12.0 -12.0 6.6 -12.0 0.0C-12.0 -6.6 -6.6 -12.0 0.0 -12.0" class="moonSphere"/>
+                        <circle cx="0" cy="0" r="12" class="moonSphere"/>
                       </g>
                     </g>
                   </g>

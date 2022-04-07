@@ -15,6 +15,7 @@ const VIEW_DISTANCE = 4.975;
 const LINE_THICKNESS = 0.03;
 const LINE_THICKNESS_2018 = 0.09;
 const HAG = 0.02; // Sleight distance above globe that longitude/latitude lines are drawn.
+const HAG_2018 = 0.05;
 
 const GRID_COLOR = '#262F36';
 const GRID_COLOR_P2018 = '#FFE696';
@@ -115,10 +116,11 @@ export class Globe {
 
       const lines: BufferGeometry[] = [];
       const thickness = post2018 ? LINE_THICKNESS_2018 : LINE_THICKNESS;
+      const hag = post2018 ? HAG_2018 : HAG;
 
       // Lines of longitude
       for (let n = 0; n < 24; ++n) {
-        const line = new CylinderGeometry(GLOBE_RADIUS - HAG, GLOBE_RADIUS - HAG, thickness, 50, 1, true,
+        const line = new CylinderGeometry(GLOBE_RADIUS - hag, GLOBE_RADIUS - hag, thickness, 50, 1, true,
           PI / 12, PI * 5 / 6);
         line.translate(0, -thickness / 2, 0);
         line.rotateX(PI / 2);
@@ -133,7 +135,7 @@ export class Globe {
         const y = GLOBE_RADIUS * sin(lat);
         const r1 = r - thickness * sin(lat) / 2;
         const r2 = r + thickness * sin(lat) / 2;
-        const line = new CylinderGeometry(r1 - HAG, r2 - HAG, cos(lat) * thickness, 50, 8, true);
+        const line = new CylinderGeometry(r1 - hag, r2 - hag, cos(lat) * thickness, 50, 8, true);
         line.translate(0, -cos(lat) * thickness / 2 + y, 0);
         lines.push(line);
       }

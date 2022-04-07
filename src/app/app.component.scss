@@ -383,12 +383,12 @@ svg {
 
 .moonDark {
   stroke: none;
-  fill: gray;
+  fill: url("#gradientMoonSphereDark");
 }
 
 .moonSunlit {
   stroke: none;
-  fill: yellow;
+  fill: white;
 }
 
 .moonSphere {
