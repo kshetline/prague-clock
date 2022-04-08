@@ -20,6 +20,8 @@ const LABEL_RADIUS = 212;
 const EQUATOR_RADIUS = 164.1;
 const HORIZON_RADIUS = CLOCK_RADIUS * tan_deg((90 - INCLINATION) / 2);
 const TROPIC_RADIUS = HORIZON_RADIUS * tan_deg((90 - INCLINATION) / 2);
+const ECLIPTIC_INNER_RADIUS = 161;
+const ECLIPTIC_CENTER_OFFSET = 71.1;
 const MAX_UNEVEN_HOUR_LATITUDE = 86;
 const RESUME_FILTERING_DELAY = 1000;
 const STOP_FILTERING_DELAY = isSafari() ? 1000 : 3000;
@@ -43,7 +45,7 @@ const defaultSettings = {
   latitude: 50.0870,
   longitude: 14.4185,
   placeName: prague,
-  post2018: false,
+  post2018: true,
   recentLocations: [{
     lastTimeUsed: 0,
     latitude: 50.0870,
@@ -837,6 +839,21 @@ export class AppComponent implements OnInit {
     this.moonAngle = 90 - this.baseMoonAngle + cos_deg(this.baseMoonAngle) * 26.6;
     this.siderealAngle = this.observer.getLocalHourAngle(jdu, true).degrees - 90;
     this.outerRingAngle = 180 - (bohemianHour - hourOfDay) * 15;
+
+    if (Date.now() < 0) {
+      const eclipticHandAngle = this.handAngle - this.siderealAngle;
+      const x2 = sin_deg(eclipticHandAngle) * CLOCK_RADIUS;
+      const y2 = -cos_deg(eclipticHandAngle) * CLOCK_RADIUS + ECLIPTIC_CENTER_OFFSET;
+      const y1 = ECLIPTIC_CENTER_OFFSET;
+      const dy = y2 - y1;
+      const dr = sqrt(x2 ** 2 + dy ** 2);
+      const D = -x2 * y1;
+      const r2 = ECLIPTIC_INNER_RADIUS ** 2;
+      const x = (D * dy + x2 * sqrt(r2 * dr ** 2 - D ** 2)) / dr ** 2;
+      const y = (-D * x2 + dy * sqrt(r2 * dr ** 2 - D ** 2)) / dr ** 2;
+
+      this.sunAngle = 90 + atan2_deg(y, x);
+    }
   }
 
   rotate(angle: number): string {
