@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService, PrimeNGConfig } from 'primeng/api';
-import { abs, atan2_deg, atan_deg, cos_deg, floor, max, mod, PI, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
+import { abs, atan2_deg, atan_deg, cos_deg, floor, max, min, mod, PI, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
 import { clone, getCssValue, isChromeOS, isEqual, isLikelyMobile, isSafari, processMillis } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import {
@@ -20,6 +20,8 @@ const LABEL_RADIUS = 212;
 const EQUATOR_RADIUS = 164.1;
 const HORIZON_RADIUS = CLOCK_RADIUS * tan_deg((90 - INCLINATION) / 2);
 const TROPIC_RADIUS = HORIZON_RADIUS * tan_deg((90 - INCLINATION) / 2);
+const ECLIPTIC_INNER_RADIUS = 161;
+const ECLIPTIC_CENTER_OFFSET = 71.1;
 const MAX_UNEVEN_HOUR_LATITUDE = 86;
 const RESUME_FILTERING_DELAY = 1000;
 const STOP_FILTERING_DELAY = isSafari() ? 1000 : 3000;
@@ -37,12 +39,14 @@ const MAX_SAVED_LOCATIONS = 10;
 const prague = $localize`Prague, CZE`;
 const defaultSettings = {
   collapsed: false,
+  constrainedSun: false,
   disableDst: true,
   eventType: EventType.EQUISOLSTICE,
   isoFormat: false,
   latitude: 50.0870,
   longitude: 14.4185,
   placeName: prague,
+  post2018: true,
   recentLocations: [{
     lastTimeUsed: 0,
     latitude: 50.0870,
@@ -172,6 +176,7 @@ export class AppComponent implements OnInit {
   private baseMoonAngle: number;
   private baseSunAngle: number;
   private _collapsed = false;
+  private _constrainedSun = false;
   private delayedCollapse = false;
   private eventFinder = new EventFinder();
   private eventType = EventType.EQUISOLSTICE;
@@ -184,7 +189,7 @@ export class AppComponent implements OnInit {
   private _latitude = 50.0870;
   private _longitude = 14.4185;
   private observer: SkyObserver;
-  private zoneFixTimeout: any;
+  private _post2018 = false;
   private solarSystem = new SolarSystem();
   private sunsetA: AstroEvent = null;
   private sunsetB: AstroEvent = null;
@@ -194,6 +199,7 @@ export class AppComponent implements OnInit {
   private _trackTime = false;
   private _translucentEcliptic = false;
   private _zone = 'Europe/Prague';
+  private zoneFixTimeout: any;
 
   menuItems: MenuItem[] = [
     { label: $localize`↔ Equinox/solstice`, icon: 'pi pi-check',
@@ -203,8 +209,13 @@ export class AppComponent implements OnInit {
     { label: $localize`↔ Sunrise/transit/sunset`, icon: 'pi pi-circle',
       command: (): void => this.setEventType(EventType.RISE_SET) },
     { separator : true },
+    { label: $localize`Post-2018 colors`, icon: 'pi pi-circle', id: 'p18',
+      command: (): boolean => this.post2018 = !this.post2018 },
+    { label: $localize`Lock sun to hand pointer`, icon: 'pi pi-circle', id: 'cns',
+      command: (): boolean => this.constrainedSun = !this.constrainedSun },
     { label: $localize`Translucent ecliptic`, icon: 'pi pi-circle', id: 'tec',
       command: (): boolean => this.translucentEcliptic = !this.translucentEcliptic },
+    { separator : true },
     { label: $localize`Code on GitHub`, icon: 'pi pi-github', url: 'https://github.com/kshetline/prague-clock' },
     { label: $localize`About the real clock`, icon: 'pi pi-info-circle',
       url: $localize`:Language-specific Wikipedia URL:https://en.wikipedia.org/wiki/Prague_astronomical_clock` },
@@ -221,6 +232,7 @@ export class AppComponent implements OnInit {
   dawnLabelPath: string;
   dawnTextOffset: number;
   disableDst = true;
+  duskGradientAdjustment = 80;
   duskLabelPath: string;
   duskTextOffset: number;
   equatorSunriseAngle: number = null;
@@ -251,6 +263,8 @@ export class AppComponent implements OnInit {
   sunriseLabelPath: string;
   sunsetLabelPath: string;
   svgFilteringOn = true;
+
+  get filterRelief(): string { return this.svgFilteringOn ? 'url("#filterRelief")' : null; }
 
   constructor(
     private confirmService: ConfirmationService,
@@ -397,6 +411,17 @@ export class AppComponent implements OnInit {
     }
   }
 
+  get post2018(): boolean { return this._post2018; }
+  set post2018(value: boolean) {
+    if (this._post2018 !== value) {
+      this._post2018 = value;
+      this.updateMenu();
+
+      if (this.initDone)
+        this.updateGlobe();
+    }
+  }
+
   clearItem(index: number): void {
     if (this.placeName === this.recentLocations[index].name)
       this.placeName = '';
@@ -433,6 +458,19 @@ export class AppComponent implements OnInit {
   set translucentEcliptic(value: boolean) {
     if (this._translucentEcliptic !== value) {
       this._translucentEcliptic = value;
+      this.updateMenu();
+    }
+  }
+
+  get constrainedSun(): boolean { return this._constrainedSun; }
+  set constrainedSun(value: boolean) {
+    if (this._constrainedSun !== value) {
+      this._constrainedSun = value;
+
+      if (value)
+        this.disableDst = true;
+
+      this.updateTime(true);
       this.updateMenu();
     }
   }
@@ -690,8 +728,23 @@ export class AppComponent implements OnInit {
       hourLabels.innerHTML = html;
     }
 
+    this.adjustDawnDuskGradient();
     this.updateTime(true);
     this.updateGlobe();
+  }
+
+  private adjustDawnDuskGradient(): void {
+    // Adjust radial gradient based on the rough distance between the horizon circle and then
+    // absolute night circle, in comparison to the horizon circle radius.
+    const gp1 = (circleIntersections(0, 0, EQUATOR_RADIUS, 0, this.horizonCy, this.horizonR) ?? [])[0];
+    const gp2 = (circleIntersections(0, 0, EQUATOR_RADIUS, 0, this.darkCy, this.darkR) ?? [])[0];
+    let span = this.horizonR / 3;
+
+    if (gp1 && gp2)
+      span = sqrt((gp2.x - gp1.x) ** 2 + (gp2.y - gp1.y) ** 2);
+
+    span = min(span, this.horizonR - this.darkR);
+    this.duskGradientAdjustment = max(min((1 - span / this.horizonR) * 100, 99.6), 80);
   }
 
   private graphicsRateChangeCheck(suppressFilteringImmediately = false): void {
@@ -721,7 +774,7 @@ export class AppComponent implements OnInit {
   }
 
   private updateGlobe(): void {
-    this.globe.orient(this._longitude, this.latitude).finally();
+    this.globe.orient(this._longitude, this.latitude, this.post2018).finally();
   }
 
   private createDayAreaMask(outerR: number): void {
@@ -793,7 +846,7 @@ export class AppComponent implements OnInit {
     const bohemianHour = (jdu - this.sunsetA.ut) / dayLength * 24;
     const date = new DateTime(this.time, this.zone);
     const wt = date.wallTime;
-    const hourOfDay = wt.hour + wt.minute / 60 - (this.disableDst ? wt.dstOffset / 3600 : 0);
+    const hourOfDay = wt.hour + wt.minute / 60 - (this.disableDst || this.constrainedSun ? wt.dstOffset / 3600 : 0);
 
     this.baseSunAngle = this.solarSystem.getEclipticPosition(SUN, jde).longitude.degrees;
     this.baseMoonAngle = this.solarSystem.getEclipticPosition(MOON, jde).longitude.degrees;
@@ -802,6 +855,21 @@ export class AppComponent implements OnInit {
     this.moonAngle = 90 - this.baseMoonAngle + cos_deg(this.baseMoonAngle) * 26.6;
     this.siderealAngle = this.observer.getLocalHourAngle(jdu, true).degrees - 90;
     this.outerRingAngle = 180 - (bohemianHour - hourOfDay) * 15;
+
+    if (this.constrainedSun) {
+      const eclipticHandAngle = this.handAngle - this.siderealAngle;
+      const x2 = sin_deg(eclipticHandAngle) * CLOCK_RADIUS;
+      const y2 = -cos_deg(eclipticHandAngle) * CLOCK_RADIUS + ECLIPTIC_CENTER_OFFSET;
+      const y1 = ECLIPTIC_CENTER_OFFSET;
+      const dy = y2 - y1;
+      const dr = sqrt(x2 ** 2 + dy ** 2);
+      const D = -x2 * y1;
+      const r2 = ECLIPTIC_INNER_RADIUS ** 2;
+      const x = (D * dy + x2 * sqrt(r2 * dr ** 2 - D ** 2)) / dr ** 2;
+      const y = (-D * x2 + dy * sqrt(r2 * dr ** 2 - D ** 2)) / dr ** 2;
+
+      this.sunAngle = 90 + atan2_deg(y, x);
+    }
   }
 
   rotate(angle: number): string {
@@ -903,6 +971,12 @@ export class AppComponent implements OnInit {
       if (index < 3)
         item.icon = (index === this.eventType ? 'pi pi-check' : 'pi pi-circle');
     });
+
+    if (this.menuItemById('p18'))
+      this.menuItemById('p18').icon = (this.post2018 ? 'pi pi-check' : 'pi pi-circle');
+
+    if (this.menuItemById('cns'))
+      this.menuItemById('cns').icon = (this.constrainedSun ? 'pi pi-check' : 'pi pi-circle');
 
     if (this.menuItemById('tec'))
       this.menuItemById('tec').icon = (this.translucentEcliptic ? 'pi pi-check' : 'pi pi-circle');

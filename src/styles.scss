@@ -29,8 +29,12 @@ body {
 .unequalHourText {
   font-size: 30px;
   text-anchor: middle;
-  fill: rgb(black, 25%);
+  fill: rgb(black, 33%);
   font-family: Horologium, sans-serif;
+}
+
+.post-2018 .unequalHourText {
+  fill: rgb(black, 67%);
 }
 
 #globe-host {
@@ -70,7 +74,7 @@ input {
 }
 
 ::placeholder {
-  color: rgba(255, 255, 255, 0.33);
+  color: rgba(255, 255, 255, 33%);
   font-style: italic;
 }
 
@@ -79,7 +83,7 @@ input {
 }
 
 .p-menu {
-  width: 20em;
+  width: 22em;
 }
 
 .p-menu-list {
