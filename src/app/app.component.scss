@@ -212,7 +212,7 @@ svg {
     transform: scale(0.9);
 
     &.collapsed {
-      margin: -2px -2px;
+      margin: -2px;
     }
   }
 }
@@ -306,7 +306,7 @@ svg {
 }
 
 .baseCircle {
-  stroke:$gold-trim;
+  stroke: $gold-trim;
   stroke-width: 3px;
   fill: none;
 }
@@ -345,7 +345,7 @@ svg {
 .eclipticSymbol {
   font-size: 85px;
   text-anchor: middle;
-  fill:$gold-trim;
+  fill: $gold-trim;
 }
 
 .signsArea {
