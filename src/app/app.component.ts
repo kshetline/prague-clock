@@ -39,6 +39,7 @@ const MAX_SAVED_LOCATIONS = 10;
 const prague = $localize`Prague, CZE`;
 const defaultSettings = {
   collapsed: false,
+  constrainedSun: false,
   disableDst: true,
   eventType: EventType.EQUISOLSTICE,
   isoFormat: false,
@@ -175,6 +176,7 @@ export class AppComponent implements OnInit {
   private baseMoonAngle: number;
   private baseSunAngle: number;
   private _collapsed = false;
+  private _constrainedSun = false;
   private delayedCollapse = false;
   private eventFinder = new EventFinder();
   private eventType = EventType.EQUISOLSTICE;
@@ -209,6 +211,8 @@ export class AppComponent implements OnInit {
     { separator : true },
     { label: $localize`Post-2018 colors`, icon: 'pi pi-circle', id: 'p18',
       command: (): boolean => this.post2018 = !this.post2018 },
+    { label: $localize`Lock sun to hand pointer`, icon: 'pi pi-circle', id: 'cns',
+      command: (): boolean => this.constrainedSun = !this.constrainedSun },
     { label: $localize`Translucent ecliptic`, icon: 'pi pi-circle', id: 'tec',
       command: (): boolean => this.translucentEcliptic = !this.translucentEcliptic },
     { separator : true },
@@ -454,6 +458,19 @@ export class AppComponent implements OnInit {
   set translucentEcliptic(value: boolean) {
     if (this._translucentEcliptic !== value) {
       this._translucentEcliptic = value;
+      this.updateMenu();
+    }
+  }
+
+  get constrainedSun(): boolean { return this._constrainedSun; }
+  set constrainedSun(value: boolean) {
+    if (this._constrainedSun !== value) {
+      this._constrainedSun = value;
+
+      if (value)
+        this.disableDst = true;
+
+      this.updateTime(true);
       this.updateMenu();
     }
   }
@@ -728,7 +745,6 @@ export class AppComponent implements OnInit {
 
     span = min(span, this.horizonR - this.darkR);
     this.duskGradientAdjustment = max(min((1 - span / this.horizonR) * 100, 99.6), 80);
-    console.log(this.duskGradientAdjustment);
   }
 
   private graphicsRateChangeCheck(suppressFilteringImmediately = false): void {
@@ -830,7 +846,7 @@ export class AppComponent implements OnInit {
     const bohemianHour = (jdu - this.sunsetA.ut) / dayLength * 24;
     const date = new DateTime(this.time, this.zone);
     const wt = date.wallTime;
-    const hourOfDay = wt.hour + wt.minute / 60 - (this.disableDst ? wt.dstOffset / 3600 : 0);
+    const hourOfDay = wt.hour + wt.minute / 60 - (this.disableDst || this.constrainedSun ? wt.dstOffset / 3600 : 0);
 
     this.baseSunAngle = this.solarSystem.getEclipticPosition(SUN, jde).longitude.degrees;
     this.baseMoonAngle = this.solarSystem.getEclipticPosition(MOON, jde).longitude.degrees;
@@ -840,7 +856,7 @@ export class AppComponent implements OnInit {
     this.siderealAngle = this.observer.getLocalHourAngle(jdu, true).degrees - 90;
     this.outerRingAngle = 180 - (bohemianHour - hourOfDay) * 15;
 
-    if (Date.now() < 0) {
+    if (this.constrainedSun) {
       const eclipticHandAngle = this.handAngle - this.siderealAngle;
       const x2 = sin_deg(eclipticHandAngle) * CLOCK_RADIUS;
       const y2 = -cos_deg(eclipticHandAngle) * CLOCK_RADIUS + ECLIPTIC_CENTER_OFFSET;
@@ -958,6 +974,9 @@ export class AppComponent implements OnInit {
 
     if (this.menuItemById('p18'))
       this.menuItemById('p18').icon = (this.post2018 ? 'pi pi-check' : 'pi pi-circle');
+
+    if (this.menuItemById('cns'))
+      this.menuItemById('cns').icon = (this.constrainedSun ? 'pi pi-check' : 'pi pi-circle');
 
     if (this.menuItemById('tec'))
       this.menuItemById('tec').icon = (this.translucentEcliptic ? 'pi pi-check' : 'pi pi-circle');
