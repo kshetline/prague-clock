@@ -211,7 +211,7 @@ export class AppComponent implements OnInit {
     { separator : true },
     { label: $localize`Post-2018 colors`, icon: 'pi pi-circle', id: 'p18',
       command: (): boolean => this.post2018 = !this.post2018 },
-    { label: $localize`Lock sun to hand pointer`, icon: 'pi pi-circle', id: 'cns',
+    { label: $localize`Align sun to hand pointer`, icon: 'pi pi-circle', id: 'cns',
       command: (): boolean => this.constrainedSun = !this.constrainedSun },
     { label: $localize`Translucent ecliptic`, icon: 'pi pi-circle', id: 'tec',
       command: (): boolean => this.translucentEcliptic = !this.translucentEcliptic },
