@@ -1,10 +1,4 @@
-$controls-background: #121212;
-$controls-text: rgba(white, 0.87);
-$dark-background-2018: #132532;
-$dark-metal: #575652;
-$metal-edge: rgba(#2B2B2B, 0.8);
-$gold-trim: #FFE696;
-$sky-color-2018: #2F9DE7;
+@import '../colors';
 
 :host {
   box-sizing: border-box;
@@ -159,13 +153,31 @@ p-toast, p-confirmDialog {
     margin: 0.5em 0;
   }
 
+  .time-text {
+    background: inherit;
+    bottom: 0;
+    display: none;
+    font: 14px Verdana, sans-serif;
+    font-variant-numeric: tabular-nums;
+    padding: 0.5em 0 0.5em 0.5em;
+    position: absolute;
+    right: 2em;
+    top: 0;
+    white-space: nowrap;
+
+    &.collapsed {
+      display: block;
+    }
+  }
+
   &.collapsed {
     height: 2.25em;
     margin-left: -2em;
     min-height: 2.25em;
     min-width: 2em;
     width: 2em;
-    overflow: hidden;
+    overflow-x: visible;
+    overflow-y: clip;
 
     .button-row,
     .time-row,
@@ -260,6 +272,13 @@ svg {
 
     i.pi-bars.collapsed {
       opacity: 1;
+    }
+
+    .time-text {
+      left: 50%;
+      padding: 0.5em;
+      right: unset;
+      transform: translate(-50%, 0);
     }
   }
 

@@ -13,6 +13,7 @@ import { TzsLocation } from '../timezone-selector/timezone-selector.component';
 import { Globe } from '../globe/globe';
 import { localeSuffix, SOUTH_NORTH, specificLocale, WEST_EAST } from '../locales/locale-info';
 import { faForward, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
+import DATETIME_LOCAL = ttime.DATETIME_LOCAL;
 
 const CLOCK_RADIUS = 250;
 const INCLINATION = 23.5;
@@ -194,6 +195,7 @@ export class AppComponent implements OnInit {
   private graphicsChangeStartTime = -1;
   private graphicsChangeStopTimer: any;
   private initDone = false;
+  private _isoFormat = false;
   private lastSavedSettings: any = null;
   private lastWallTime: DateAndTime;
   private _latitude = 50.0870;
@@ -261,7 +263,6 @@ export class AppComponent implements OnInit {
   innerSunriseAngle: number = null;
   inputLength = 0;
   inputName: string;
-  isoFormat = false;
   lastHeight = -1;
   midnightSunR = 0;
   moonAngle = 0;
@@ -280,6 +281,7 @@ export class AppComponent implements OnInit {
   sunriseLabelPath: string;
   sunsetLabelPath: string;
   svgFilteringOn = true;
+  timeText = '';
 
   get filterEcliptic(): string { return this.svgFilteringOn && !this._playing ? 'url("#filterEcliptic")' : null; }
   get filterHand(): string { return this.svgFilteringOn && !this._playing ? 'url("#filterHand")' : null; }
@@ -409,6 +411,14 @@ export class AppComponent implements OnInit {
         this.canEditName = true;
       }
     });
+  }
+
+  get isoFormat(): boolean { return this._isoFormat; }
+  set isoFormat(value: boolean) {
+    if (this._isoFormat !== value) {
+      this._isoFormat = value;
+      this.updateTime();
+    }
   }
 
   get collapsed(): boolean { return this._collapsed; }
@@ -939,6 +949,7 @@ export class AppComponent implements OnInit {
     const wt = this.lastWallTime = date.wallTime;
     const hourOfDay = wt.hour + wt.minute / 60 - (this.disableDst || this.constrainedSun ? wt.dstOffset / 3600 : 0);
 
+    this.timeText = date.format(this.isoFormat ? DATETIME_LOCAL : 'ISS{year:numeric,month:2-digit,day:2-digit,hour:2-digit}');
     this.baseSunAngle = this.solarSystem.getEclipticPosition(SUN, jde).longitude.degrees;
     this.baseMoonAngle = this.solarSystem.getEclipticPosition(MOON, jde).longitude.degrees;
     this.handAngle = hourOfDay * 15 - 180;

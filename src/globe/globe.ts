@@ -20,7 +20,6 @@ const HAG = -0.02; // Sleight distance above globe that longitude/latitude lines
 const HAG_2018 = 0.05;
 
 const GRID_COLOR = '#262F36';
-const GRID_COLOR_P2018 = '#FFE696';
 
 export class Globe {
   private static mapCanvas: HTMLCanvasElement;
@@ -90,6 +89,10 @@ export class Globe {
     loadOneMap();
   }
 
+  static getGoldTrimColor(): string {
+    return getComputedStyle(document.documentElement).getPropertyValue('--gold-trim').trim();
+  }
+
   constructor(rendererHost: string | HTMLElement) {
     if (isString(rendererHost))
       this.rendererHost = document.getElementById(rendererHost);
@@ -147,7 +150,7 @@ export class Globe {
       }
 
       this.globeMesh.add(new Mesh(mergeBufferGeometries(lines),
-        new MeshBasicMaterial({ color: post2018 ? GRID_COLOR_P2018 : GRID_COLOR, side: DoubleSide })));
+        new MeshBasicMaterial({ color: post2018 ? Globe.getGoldTrimColor() : GRID_COLOR, side: DoubleSide })));
 
       this.camera.position.z = post2018 ? VIEW_DISTANCE_2018 : VIEW_DISTANCE;
       this.renderer = new WebGLRenderer({ alpha: true, antialias: true });
