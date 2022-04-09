@@ -170,7 +170,7 @@ export class Globe {
 
     this.globeMesh.rotation.y = -to_radian(lon);
     this.globeMesh.rotation.x = to_radian(lat);
-    this.camera.rotation.z = (lat >= 0 ? PI : 0);
+    this.camera.rotation.z = (lat >= 0 || post2018 ? PI : 0);
 
     requestAnimationFrame(() => this.renderer.render(this.scene, this.camera));
   }

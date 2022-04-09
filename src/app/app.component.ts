@@ -1,17 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService, PrimeNGConfig } from 'primeng/api';
 import { abs, atan2_deg, atan_deg, cos_deg, floor, max, min, mod, PI, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
-import { clone, getCssValue, isChromeOS, isEqual, isLikelyMobile, isSafari, processMillis } from '@tubular/util';
+import { clone, getCssValue, isEqual, isLikelyMobile, isSafari, processMillis } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import {
   AstroEvent, EventFinder, FALL_EQUINOX, FIRST_QUARTER, FULL_MOON, LAST_QUARTER, MOON, NEW_MOON, RISE_EVENT, SET_EVENT,
   SkyObserver, SolarSystem, SPRING_EQUINOX, SUMMER_SOLSTICE, SUN, TRANSIT_EVENT, WINTER_SOLSTICE
 } from '@tubular/astronomy';
-import ttime, { DateTime, utToTdt } from '@tubular/time';
+import ttime, { DateAndTime, DateTime, utToTdt } from '@tubular/time';
 import julianDay = ttime.julianDay;
 import { TzsLocation } from '../timezone-selector/timezone-selector.component';
 import { Globe } from '../globe/globe';
 import { localeSuffix, SOUTH_NORTH, specificLocale, WEST_EAST } from '../locales/locale-info';
+import { faForward, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 
 const CLOCK_RADIUS = 250;
 const INCLINATION = 23.5;
@@ -33,6 +34,7 @@ interface CircleAttributes {
 }
 
 enum EventType { EQUISOLSTICE, MOON_PHASE, RISE_SET }
+enum PlaySpeed { NORMAL, FAST }
 
 const MAX_SAVED_LOCATIONS = 10;
 
@@ -154,11 +156,16 @@ function findCircleRadius(x1: number, y1: number, x2: number, y2: number, x3: nu
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  buggyForeignObject = isChromeOS() || isSafari();
+  faForward = faForward;
+  faPlay = faPlay;
+  faStop = faStop;
+
   DD = AngleStyle.DD;
   DDD = AngleStyle.DDD;
+  FAST = PlaySpeed.FAST;
   MAX_YEAR = 2399;
   MIN_YEAR = 1400;
+  NORMAL = PlaySpeed.NORMAL;
   SOUTH_NORTH = SOUTH_NORTH;
   specificLocale = specificLocale;
   WEST_EAST = WEST_EAST;
@@ -186,9 +193,13 @@ export class AppComponent implements OnInit {
   private graphicsChangeStopTimer: any;
   private initDone = false;
   private lastSavedSettings: any = null;
+  private lastWallTime: DateAndTime;
   private _latitude = 50.0870;
   private _longitude = 14.4185;
   private observer: SkyObserver;
+  private _playing = false;
+  private playTimeBase: number;
+  private playTimeProcessBase: number;
   private _post2018 = false;
   private solarSystem = new SolarSystem();
   private sunsetA: AstroEvent = null;
@@ -253,6 +264,7 @@ export class AppComponent implements OnInit {
   outerRingAngle = 0;
   outerSunriseAngle: number = null;
   placeName = 'Prague, CZE';
+  playSpeed = PlaySpeed.NORMAL;
   recentLocations: TzsLocation[] = [];
   riseSetFontSize = '15px';
   rotateSign = 1;
@@ -264,7 +276,9 @@ export class AppComponent implements OnInit {
   sunsetLabelPath: string;
   svgFilteringOn = true;
 
-  get filterRelief(): string { return this.svgFilteringOn ? 'url("#filterRelief")' : null; }
+  get filterEcliptic(): string { return this.svgFilteringOn && !this._playing ? 'url("#filterEcliptic")' : null; }
+  get filterHand(): string { return this.svgFilteringOn && !this._playing ? 'url("#filterHand")' : null; }
+  get filterRelief(): string { return this.svgFilteringOn && !this._playing ? 'url("#filterRelief")' : null; }
 
   constructor(
     private confirmService: ConfirmationService,
@@ -420,6 +434,59 @@ export class AppComponent implements OnInit {
       if (this.initDone)
         this.updateGlobe();
     }
+  }
+
+  get playing(): boolean { return this._playing; }
+  set playing(value: boolean) {
+    if (this._playing !== value) {
+      this._playing = value;
+
+      if (value) {
+        this.trackTime = false;
+        this.playTimeBase = this._time;
+        this.playTimeProcessBase = processMillis();
+        requestAnimationFrame(this.playStep);
+      }
+    }
+  }
+
+  play(): void {
+    if (this.playSpeed !== PlaySpeed.NORMAL) {
+      this.playing = false;
+      this.playSpeed = PlaySpeed.NORMAL;
+    }
+
+    this.playing = true;
+  }
+
+  playFast(): void {
+    if (this.playSpeed !== PlaySpeed.FAST) {
+      this.playing = false;
+      this.playSpeed = PlaySpeed.FAST;
+    }
+
+    this.playing = true;
+  }
+
+  stop(): void {
+    this.playing = false;
+  }
+
+  private playStep = (): void => {
+    if (!this.playing)
+      return;
+
+    const elapsed = processMillis() - this.playTimeProcessBase;
+
+    if (this.playSpeed === PlaySpeed.NORMAL)
+      this.time = this.playTimeBase + floor(elapsed / 25) * 60_000;
+    else
+      this.time = this.playTimeBase + floor(elapsed / 100) * 86_400_000;
+
+    if (this.lastWallTime && this.lastWallTime.y === this.MAX_YEAR && this.lastWallTime.m === 12 && this.lastWallTime.d === 31)
+      this.stop();
+    else
+      requestAnimationFrame(this.playStep);
   }
 
   clearItem(index: number): void {
@@ -595,8 +662,14 @@ export class AppComponent implements OnInit {
   setNow(): void {
     const newTime = floor(Date.now() / 60000) * 60000;
 
-    if (this.time !== newTime)
+    if (this.time !== newTime) {
       this.time = newTime;
+
+      if (this.playing) {
+        this.playTimeBase = newTime;
+        this.playTimeProcessBase = processMillis();
+      }
+    }
   }
 
   private clearZoneFixTimeout(): void {
@@ -761,13 +834,18 @@ export class AppComponent implements OnInit {
         this.graphicsChangeStartTime = now;
       else if (now > this.graphicsChangeStartTime + STOP_FILTERING_DELAY || suppressFilteringImmediately) {
         this.graphicsChangeStartTime = -1;
-        this.svgFilteringOn = false;
-        this.graphicsChangeStopTimer = setTimeout(resumeFiltering, RESUME_FILTERING_DELAY);
+
+        if (!this.playing) {
+          this.svgFilteringOn = false;
+          this.graphicsChangeStopTimer = setTimeout(resumeFiltering, RESUME_FILTERING_DELAY);
+        }
       }
     }
     else if (this.graphicsChangeStopTimer) {
       clearTimeout(this.graphicsChangeStopTimer);
-      this.graphicsChangeStopTimer = setTimeout(resumeFiltering, RESUME_FILTERING_DELAY);
+
+      if (!this.playing)
+        this.graphicsChangeStopTimer = setTimeout(resumeFiltering, RESUME_FILTERING_DELAY);
     }
 
     this.graphicsChangeLastTime = now;
@@ -845,7 +923,7 @@ export class AppComponent implements OnInit {
     const dayLength = this.sunsetB.ut - this.sunsetA.ut;
     const bohemianHour = (jdu - this.sunsetA.ut) / dayLength * 24;
     const date = new DateTime(this.time, this.zone);
-    const wt = date.wallTime;
+    const wt = this.lastWallTime = date.wallTime;
     const hourOfDay = wt.hour + wt.minute / 60 - (this.disableDst || this.constrainedSun ? wt.dstOffset / 3600 : 0);
 
     this.baseSunAngle = this.solarSystem.getEclipticPosition(SUN, jde).longitude.degrees;

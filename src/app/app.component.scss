@@ -141,6 +141,18 @@ p-toast, p-confirmDialog {
     font-size: 18px;
   }
 
+  .time-row {
+    fa-icon {
+      cursor: pointer;
+      margin-left: 0.75em;
+
+      &.disabled {
+        cursor: default;
+        opacity: 0.33;
+      }
+    }
+  }
+
   tze-zone-selector {
     margin: 0.5em 0;
   }

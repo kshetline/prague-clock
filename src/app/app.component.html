@@ -43,9 +43,12 @@
   <tze-zone-selector [(ngModel)]="zone" [recents]="recentLocations" (clearItem)='clearItem($event)' (clearRecents)="clearRecents()"
       [autofocus]="false" [disabled]="canSaveName" (location)="changeLocation($event)"></tze-zone-selector>
   <div class="button-row time-row">
-    <p-checkbox [(ngModel)]="trackTime" [binary]="true"
+    <p-checkbox [(ngModel)]="trackTime" [binary]="true" [disabled]="playing"
         i18n-label label="Track current time"></p-checkbox><span>&nbsp;&nbsp;</span>
     <button i18n type="button" pButton (click)="setNow()" [disabled]="trackTime">Now</button>
+    <fa-icon [icon]="faPlay" class="fa-xl" [class.disabled]="playing && playSpeed === NORMAL" (click)="play()"></fa-icon>
+    <fa-icon [icon]="faForward" class="fa-xl" [class.disabled]="playing && playSpeed === FAST" (click)="playFast()"></fa-icon>
+    <fa-icon [icon]="faStop" class="fa-xl" [class.disabled]="!playing" (click)="stop()"></fa-icon>
   </div>
   <div class="button-row">
     <tbw-angle-editor wideSpinner [(ngModel)]="latitude" [disableMobileKeyboard]="suppressOsKeyboard" [disabled]="canSaveName"
@@ -365,7 +368,7 @@
   <svg viewBox="0 0 600 600" xml:space="preserve" class="svg-overlay" [class.controls-collapsed]="collapsed">
     <g transform="translate(300, 300)" class="content">
       <g id="frontPart">
-        <g [attr.filter]="svgFilteringOn ? 'url(&quot;#filterHand&quot;)' : null">
+        <g [attr.filter]="filterHand">
           <g [attr.filter]="filterRelief">
             <g id="hand" [attr.transform]="rotate(handAngle * rotateSign)">
               <use xlink:href="#leverRafieSymbol" class="leverRafieSymbol"/>
@@ -376,7 +379,7 @@
             </g>
           </g>
         </g>
-        <g [attr.filter]="svgFilteringOn ? 'url(&quot;#filterEcliptic&quot;)' : null" class="eclipticWheel"
+        <g [attr.filter]="filterEcliptic"
             [style.opacity]="translucentEcliptic ? '0.33' : '1'">
           <g [attr.filter]="filterRelief">
             <g id="ecliptic_positive_levers" [attr.transform]="rotate(siderealAngle * rotateSign)">
