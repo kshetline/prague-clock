@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService, PrimeNGConfig } from 'primeng/api';
 import { abs, atan2_deg, atan_deg, cos_deg, floor, max, min, mod, PI, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
 import { clone, getCssValue, isEqual, isLikelyMobile, isSafari, processMillis } from '@tubular/util';
@@ -14,6 +14,7 @@ import { Globe } from '../globe/globe';
 import { localeSuffix, SOUTH_NORTH, specificLocale, WEST_EAST } from '../locales/locale-info';
 import { faForward, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 import DATETIME_LOCAL = ttime.DATETIME_LOCAL;
+import { AdvancedOptionsComponent, SettingsHolder } from '../advanced-options/advanced-options.component';
 
 const CLOCK_RADIUS = 250;
 const INCLINATION = 23.5;
@@ -157,7 +158,7 @@ function findCircleRadius(x1: number, y1: number, x2: number, y2: number, x3: nu
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, SettingsHolder {
   faForward = faForward;
   faPlay = faPlay;
   faStop = faStop;
@@ -224,14 +225,7 @@ export class AppComponent implements OnInit {
     { label: $localize`↔ Sunrise/transit/sunset`, icon: 'pi pi-circle',
       command: (): void => this.setEventType(EventType.RISE_SET) },
     { separator : true },
-    { label: $localize`Post-2018 colors`, icon: 'pi pi-circle', id: 'p18',
-      command: (): boolean => this.post2018 = !this.post2018 },
-    { label: $localize`Align sun to hand pointer`, icon: 'pi pi-circle', id: 'cns',
-      command: (): boolean => this.constrainedSun = !this.constrainedSun },
-    { label: $localize`Translucent ecliptic`, icon: 'pi pi-circle', id: 'tec',
-      command: (): boolean => this.translucentEcliptic = !this.translucentEcliptic },
-    { label: $localize`Detailed mechanism`, icon: 'pi pi-circle', id: 'dtm',
-      command: (): boolean => this.detailedMechanism = !this.detailedMechanism },
+    { label: $localize`Advanced options...`, icon: 'pi pi-circle', command: (): void => this.advancedOptions?.show() },
     { separator : true },
     { label: $localize`Code on GitHub`, icon: 'pi pi-github', url: 'https://github.com/kshetline/prague-clock' },
     { label: $localize`About the real clock`, icon: 'pi pi-info-circle',
@@ -282,6 +276,8 @@ export class AppComponent implements OnInit {
   sunsetLabelPath: string;
   svgFilteringOn = true;
   timeText = '';
+
+  @ViewChild('advancedOptions', { static: true }) advancedOptions: AdvancedOptionsComponent;
 
   get filterEcliptic(): string { return this.svgFilteringOn && !this._playing ? 'url("#filterEcliptic")' : null; }
   get filterHand(): string { return this.svgFilteringOn && !this._playing ? 'url("#filterHand")' : null; }
@@ -335,6 +331,7 @@ export class AppComponent implements OnInit {
     this.adjustLatitude();
     this.setNow();
     this.placeName = placeName;
+    this.advancedOptions.settingsHolder = this;
 
     if (this.delayedCollapse)
       setTimeout(() => this.collapsed = true);
@@ -1083,18 +1080,6 @@ export class AppComponent implements OnInit {
       if (index < 3)
         item.icon = (index === this.eventType ? 'pi pi-check' : 'pi pi-circle');
     });
-
-    if (this.menuItemById('p18'))
-      this.menuItemById('p18').icon = (this.post2018 ? 'pi pi-check' : 'pi pi-circle');
-
-    if (this.menuItemById('cns'))
-      this.menuItemById('cns').icon = (this.constrainedSun ? 'pi pi-check' : 'pi pi-circle');
-
-    if (this.menuItemById('tec'))
-      this.menuItemById('tec').icon = (this.translucentEcliptic ? 'pi pi-check' : 'pi pi-circle');
-
-    if (this.menuItemById('dtm'))
-      this.menuItemById('dtm').icon = (this.detailedMechanism ? 'pi pi-check' : 'pi pi-circle');
 
     if (this.menuItemById('sok'))
       this.menuItemById('sok').icon = (this.suppressOsKeyboard ? 'pi pi-check' : 'pi pi-circle');

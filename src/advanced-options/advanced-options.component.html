@@ -1,0 +1,18 @@
+<i class="pi pi-times closer" (click)="hide()"></i>
+<div i18n class="header">Advanced Options</div>
+
+<div class="colors">
+  <p-radioButton [value]="true" [(ngModel)]="settingsHolder.post2018"
+      i18n-label label="Post-2018 colors"></p-radioButton>
+  <p-radioButton [value]="true" [(ngModel)]="pre2018"
+      i18n-label label="Pre-2018 colors"></p-radioButton>
+</div>
+
+<p-checkbox [(ngModel)]="settingsHolder.translucentEcliptic" [binary]="true"
+    i18n-label label="Translucent ecliptic"></p-checkbox>
+
+<p-checkbox [(ngModel)]="settingsHolder.constrainedSun" [binary]="true"
+    i18n-label label="Align sun to hand pointer"></p-checkbox>
+
+<p-checkbox [(ngModel)]="settingsHolder.detailedMechanism" [binary]="true"
+    i18n-label label="Mechanically detailed"></p-checkbox>

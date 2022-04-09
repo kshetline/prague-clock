@@ -57,6 +57,7 @@
         [options]="{ angleStyle: DDD, compass: WEST_EAST, decimalPrecision: 1, locale: specificLocale }"></tbw-angle-editor>
   </div>
   <div class="time-text" [class.collapsed]="collapsed" [class.track-time]="trackTime">{{timeText}}</div>
+  <app-advanced-options #advancedOptions></app-advanced-options>
 </div>
 
 <div id="svg-wrapper" [class.post-2018]="post2018">
@@ -371,7 +372,8 @@
       <g id="frontPart">
         <g [attr.filter]="filterHand">
           <g [attr.filter]="filterRelief">
-            <g *ngIf="detailedMechanism" id="moon-hand" [attr.transform]="rotate(moonHandAngle * rotateSign)">
+            <g *ngIf="detailedMechanism" id="moon-hand" [attr.transform]="rotate(moonHandAngle * rotateSign)"
+                [style.opacity]="translucentEcliptic ? '0.33' : '1'">
               <use xlink:href="#leverRafieSymbol" class="leverRafieSymbol"/>
               <path d="M0 0L0 -250.0" class="leverRafieSymbol"/>
             </g>
@@ -582,7 +584,8 @@
               <g transform="translate(0, -71.1)">
                 <g id="sun_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(sunAngle * rotateSign)">
                   <g id="sun_translate_sunBeamLargeSymbol_B" transform="translate(0,-161.0)">
-                    <rect *ngIf="detailedMechanism" x="-1" y="0" width="2" height="161" class="sun-moon-arms" [attr.filter]="filterRelief"/>
+                    <rect *ngIf="detailedMechanism" x="-1" y="0" width="2" height="161"
+                        class="sun-moon-arms" [attr.filter]="filterRelief"/>
                     <g id="sun_negative_sunBeamLargeSymbol_B" [attr.transform]="rotate(-sunAngle * rotateSign)">
                       <g id="ecliptic_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(-siderealAngle * rotateSign)">
                         <path d="M0.0 -9.6C5.3 -9.6 9.6 -5.3 9.6 0.0C9.6 5.3 5.3 9.6 0.0 9.6C-5.3 9.6 -9.6 5.3 -9.6 0.0C-9.6 -5.3 -5.3 -9.6 0.0 -9.6" class="sunSphere"/>

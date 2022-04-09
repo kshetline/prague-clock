@@ -405,9 +405,11 @@ svg {
 }
 
 .leverRafieSymbol {
+  fill: $dark-metal;
+  opacity: 1;
   stroke: $metal-edge;
   stroke-width: 0.5;
-  fill: $dark-metal;
+  transition: opacity 0.5s ease-in-out;
 }
 
 .leverRafieGolden {
