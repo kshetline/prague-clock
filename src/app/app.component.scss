@@ -168,6 +168,10 @@ p-toast, p-confirmDialog {
     &.collapsed {
       display: block;
     }
+
+    &.track-time {
+      color: #0A0;
+    }
   }
 
   &.collapsed {

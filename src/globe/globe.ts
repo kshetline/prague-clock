@@ -33,12 +33,14 @@ export class Globe {
   private camera: PerspectiveCamera;
   private globeMesh: Mesh;
   private initialized = false;
+  private lastLatitude: number;
+  private lastLongitude: number;
   private lastPixelSize = DEFAULT_GLOBE_PIXEL_SIZE;
   private lastRenderer: HTMLElement;
   private renderer: WebGLRenderer;
   private rendererHost: HTMLElement;
+  private post2018 = true;
   private scene: Scene;
-  private was2018 = false;
 
   static loadMap(): void {
     this.mapLoading = true;
@@ -89,7 +91,7 @@ export class Globe {
     loadOneMap();
   }
 
-  static getGoldTrimColor(): string {
+  private static getGoldTrimColor(): string {
     return getComputedStyle(document.documentElement).getPropertyValue('--gold-trim').trim();
   }
 
@@ -103,69 +105,18 @@ export class Globe {
       Globe.loadMap();
   }
 
-  async orient(lon: number, lat: number, post2018 = false): Promise<void> {
+  async orient(lon: number, lat: number): Promise<void> {
     if (Globe.mapFailed)
       throw new Error('Map not available');
     else if (!Globe.mapImage)
       await new Promise<void>((resolve, reject) => Globe.waitList.push({ resolve, reject }));
 
-    if (!this.initialized || this.was2018 !== post2018) {
-      this.camera = new PerspectiveCamera(post2018 ? FIELD_OF_VIEW_2018 : FIELD_OF_VIEW, 1);
-      this.scene = new Scene();
-      const globe = new SphereGeometry(GLOBE_RADIUS, 50, 50);
-      globe.rotateY(-PI / 2);
-
-      if (!post2018)
-        globe.scale(-1, -1, -1);
-
-      this.globeMesh = new Mesh(globe,
-        new MeshBasicMaterial({ map: new CanvasTexture(post2018 ? Globe.mapCanvas2018 : Globe.mapCanvas), side: DoubleSide }));
-      this.scene.add(this.globeMesh);
-
-      const lines: BufferGeometry[] = [];
-      const thickness = post2018 ? LINE_THICKNESS_2018 : LINE_THICKNESS;
-      const hag = post2018 ? HAG_2018 : HAG;
-      const arcAdjust = 0.02;
-
-      // Lines of longitude
-      for (let n = 0; n < 24; ++n) {
-        const line = new CylinderGeometry(GLOBE_RADIUS + hag, GLOBE_RADIUS + hag, thickness, 50, 1, true,
-          PI / 12 + arcAdjust, PI * 5 / 6 - arcAdjust * 2);
-        line.translate(0, -thickness / 2, 0);
-        line.rotateX(PI / 2);
-        line.rotateY(n * PI / 12);
-        lines.push(line);
-      }
-
-      // Lines of latitude
-      for (let n = 1; n < 12; ++n) {
-        const lat = (n - 6) * PI / 12;
-        const r = GLOBE_RADIUS * cos(lat);
-        const y = GLOBE_RADIUS * sin(lat);
-        const r1 = r - thickness * sin(lat) / 2;
-        const r2 = r + thickness * sin(lat) / 2;
-        const line = new CylinderGeometry(r1 + hag, r2 + hag, cos(lat) * thickness, 50, 8, true);
-        line.translate(0, -cos(lat) * thickness / 2 + y, 0);
-        lines.push(line);
-      }
-
-      this.globeMesh.add(new Mesh(mergeBufferGeometries(lines),
-        new MeshBasicMaterial({ color: post2018 ? Globe.getGoldTrimColor() : GRID_COLOR, side: DoubleSide })));
-
-      this.camera.position.z = post2018 ? VIEW_DISTANCE_2018 : VIEW_DISTANCE;
-      this.renderer = new WebGLRenderer({ alpha: true, antialias: true });
-
-      if (this.lastRenderer)
-        this.lastRenderer.remove();
-
-      this.rendererHost.appendChild(this.renderer.domElement);
-      this.lastRenderer = this.renderer.domElement;
-    }
+    if (!this.initialized)
+      this.setUpRenderer();
 
     const currentPixelSize = (this.renderer.domElement.getBoundingClientRect().width * 2) || DEFAULT_GLOBE_PIXEL_SIZE;
 
-    if (!this.initialized || this.lastPixelSize !== currentPixelSize || this.was2018 !== post2018) {
-      this.was2018 = post2018;
+    if (!this.initialized || this.lastPixelSize !== currentPixelSize) {
       this.renderer.setSize(currentPixelSize, currentPixelSize);
       this.lastPixelSize = currentPixelSize;
       this.initialized = true;
@@ -173,8 +124,79 @@ export class Globe {
 
     this.globeMesh.rotation.y = -to_radian(lon);
     this.globeMesh.rotation.x = to_radian(lat);
-    this.camera.rotation.z = (lat >= 0 || post2018 ? PI : 0);
+    this.camera.rotation.z = (lat >= 0 || this.post2018 ? PI : 0);
+    this.lastLatitude = lat;
+    this.lastLongitude = lon;
 
     requestAnimationFrame(() => this.renderer.render(this.scene, this.camera));
+  }
+
+  setColorScheme(post2018: boolean): void {
+    if (this.post2018 !== post2018) {
+      this.post2018 = post2018;
+
+      if (this.initialized)
+        this.resetRenderer();
+    }
+  }
+
+  private resetRenderer(): void {
+    this.setUpRenderer();
+    this.renderer.setSize(this.lastPixelSize, this.lastPixelSize);
+    this.orient(this.lastLongitude, this.lastLatitude).finally();
+  }
+
+  private setUpRenderer(): void {
+    this.camera = new PerspectiveCamera(this.post2018 ? FIELD_OF_VIEW_2018 : FIELD_OF_VIEW, 1);
+    this.scene = new Scene();
+    const globe = new SphereGeometry(GLOBE_RADIUS, 50, 50);
+    globe.rotateY(-PI / 2);
+
+    if (!this.post2018)
+      globe.scale(-1, -1, -1);
+
+    this.globeMesh = new Mesh(globe,
+      new MeshBasicMaterial(
+        { map: new CanvasTexture(this.post2018 ? Globe.mapCanvas2018 : Globe.mapCanvas), side: DoubleSide }));
+    this.scene.add(this.globeMesh);
+
+    const lines: BufferGeometry[] = [];
+    const thickness = this.post2018 ? LINE_THICKNESS_2018 : LINE_THICKNESS;
+    const hag = this.post2018 ? HAG_2018 : HAG;
+    const arcAdjust = 0.02;
+
+    // Lines of longitude
+    for (let n = 0; n < 24; ++n) {
+      const line = new CylinderGeometry(GLOBE_RADIUS + hag, GLOBE_RADIUS + hag, thickness, 50, 1, true,
+        PI / 12 + arcAdjust, PI * 5 / 6 - arcAdjust * 2);
+      line.translate(0, -thickness / 2, 0);
+      line.rotateX(PI / 2);
+      line.rotateY(n * PI / 12);
+      lines.push(line);
+    }
+
+    // Lines of latitude
+    for (let n = 1; n < 12; ++n) {
+      const lat = (n - 6) * PI / 12;
+      const r = GLOBE_RADIUS * cos(lat);
+      const y = GLOBE_RADIUS * sin(lat);
+      const r1 = r - thickness * sin(lat) / 2;
+      const r2 = r + thickness * sin(lat) / 2;
+      const line = new CylinderGeometry(r1 + hag, r2 + hag, cos(lat) * thickness, 50, 8, true);
+      line.translate(0, -cos(lat) * thickness / 2 + y, 0);
+      lines.push(line);
+    }
+
+    this.globeMesh.add(new Mesh(mergeBufferGeometries(lines),
+      new MeshBasicMaterial({ color: this.post2018 ? Globe.getGoldTrimColor() : GRID_COLOR, side: DoubleSide })));
+
+    this.camera.position.z = this.post2018 ? VIEW_DISTANCE_2018 : VIEW_DISTANCE;
+    this.renderer = new WebGLRenderer({ alpha: true, antialias: true });
+
+    if (this.lastRenderer)
+      this.lastRenderer.remove();
+
+    this.rendererHost.appendChild(this.renderer.domElement);
+    this.lastRenderer = this.renderer.domElement;
   }
 }

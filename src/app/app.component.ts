@@ -331,6 +331,7 @@ export class AppComponent implements OnInit {
 
     this.initDone = true;
     this.globe = new Globe('globe-host');
+    this.globe.setColorScheme(this.post2018);
     this.adjustLatitude();
     this.setNow();
     this.placeName = placeName;
@@ -445,9 +446,7 @@ export class AppComponent implements OnInit {
     if (this._post2018 !== value) {
       this._post2018 = value;
       this.updateMenu();
-
-      if (this.initDone)
-        this.updateGlobe();
+      this.globe?.setColorScheme(value);
     }
   }
 
@@ -875,7 +874,7 @@ export class AppComponent implements OnInit {
   }
 
   private updateGlobe(): void {
-    this.globe.orient(this._longitude, this.latitude, this.post2018).finally();
+    this.globe.orient(this._longitude, this.latitude).finally();
   }
 
   private createDayAreaMask(outerR: number): void {

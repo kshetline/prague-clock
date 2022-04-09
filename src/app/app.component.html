@@ -56,7 +56,7 @@
     <tbw-angle-editor wideSpinner [(ngModel)]="longitude" [disableMobileKeyboard]="suppressOsKeyboard" [disabled]="canSaveName"
         [options]="{ angleStyle: DDD, compass: WEST_EAST, decimalPrecision: 1, locale: specificLocale }"></tbw-angle-editor>
   </div>
-  <div class="time-text" [class.collapsed]="collapsed">{{timeText}}</div>
+  <div class="time-text" [class.collapsed]="collapsed" [class.track-time]="trackTime">{{timeText}}</div>
 </div>
 
 <div id="svg-wrapper" [class.post-2018]="post2018">
