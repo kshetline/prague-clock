@@ -42,6 +42,7 @@ const prague = $localize`Prague, CZE`;
 const defaultSettings = {
   collapsed: false,
   constrainedSun: false,
+  detailedMechanism: false,
   disableDst: true,
   eventType: EventType.EQUISOLSTICE,
   isoFormat: false,
@@ -185,6 +186,7 @@ export class AppComponent implements OnInit {
   private _collapsed = false;
   private _constrainedSun = false;
   private delayedCollapse = false;
+  private _detailedMechanism = false;
   private eventFinder = new EventFinder();
   private eventType = EventType.EQUISOLSTICE;
   private globe: Globe
@@ -226,6 +228,8 @@ export class AppComponent implements OnInit {
       command: (): boolean => this.constrainedSun = !this.constrainedSun },
     { label: $localize`Translucent ecliptic`, icon: 'pi pi-circle', id: 'tec',
       command: (): boolean => this.translucentEcliptic = !this.translucentEcliptic },
+    { label: $localize`Detailed mechanism`, icon: 'pi pi-circle', id: 'dtm',
+      command: (): boolean => this.detailedMechanism = !this.detailedMechanism },
     { separator : true },
     { label: $localize`Code on GitHub`, icon: 'pi pi-github', url: 'https://github.com/kshetline/prague-clock' },
     { label: $localize`About the real clock`, icon: 'pi pi-info-circle',
@@ -261,6 +265,7 @@ export class AppComponent implements OnInit {
   lastHeight = -1;
   midnightSunR = 0;
   moonAngle = 0;
+  moonHandAngle = 0;
   outerRingAngle = 0;
   outerSunriseAngle: number = null;
   placeName = 'Prague, CZE';
@@ -433,6 +438,14 @@ export class AppComponent implements OnInit {
 
       if (this.initDone)
         this.updateGlobe();
+    }
+  }
+
+  get detailedMechanism(): boolean { return this._detailedMechanism; }
+  set detailedMechanism(value: boolean) {
+    if (this._detailedMechanism !== value) {
+      this._detailedMechanism = value;
+      this.updateMenu();
     }
   }
 
@@ -933,21 +946,32 @@ export class AppComponent implements OnInit {
     this.moonAngle = 90 - this.baseMoonAngle + cos_deg(this.baseMoonAngle) * 26.6;
     this.siderealAngle = this.observer.getLocalHourAngle(jdu, true).degrees - 90;
     this.outerRingAngle = 180 - (bohemianHour - hourOfDay) * 15;
+    this.calculateMoonHandAngle();
 
-    if (this.constrainedSun) {
-      const eclipticHandAngle = this.handAngle - this.siderealAngle;
-      const x2 = sin_deg(eclipticHandAngle) * CLOCK_RADIUS;
-      const y2 = -cos_deg(eclipticHandAngle) * CLOCK_RADIUS + ECLIPTIC_CENTER_OFFSET;
-      const y1 = ECLIPTIC_CENTER_OFFSET;
-      const dy = y2 - y1;
-      const dr = sqrt(x2 ** 2 + dy ** 2);
-      const D = -x2 * y1;
-      const r2 = ECLIPTIC_INNER_RADIUS ** 2;
-      const x = (D * dy + x2 * sqrt(r2 * dr ** 2 - D ** 2)) / dr ** 2;
-      const y = (-D * x2 + dy * sqrt(r2 * dr ** 2 - D ** 2)) / dr ** 2;
+    if (this.constrainedSun)
+      this.calculateSunAngleFromHandAngle();
+  }
 
-      this.sunAngle = 90 + atan2_deg(y, x);
-    }
+  private calculateMoonHandAngle(): void {
+    const x = sin_deg(this.moonAngle) * ECLIPTIC_INNER_RADIUS;
+    const y = -cos_deg(this.moonAngle) * ECLIPTIC_INNER_RADIUS - ECLIPTIC_CENTER_OFFSET;
+
+    this.moonHandAngle = 90 + atan2_deg(y, x) + this.siderealAngle;
+  }
+
+  private calculateSunAngleFromHandAngle(): void {
+    const eclipticHandAngle = this.handAngle - this.siderealAngle;
+    const x2 = sin_deg(eclipticHandAngle) * CLOCK_RADIUS;
+    const y2 = -cos_deg(eclipticHandAngle) * CLOCK_RADIUS + ECLIPTIC_CENTER_OFFSET;
+    const y1 = ECLIPTIC_CENTER_OFFSET;
+    const dy = y2 - y1;
+    const dr = sqrt(x2 ** 2 + dy ** 2);
+    const D = -x2 * y1;
+    const r2 = ECLIPTIC_INNER_RADIUS ** 2;
+    const x = (D * dy + x2 * sqrt(r2 * dr ** 2 - D ** 2)) / dr ** 2;
+    const y = (-D * x2 + dy * sqrt(r2 * dr ** 2 - D ** 2)) / dr ** 2;
+
+    this.sunAngle = 90 + atan2_deg(y, x);
   }
 
   rotate(angle: number): string {
@@ -1058,6 +1082,9 @@ export class AppComponent implements OnInit {
 
     if (this.menuItemById('tec'))
       this.menuItemById('tec').icon = (this.translucentEcliptic ? 'pi pi-check' : 'pi pi-circle');
+
+    if (this.menuItemById('dtm'))
+      this.menuItemById('dtm').icon = (this.detailedMechanism ? 'pi pi-check' : 'pi pi-circle');
 
     if (this.menuItemById('sok'))
       this.menuItemById('sok').icon = (this.suppressOsKeyboard ? 'pi pi-check' : 'pi pi-circle');

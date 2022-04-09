@@ -1,6 +1,8 @@
 $controls-background: #121212;
 $controls-text: rgba(white, 0.87);
 $dark-background-2018: #132532;
+$dark-metal: #575652;
+$metal-edge: rgba(#2B2B2B, 0.8);
 $gold-trim: #FFE696;
 $sky-color-2018: #2F9DE7;
 
@@ -380,8 +382,9 @@ svg {
 }
 
 .leverRafieSymbol {
-  stroke: none;
-  fill: #575652;
+  stroke: $metal-edge;
+  stroke-width: 0.5;
+  fill: $dark-metal;
 }
 
 .leverRafieGolden {
@@ -391,7 +394,7 @@ svg {
 
 .leverSymbol {
   stroke: none;
-  fill: $gold-trim;
+  fill: $dark-metal;
 }
 
 .hourAngleStarSymbol {
@@ -421,12 +424,22 @@ svg {
 
 .pin {
   stroke: none;
-  fill: orange;
+  fill: $dark-metal;
 }
 
 .pinSphere {
   stroke: none;
-  fill: url("#gradientSunSphere");
+  fill: url("#gradientMoonSphereDark");
+}
+
+.sun-moon-arms {
+  fill: $dark-metal;
+}
+
+.sun-moon-guides {
+  fill: $dark-metal;
+  stroke: $metal-edge;
+  stroke-width: 0.66;
 }
 
 .outerRingBackground {

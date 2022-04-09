@@ -370,6 +370,10 @@
       <g id="frontPart">
         <g [attr.filter]="filterHand">
           <g [attr.filter]="filterRelief">
+            <g *ngIf="detailedMechanism" id="moon-hand" [attr.transform]="rotate(moonHandAngle * rotateSign)">
+              <use xlink:href="#leverRafieSymbol" class="leverRafieSymbol"/>
+              <path d="M0 0L0 -250.0" class="leverRafieSymbol"/>
+            </g>
             <g id="hand" [attr.transform]="rotate(handAngle * rotateSign)">
               <use xlink:href="#leverRafieSymbol" class="leverRafieSymbol"/>
               <path d="M0 0L0 -250.0" class="leverRafieGolden"/>
@@ -554,6 +558,14 @@
             </g>
           </g>
           <g id="sunGroup">
+            <g *ngIf="detailedMechanism" [attr.filter]="filterHand">
+              <g [attr.filter]="filterRelief">
+                <g id="sun-guide" [attr.transform]="rotate(handAngle * rotateSign)">
+                  <rect x="-2.5" y="-250" width="5" height="20" class="sun-moon-guides"/>
+                  <rect x="-1.5" y="-230" width="3" height="150" class="sun-moon-guides"/>
+                </g>
+              </g>
+            </g>
             <g [attr.filter]="filterRelief">
               <g id="ecliptic_positive_sunBeamLargeSymbol_A" [attr.transform]="rotate(siderealAngle * rotateSign)">
                 <g transform="translate(0, -71.1)">
@@ -569,12 +581,15 @@
               <g transform="translate(0, -71.1)">
                 <g id="sun_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(sunAngle * rotateSign)">
                   <g id="sun_translate_sunBeamLargeSymbol_B" transform="translate(0,-161.0)">
+                    <rect *ngIf="detailedMechanism" x="-1" y="0" width="2" height="161" class="sun-moon-arms" [attr.filter]="filterRelief"/>
                     <g id="sun_negative_sunBeamLargeSymbol_B" [attr.transform]="rotate(-sunAngle * rotateSign)">
                       <g id="ecliptic_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(-siderealAngle * rotateSign)">
                         <path d="M0.0 -9.6C5.3 -9.6 9.6 -5.3 9.6 0.0C9.6 5.3 5.3 9.6 0.0 9.6C-5.3 9.6 -9.6 5.3 -9.6 0.0C-9.6 -5.3 -5.3 -9.6 0.0 -9.6" class="sunSphere"/>
                       </g>
                     </g>
                   </g>
+                  <circle *ngIf="detailedMechanism" cx="0" cy="0" r="3.5" class="pin"/>
+                  <circle *ngIf="detailedMechanism" cx="0" cy="0" r="3.5" class="pinSphere"/>
                 </g>
               </g>
             </g>
@@ -603,11 +618,20 @@
               </g>
             </g>
           </g>
+          <g *ngIf="detailedMechanism" [attr.filter]="filterHand">
+            <g [attr.filter]="filterRelief">
+              <g id="moon-guide" [attr.transform]="rotate(moonHandAngle * rotateSign)">
+                <rect x="-2.5" y="-270" width="5" height="30" class="sun-moon-guides"/>
+                <rect x="-1.5" y="-240" width="3" height="160" class="sun-moon-guides"/>
+              </g>
+            </g>
+          </g>
           <g [attr.filter]="filterRelief">
             <g id="ecliptic_positive_moonGroup" [attr.transform]="rotate(siderealAngle * rotateSign)">
               <g transform="translate(0, -71.1)">
                 <g id="moon_positive" [attr.transform]="rotate(moonAngle * rotateSign)">
                   <g transform="translate(0,-161.0)">
+                    <rect *ngIf="detailedMechanism" x="-1" y="0" width="2" height="161" class="sun-moon-arms"/>
                     <circle cx="0" cy="0" r="12" fill="black"/>
                     <circle cx="0" cy="0" r="12" class="moonDark"/>
                     <path id="moonSunlit" [attr.d]="sunlitMoonPath()" class="moonSunlit"/>
@@ -624,8 +648,8 @@
             </g>
           </g>
         </g>
-        <path d="M0.0 -4.5C2.5 -4.5 4.5 -2.5 4.5 0.0C4.5 2.5 2.5 4.5 0.0 4.5C-2.5 4.5 -4.5 2.5 -4.5 0.0C-4.5 -2.5 -2.5 -4.5 0.0 -4.5" class="pin"/>
-        <path d="M0.0 -4.5C2.5 -4.5 4.5 -2.5 4.5 0.0C4.5 2.5 2.5 4.5 0.0 4.5C-2.5 4.5 -4.5 2.5 -4.5 0.0C-4.5 -2.5 -2.5 -4.5 0.0 -4.5" class="pinSphere"/>
+        <circle cx="0" cy="0" r="4.5" class="pin"/>
+        <circle cx="0" cy="0" r="4.5" class="pinSphere"/>
       </g>
     </g>
   </svg>
