@@ -15,8 +15,8 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { TubularNgWidgetsModule } from '@tubular/ng-widgets';
 
-import { AppComponent } from './app.component';
-import { TimezoneSelectorComponent } from '../timezone-selector/timezone-selector.component';
+import { AppComponent } from './app/app.component';
+import { TimezoneSelectorComponent } from './timezone-selector/timezone-selector.component';
 
 @NgModule({
   declarations: [
