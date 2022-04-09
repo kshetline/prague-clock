@@ -621,8 +621,8 @@
           <g *ngIf="detailedMechanism" [attr.filter]="filterHand">
             <g [attr.filter]="filterRelief">
               <g id="moon-guide" [attr.transform]="rotate(moonHandAngle * rotateSign)">
-                <rect x="-2.5" y="-270" width="5" height="30" class="sun-moon-guides"/>
-                <rect x="-1.5" y="-240" width="3" height="160" class="sun-moon-guides"/>
+                <rect x="-2.5" y="-270" width="5" height="20" class="sun-moon-guides"/>
+                <rect x="-1.5" y="-250" width="3" height="170" class="sun-moon-guides"/>
               </g>
             </g>
           </g>
@@ -631,7 +631,11 @@
               <g transform="translate(0, -71.1)">
                 <g id="moon_positive" [attr.transform]="rotate(moonAngle * rotateSign)">
                   <g transform="translate(0,-161.0)">
-                    <rect *ngIf="detailedMechanism" x="-1" y="0" width="2" height="161" class="sun-moon-arms"/>
+                    <ng-container *ngIf="detailedMechanism">
+                      <rect x="-1" y="0" width="2" height="161" class="sun-moon-arms"/>
+                      <circle cx="0" cy="0" r="16" class="moon-ring-edge"/>
+                      <circle cx="0" cy="0" r="15" class="moon-ring"/>
+                    </ng-container>
                     <circle cx="0" cy="0" r="12" fill="black"/>
                     <circle cx="0" cy="0" r="12" class="moonDark"/>
                     <path id="moonSunlit" [attr.d]="sunlitMoonPath()" class="moonSunlit"/>

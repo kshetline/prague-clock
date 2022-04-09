@@ -442,6 +442,18 @@ svg {
   stroke-width: 0.66;
 }
 
+.moon-ring-edge {
+  fill: none;
+  stroke: $metal-edge;
+  stroke-width: 5;
+}
+
+.moon-ring {
+  fill: none;
+  stroke: $dark-metal;
+  stroke-width: 4;
+}
+
 .outerRingBackground {
   stroke: none;
   fill: #0E3D64;
