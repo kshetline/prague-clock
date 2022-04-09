@@ -47,6 +47,7 @@ const defaultSettings = {
   detailedMechanism: false,
   disableDst: true,
   eventType: EventType.EQUISOLSTICE,
+  hideMap: false,
   isoFormat: false,
   latitude: 50.0870,
   longitude: 14.4185,
@@ -188,13 +189,13 @@ export class AppComponent implements OnInit, SettingsHolder {
   private _collapsed = false;
   private _constrainedSun = false;
   private delayedCollapse = false;
-  private _detailedMechanism = false;
   private eventFinder = new EventFinder();
   private eventType = EventType.EQUISOLSTICE;
   private globe: Globe
   private graphicsChangeLastTime = -1;
   private graphicsChangeStartTime = -1;
   private graphicsChangeStopTimer: any;
+  private _hideMap = false;
   private initDone = false;
   private _isoFormat = false;
   private lastSavedSettings: any = null;
@@ -213,7 +214,6 @@ export class AppComponent implements OnInit, SettingsHolder {
   private _time = 0;
   private timeCheck: any;
   private _trackTime = false;
-  private _translucentEcliptic = false;
   private _zone = 'Europe/Prague';
   private zoneFixTimeout: any;
 
@@ -242,6 +242,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   dawnDuskFontSize = '15px';
   dawnLabelPath: string;
   dawnTextOffset: number;
+  detailedMechanism = false;
   disableDst = true;
   duskGradientAdjustment = 80;
   duskLabelPath: string;
@@ -276,6 +277,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   sunsetLabelPath: string;
   svgFilteringOn = true;
   timeText = '';
+  translucentEcliptic = false;
 
   @ViewChild('advancedOptions', { static: true }) advancedOptions: AdvancedOptionsComponent;
 
@@ -442,16 +444,15 @@ export class AppComponent implements OnInit, SettingsHolder {
   set post2018(value: boolean) {
     if (this._post2018 !== value) {
       this._post2018 = value;
-      this.updateMenu();
       this.globe?.setColorScheme(value);
     }
   }
 
-  get detailedMechanism(): boolean { return this._detailedMechanism; }
-  set detailedMechanism(value: boolean) {
-    if (this._detailedMechanism !== value) {
-      this._detailedMechanism = value;
-      this.updateMenu();
+  get hideMap(): boolean { return this._hideMap; }
+  set hideMap(value: boolean) {
+    if (this._hideMap !== value) {
+      this._hideMap = value;
+      this.globe?.setHideMap(value);
     }
   }
 
@@ -540,14 +541,6 @@ export class AppComponent implements OnInit, SettingsHolder {
     return this.menuItems.find(item => item.id === id);
   }
 
-  get translucentEcliptic(): boolean { return this._translucentEcliptic; }
-  set translucentEcliptic(value: boolean) {
-    if (this._translucentEcliptic !== value) {
-      this._translucentEcliptic = value;
-      this.updateMenu();
-    }
-  }
-
   get constrainedSun(): boolean { return this._constrainedSun; }
   set constrainedSun(value: boolean) {
     if (this._constrainedSun !== value) {
@@ -557,7 +550,6 @@ export class AppComponent implements OnInit, SettingsHolder {
         this.disableDst = true;
 
       this.updateTime(true);
-      this.updateMenu();
     }
   }
 

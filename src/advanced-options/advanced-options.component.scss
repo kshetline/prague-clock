@@ -5,7 +5,7 @@
   color: white;
   display: none;
   flex-direction: column;
-  gap: 0.67em;
+  gap: 1em;
   height: 100% !important;
   left: 0 !important;
   overflow: auto;
@@ -34,4 +34,9 @@
   display: flex;
   flex-direction: row;
   gap: 1em;
+}
+
+.hide-map {
+  margin-left: 3em;
+  margin-top: -0.5em;
 }

@@ -3,6 +3,7 @@ import { Component, ElementRef } from '@angular/core';
 export interface SettingsHolder {
   constrainedSun: boolean;
   detailedMechanism: boolean;
+  hideMap: boolean;
   post2018: boolean;
   translucentEcliptic: boolean;
 }

@@ -8,6 +8,9 @@
       i18n-label label="Pre-2018 colors"></p-radioButton>
 </div>
 
+<p-checkbox [(ngModel)]="settingsHolder.hideMap" [binary]="true" [disabled]="!settingsHolder.post2018" class="hide-map"
+    i18n-label label="Hide globe map"></p-checkbox>
+
 <p-checkbox [(ngModel)]="settingsHolder.translucentEcliptic" [binary]="true"
     i18n-label label="Translucent ecliptic"></p-checkbox>
 

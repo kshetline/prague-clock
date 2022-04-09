@@ -32,6 +32,7 @@ export class Globe {
 
   private camera: PerspectiveCamera;
   private globeMesh: Mesh;
+  private hideMap = false;
   private initialized = false;
   private lastLatitude: number;
   private lastLongitude: number;
@@ -95,6 +96,10 @@ export class Globe {
     return getComputedStyle(document.documentElement).getPropertyValue('--gold-trim').trim();
   }
 
+  private static getSkyColorColor2018(): string {
+    return getComputedStyle(document.documentElement).getPropertyValue('--sky-color-2018').trim();
+  }
+
   constructor(rendererHost: string | HTMLElement) {
     if (isString(rendererHost))
       this.rendererHost = document.getElementById(rendererHost);
@@ -134,13 +139,21 @@ export class Globe {
   setColorScheme(post2018: boolean): void {
     if (this.post2018 !== post2018) {
       this.post2018 = post2018;
+      this.resetRenderer();
+    }
+  }
 
-      if (this.initialized)
-        this.resetRenderer();
+  setHideMap(value: boolean): void {
+    if (this.hideMap !== value) {
+      this.hideMap = value;
+      this.resetRenderer();
     }
   }
 
   private resetRenderer(): void {
+    if (!this.initialized)
+      return;
+
     this.setUpRenderer();
     this.renderer.setSize(this.lastPixelSize, this.lastPixelSize);
     this.orient(this.lastLongitude, this.lastLatitude).finally();
@@ -155,9 +168,13 @@ export class Globe {
     if (!this.post2018)
       globe.scale(-1, -1, -1);
 
-    this.globeMesh = new Mesh(globe,
-      new MeshBasicMaterial(
-        { map: new CanvasTexture(this.post2018 ? Globe.mapCanvas2018 : Globe.mapCanvas), side: DoubleSide }));
+    if (this.post2018 && this.hideMap)
+      this.globeMesh = new Mesh(globe, new MeshBasicMaterial({ color: Globe.getSkyColorColor2018() }));
+    else
+      this.globeMesh = new Mesh(globe,
+        new MeshBasicMaterial(
+          { map: new CanvasTexture(this.post2018 ? Globe.mapCanvas2018 : Globe.mapCanvas), side: DoubleSide }));
+
     this.scene.add(this.globeMesh);
 
     const lines: BufferGeometry[] = [];
