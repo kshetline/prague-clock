@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService, PrimeNGConfig } from 'primeng/api';
 import {
-  abs, atan2_deg, atan_deg, cos_deg, floor, max, min, mod, PI, Point, sign, sin_deg, sqrt, tan_deg
+  abs, atan2_deg, atan_deg, cos_deg, floor, max, min, mod, mod2, PI, Point, sign, sin_deg, sqrt, tan_deg
 } from '@tubular/math';
 import { clone, forEach, getCssValue, isEqual, isLikelyMobile, isSafari, processMillis } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
@@ -17,6 +17,7 @@ import { localeSuffix, SOUTH_NORTH, specificLocale, WEST_EAST } from '../locales
 import { faForward, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 import DATETIME_LOCAL = ttime.DATETIME_LOCAL;
 import { AdvancedOptionsComponent, SettingsHolder } from '../advanced-options/advanced-options.component';
+import DATETIME_LOCAL_SECONDS = ttime.DATETIME_LOCAL_SECONDS;
 
 const CLOCK_RADIUS = 250;
 const INCLINATION = 23.5;
@@ -304,9 +305,9 @@ export class AppComponent implements OnInit, SettingsHolder {
 
   @ViewChild('advancedOptions', { static: true }) advancedOptions: AdvancedOptionsComponent;
 
-  get filterEcliptic(): string { return this.svgFilteringOn && !this._playing ? 'url("#filterEcliptic")' : null; }
-  get filterHand(): string { return this.svgFilteringOn && !this._playing ? 'url("#filterHand")' : null; }
-  get filterRelief(): string { return this.svgFilteringOn && !this._playing ? 'url("#filterRelief")' : null; }
+  get filterEcliptic(): string { return 'url("#filterEcliptic")'; } // TODO put back
+  get filterHand(): string { return 'url("#filterHand")'; }
+  get filterRelief(): string { return 'url("#filterRelief")'; }
 
   constructor(
     private confirmService: ConfirmationService,
@@ -355,11 +356,8 @@ export class AppComponent implements OnInit, SettingsHolder {
     this.globe.setColorScheme(this.post2018);
     this.adjustLatitude();
 
-    if (this.mechanicalTiming && !this.timingReference) {
-      const t = floor(Date.now() / 60000) * 60000;
-      this.timingReference = this.calculateBasicPositions(t);
-      this.timingReference._referenceTime = t;
-    }
+    if (this.mechanicalTiming)
+      this.adjustMechanicalTimingReference();
 
     this.setNow();
     this.placeName = placeName;
@@ -491,16 +489,20 @@ export class AppComponent implements OnInit, SettingsHolder {
     if (this._mechanicalTiming !== value) {
       this._mechanicalTiming = value;
 
-      if (value && this.observer) {
-        const t = floor(this.time / 60000) * 60000;
-        this.timingReference = this.calculateBasicPositions(t);
-        this.timingReference._referenceTime = t;
-      }
+      if (value && this.observer)
+        this.adjustMechanicalTimingReference();
       else
         this.timingReference = undefined;
 
       this.updateTime(true);
     }
+  }
+
+  private adjustMechanicalTimingReference(): void {
+    const t = floor(Date.now() / 60000) * 60000;
+
+    this.timingReference = this.calculateBasicPositions(t);
+    this.timingReference._referenceTime = t;
   }
 
   get playing(): boolean { return this._playing; }
@@ -628,6 +630,7 @@ export class AppComponent implements OnInit, SettingsHolder {
       if (this.initDone) {
         this.placeName = '';
         this.updateObserver();
+        this.adjustMechanicalTimingReference();
         this.updateTime(true);
       }
     }
@@ -977,15 +980,24 @@ export class AppComponent implements OnInit, SettingsHolder {
     else
       forEach(basicPositions as any, (key, value) => bpKey(key) && ((this as any)[key] = value));
 
-    this.timeText = basicPositions._date.format(this.isoFormat ?
-      DATETIME_LOCAL : 'ISS{year:numeric,month:2-digit,day:2-digit,hour:2-digit}');
+    const format = this.isoFormat ? DATETIME_LOCAL : 'ISS{year:numeric,month:2-digit,day:2-digit,hour:2-digit}';
+
+    this.timeText = basicPositions._date.format(format);
     this.outerRingAngle = 180 - (bohemianHour - basicPositions._hourOfDay) * 15;
+
+    console.log({ // TODO remove
+      time: basicPositions._date.format(DATETIME_LOCAL_SECONDS),
+      ref: this.timingReference ? new DateTime(this.timingReference._referenceTime).format(DATETIME_LOCAL_SECONDS) : null,
+      dS: (mod2(this.sunAngle - this.true_sunAngle, 360) / 360 * 1440).toFixed(2) + ' minutes',
+      dM: mod2(this.moonAngle - this.true_moonAngle, 360).toFixed(2) + '°',
+      dP: (mod2(this.moonPhase - this.true_moonPhase, 360) / 360 * 29.53059).toFixed(2) + ' days'
+    });
   }
 
   private calculateBasicPositions(time: number): BasicPositions {
     const jdu = julianDay(time);
     const jde = utToTdt(jdu);
-    const _date = new DateTime(this.time, this.zone);
+    const _date = new DateTime(time, this.zone);
     const wt = this.lastWallTime = _date.wallTime;
     const _hourOfDay = wt.hour + wt.minute / 60 - (this.disableDst || this.mechanicalTiming ? wt.dstOffset / 3600 : 0);
     const handAngle = _hourOfDay * 15 - 180;
@@ -1020,25 +1032,49 @@ export class AppComponent implements OnInit, SettingsHolder {
   }
 
   private static calculateMoonHandAngle(moonAngle: number, siderealAngle: number): number {
+    // Note: SVG angles start at "noon" and go clockwise, rather than at 3:00 going counterclockwise,
+    // so the roles of sin and cos are swapped, and signs are changed.
     const x = sin_deg(moonAngle) * ECLIPTIC_INNER_RADIUS;
     const y = -cos_deg(moonAngle) * ECLIPTIC_INNER_RADIUS - ECLIPTIC_CENTER_OFFSET;
 
     return 90 + atan2_deg(y, x) + siderealAngle;
   }
 
-  private static calculateEclipticAngleFromHandAngle(handAngle: number, siderealAngle: number): number {
-    const eclipticHandAngle = handAngle - siderealAngle;
-    const x2 = sin_deg(eclipticHandAngle) * CLOCK_RADIUS;
-    const y2 = -cos_deg(eclipticHandAngle) * CLOCK_RADIUS + ECLIPTIC_CENTER_OFFSET;
-    const y1 = ECLIPTIC_CENTER_OFFSET;
-    const dy = y2 - y1;
-    const dr = sqrt(x2 ** 2 + dy ** 2);
-    const D = -x2 * y1;
-    const r2 = ECLIPTIC_INNER_RADIUS ** 2;
-    const x = (D * dy + x2 * sqrt(r2 * dr ** 2 - D ** 2)) / dr ** 2;
-    const y = (-D * x2 + dy * sqrt(r2 * dr ** 2 - D ** 2)) / dr ** 2;
+  private static calculateEclipticAngleFromHandAngle(handAngle: number, siderealAngle: number, check?: number): number {
+    let result: number;
+    const t = mod2(handAngle - siderealAngle, 360);
 
-    return 90 + atan2_deg(y, x);
+    if (abs(t) < 0.01)
+      result = 0;
+    else if (abs(t - 180) < 0.01)
+      result = 180;
+    // Avoid tan explosions
+    else if (abs(t - 90) < 0.01)
+      result = 142.83;
+    else if (abs(t + 90) < 0.01)
+      result = -142.83;
+    else {
+      const M = tan_deg(90 - abs(t)); // As in y = mx + b
+      const B = -ECLIPTIC_CENTER_OFFSET; // As in y = mx + b
+      const a = 1 + M ** 2; // a, b, and c as in quadratic equation.
+      const b = 2 * M * B;
+      const R2 = ECLIPTIC_INNER_RADIUS ** 2;
+      const c = B ** 2 - R2;
+      const x = (-b + sqrt(b ** 2 - 4 * a * c)) / 2 / a;
+      const y = sqrt(R2 - x ** 2);
+
+      result = atan2_deg(x, y);
+
+      if (check !== null) {
+        const dif = mod2(result - check, 360);
+        if (abs(dif) > 0.01)
+          console.log('bad', abs(mod2(check, 360)) > 90, mod(result, 360), mod(check, 360), dif, t);
+        else
+          console.log('good!', mod(result, 360), mod(check, 360), t);
+      }
+    }
+
+    return result;
   }
 
   rotate(angle: number): string {

@@ -212,7 +212,7 @@
           </text>
           <text *ngIf="midnightSunR">
             <textPath xlink:href="#solNoctis" startOffset="49%" class="eventText">
-              <tspan dy="-2" [style.font-size]="'12px'">ⓈⓄⓁ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ⓃⓄⒸⓉⒾⓈ</tspan><!-- CREPUSCULUM -->
+              <tspan dy="-2" [style.font-size]="'12px'">ⓈⓄⓁ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ⓃⓄⒸⓉⒾⓈ</tspan>
             </textPath>
           </text>
           <!-- cspell:enable -->
@@ -619,6 +619,9 @@
                     </g>
                   </g>
                 </g>
+                <g id="sun_true" [attr.transform]="rotate(true_sunAngle * rotateSign)">
+                  <circle cx="0" cy="-178.9" r="3" fill="yellow"/>
+                </g>
               </g>
             </g>
           </g>
@@ -651,6 +654,9 @@
                       </g>
                     </g>
                   </g>
+                </g>
+                <g id="moon_true" [attr.transform]="rotate(true_moonAngle * rotateSign)">
+                  <circle cx="0" cy="-178.9" r="3" fill="white"/>
                 </g>
               </g>
             </g>
