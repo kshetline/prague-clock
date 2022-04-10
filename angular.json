@@ -79,7 +79,8 @@
               "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
-              "namedChunks": true
+              "namedChunks": true,
+              "localize": ["en-US"]
             },
             "cs": {
               "localize": ["cs"]
@@ -90,7 +91,7 @@
             "en-US": {
               "localize": ["en-US"]
             }
-          },
+         },
           "defaultConfiguration": "production"
         },
         "serve": {

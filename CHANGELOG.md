@@ -1,6 +1,9 @@
 ## 1.3.0
 
+* New “Advanced Options” panel.
 * Option to display greater mechanical detail of the clock.
+* Option for emulation of mechanical timekeeping (supersedes “Align sun to hand pointer” from version 1.2.0).
+* For greater consistency with post-2018 appearance, globe map can be hidden.
 * Collapsed control panel displays currently-set time.
 
 ## 1.2.0

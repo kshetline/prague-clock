@@ -37,7 +37,7 @@
   <div class="button-row">
     <p-checkbox [(ngModel)]="isoFormat" [binary]="true"
         i18n-label label="ISO time format"></p-checkbox>
-    <p-checkbox [(ngModel)]="disableDst" [binary]="true" [disabled]="constrainedSun"
+    <p-checkbox [(ngModel)]="disableDst" [binary]="true" [disabled]="mechanicalTiming"
         i18n-label label="Disable DST on clock" (onChange)="updateTime(true)"></p-checkbox>
   </div>
   <tze-zone-selector [(ngModel)]="zone" [recents]="recentLocations" (clearItem)='clearItem($event)' (clearRecents)="clearRecents()"

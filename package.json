@@ -3,7 +3,7 @@
   "version": "1.3.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --configuration=en-US",
+    "start": "ng serve --configuration=development",
     "start:cs": "ng serve --configuration=cs",
     "start:es": "ng serve --configuration=es",
     "build": "ng build --base-href /orloj/",

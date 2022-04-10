@@ -1,9 +1,9 @@
 import { Component, ElementRef } from '@angular/core';
 
 export interface SettingsHolder {
-  constrainedSun: boolean;
   detailedMechanism: boolean;
   hideMap: boolean;
+  mechanicalTiming: boolean;
   post2018: boolean;
   translucentEcliptic: boolean;
 }

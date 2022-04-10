@@ -1,7 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService, PrimeNGConfig } from 'primeng/api';
-import { abs, atan2_deg, atan_deg, cos_deg, floor, max, min, mod, PI, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
-import { clone, getCssValue, isEqual, isLikelyMobile, isSafari, processMillis } from '@tubular/util';
+import {
+  abs, atan2_deg, atan_deg, cos_deg, floor, max, min, mod, PI, Point, sign, sin_deg, sqrt, tan_deg
+} from '@tubular/math';
+import { clone, forEach, getCssValue, isEqual, isLikelyMobile, isSafari, processMillis } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import {
   AstroEvent, EventFinder, FALL_EQUINOX, FIRST_QUARTER, FULL_MOON, LAST_QUARTER, MOON, NEW_MOON, RISE_EVENT, SET_EVENT,
@@ -28,6 +30,7 @@ const ECLIPTIC_CENTER_OFFSET = 71.1;
 const MAX_UNEVEN_HOUR_LATITUDE = 86;
 const RESUME_FILTERING_DELAY = 1000;
 const STOP_FILTERING_DELAY = isSafari() ? 1000 : 3000;
+const MILLIS_PER_DAY = 86_400_000;
 
 interface CircleAttributes {
   cy: number;
@@ -43,7 +46,6 @@ const MAX_SAVED_LOCATIONS = 10;
 const prague = $localize`Prague, CZE`;
 const defaultSettings = {
   collapsed: false,
-  constrainedSun: false,
   detailedMechanism: false,
   disableDst: true,
   eventType: EventType.EQUISOLSTICE,
@@ -51,6 +53,7 @@ const defaultSettings = {
   isoFormat: false,
   latitude: 50.0870,
   longitude: 14.4185,
+  mechanicalTiming: false,
   placeName: prague,
   post2018: true,
   recentLocations: [{
@@ -154,6 +157,20 @@ function findCircleRadius(x1: number, y1: number, x2: number, y2: number, x3: nu
   return sqrt(sqr_of_r);
 }
 
+function bpKey(key: string): boolean { return !key.startsWith('_'); }
+
+interface BasicPositions {
+  _date?: DateTime;
+  _hourOfDay?: number;
+  _referenceTime?: number;
+  handAngle: number;
+  moonAngle: number;
+  moonHandAngle: number;
+  moonPhase: number;
+  siderealAngle: number;
+  sunAngle: number;
+}
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -184,10 +201,7 @@ export class AppComponent implements OnInit, SettingsHolder {
 
   ISO_OPTS = ['ISO', this.LOCAL_OPTS, { showUtcOffset: true }];
 
-  private baseMoonAngle: number;
-  private baseSunAngle: number;
   private _collapsed = false;
-  private _constrainedSun = false;
   private delayedCollapse = false;
   private eventFinder = new EventFinder();
   private eventType = EventType.EQUISOLSTICE;
@@ -202,6 +216,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   private lastWallTime: DateAndTime;
   private _latitude = 50.0870;
   private _longitude = 14.4185;
+  private _mechanicalTiming = false;
   private observer: SkyObserver;
   private _playing = false;
   private playTimeBase: number;
@@ -213,6 +228,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   private _suppressOsKeyboard = false;
   private _time = 0;
   private timeCheck: any;
+  private timingReference: BasicPositions;
   private _trackTime = false;
   private _zone = 'Europe/Prague';
   private zoneFixTimeout: any;
@@ -262,6 +278,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   midnightSunR = 0;
   moonAngle = 0;
   moonHandAngle = 0;
+  moonPhase = 0;
   outerRingAngle = 0;
   outerSunriseAngle: number = null;
   placeName = 'Prague, CZE';
@@ -278,6 +295,12 @@ export class AppComponent implements OnInit, SettingsHolder {
   svgFilteringOn = true;
   timeText = '';
   translucentEcliptic = false;
+  true_handAngle = 0;
+  true_moonAngle = 0;
+  true_moonHandleAngle = 0;
+  true_moonPhase = 0;
+  true_siderealAngle = 0;
+  true_sunAngle = 0;
 
   @ViewChild('advancedOptions', { static: true }) advancedOptions: AdvancedOptionsComponent;
 
@@ -331,6 +354,13 @@ export class AppComponent implements OnInit, SettingsHolder {
     this.globe = new Globe('globe-host');
     this.globe.setColorScheme(this.post2018);
     this.adjustLatitude();
+
+    if (this.mechanicalTiming && !this.timingReference) {
+      const t = floor(Date.now() / 60000) * 60000;
+      this.timingReference = this.calculateBasicPositions(t);
+      this.timingReference._referenceTime = t;
+    }
+
     this.setNow();
     this.placeName = placeName;
     this.advancedOptions.settingsHolder = this;
@@ -456,6 +486,23 @@ export class AppComponent implements OnInit, SettingsHolder {
     }
   }
 
+  get mechanicalTiming(): boolean { return this._mechanicalTiming; }
+  set mechanicalTiming(value: boolean) {
+    if (this._mechanicalTiming !== value) {
+      this._mechanicalTiming = value;
+
+      if (value && this.observer) {
+        const t = floor(this.time / 60000) * 60000;
+        this.timingReference = this.calculateBasicPositions(t);
+        this.timingReference._referenceTime = t;
+      }
+      else
+        this.timingReference = undefined;
+
+      this.updateTime(true);
+    }
+  }
+
   get playing(): boolean { return this._playing; }
   set playing(value: boolean) {
     if (this._playing !== value) {
@@ -501,7 +548,7 @@ export class AppComponent implements OnInit, SettingsHolder {
     if (this.playSpeed === PlaySpeed.NORMAL)
       this.time = this.playTimeBase + floor(elapsed / 25) * 60_000;
     else
-      this.time = this.playTimeBase + floor(elapsed / 100) * 86_400_000;
+      this.time = this.playTimeBase + floor(elapsed / 100) * MILLIS_PER_DAY;
 
     if (this.lastWallTime && this.lastWallTime.y === this.MAX_YEAR && this.lastWallTime.m === 12 && this.lastWallTime.d === 31)
       this.stop();
@@ -539,18 +586,6 @@ export class AppComponent implements OnInit, SettingsHolder {
 
   private menuItemById(id: string): MenuItem {
     return this.menuItems.find(item => item.id === id);
-  }
-
-  get constrainedSun(): boolean { return this._constrainedSun; }
-  set constrainedSun(value: boolean) {
-    if (this._constrainedSun !== value) {
-      this._constrainedSun = value;
-
-      if (value)
-        this.disableDst = true;
-
-      this.updateTime(true);
-    }
   }
 
   get suppressOsKeyboard(): boolean { return this._suppressOsKeyboard; }
@@ -923,7 +958,6 @@ export class AppComponent implements OnInit, SettingsHolder {
     this.graphicsRateChangeCheck();
 
     const jdu = julianDay(this.time);
-    const jde = utToTdt(jdu);
 
     // Finding sunset events can be slow at high latitudes, so use cached values when possible.
     if (forceUpdate || !this.sunsetA || !this.sunsetB || jdu < this.sunsetA.ut || jdu > this.sunsetB.ut) {
@@ -933,33 +967,67 @@ export class AppComponent implements OnInit, SettingsHolder {
 
     const dayLength = this.sunsetB.ut - this.sunsetA.ut;
     const bohemianHour = (jdu - this.sunsetA.ut) / dayLength * 24;
-    const date = new DateTime(this.time, this.zone);
-    const wt = this.lastWallTime = date.wallTime;
-    const hourOfDay = wt.hour + wt.minute / 60 - (this.disableDst || this.constrainedSun ? wt.dstOffset / 3600 : 0);
+    const basicPositions = this.calculateBasicPositions(this.time);
 
-    this.timeText = date.format(this.isoFormat ? DATETIME_LOCAL : 'ISS{year:numeric,month:2-digit,day:2-digit,hour:2-digit}');
-    this.baseSunAngle = this.solarSystem.getEclipticPosition(SUN, jde).longitude.degrees;
-    this.baseMoonAngle = this.solarSystem.getEclipticPosition(MOON, jde).longitude.degrees;
-    this.handAngle = hourOfDay * 15 - 180;
-    this.sunAngle = 90 - this.baseSunAngle + cos_deg(this.baseSunAngle) * 26.6;
-    this.moonAngle = 90 - this.baseMoonAngle + cos_deg(this.baseMoonAngle) * 26.6;
-    this.siderealAngle = this.observer.getLocalHourAngle(jdu, true).degrees - 90;
-    this.outerRingAngle = 180 - (bohemianHour - hourOfDay) * 15;
-    this.calculateMoonHandAngle();
+    forEach(basicPositions as any, (key, value) => bpKey(key) && ((this as any)['true_' + key] = value));
 
-    if (this.constrainedSun)
-      this.calculateSunAngleFromHandAngle();
+    if (this.timingReference)
+      forEach(AppComponent.calculateMechanicalPositions(this.time, this.timingReference) as any,
+        (key, value) => bpKey(key) && ((this as any)[key] = value));
+    else
+      forEach(basicPositions as any, (key, value) => bpKey(key) && ((this as any)[key] = value));
+
+    this.timeText = basicPositions._date.format(this.isoFormat ?
+      DATETIME_LOCAL : 'ISS{year:numeric,month:2-digit,day:2-digit,hour:2-digit}');
+    this.outerRingAngle = 180 - (bohemianHour - basicPositions._hourOfDay) * 15;
   }
 
-  private calculateMoonHandAngle(): void {
-    const x = sin_deg(this.moonAngle) * ECLIPTIC_INNER_RADIUS;
-    const y = -cos_deg(this.moonAngle) * ECLIPTIC_INNER_RADIUS - ECLIPTIC_CENTER_OFFSET;
+  private calculateBasicPositions(time: number): BasicPositions {
+    const jdu = julianDay(time);
+    const jde = utToTdt(jdu);
+    const _date = new DateTime(this.time, this.zone);
+    const wt = this.lastWallTime = _date.wallTime;
+    const _hourOfDay = wt.hour + wt.minute / 60 - (this.disableDst || this.mechanicalTiming ? wt.dstOffset / 3600 : 0);
+    const handAngle = _hourOfDay * 15 - 180;
+    const baseSunAngle = this.solarSystem.getEclipticPosition(SUN, jde).longitude.degrees;
+    const baseMoonAngle = this.solarSystem.getEclipticPosition(MOON, jde).longitude.degrees;
+    const sunAngle = 90 - baseSunAngle + cos_deg(baseSunAngle) * 26.6;
+    const moonAngle = 90 - baseMoonAngle + cos_deg(baseMoonAngle) * 26.6;
+    const siderealAngle = this.observer.getLocalHourAngle(jdu, true).degrees - 90;
+    const moonPhase = mod((baseMoonAngle - baseSunAngle) * this.rotateSign, 360);
+    const moonHandAngle = AppComponent.calculateMoonHandAngle(moonAngle, siderealAngle);
 
-    this.moonHandAngle = 90 + atan2_deg(y, x) + this.siderealAngle;
+    return { _hourOfDay, _date, handAngle, moonAngle, moonHandAngle, moonPhase, siderealAngle, sunAngle };
   }
 
-  private calculateSunAngleFromHandAngle(): void {
-    const eclipticHandAngle = this.handAngle - this.siderealAngle;
+  private static calculateMechanicalPositions(time: number, ref: BasicPositions): BasicPositions {
+    const deltaDays = (time - ref._referenceTime) / MILLIS_PER_DAY;
+    const deltaSiderealDays = deltaDays * 366 / 365;
+    const deltaMoonDays = deltaDays * 366 / 379;
+    const phaseCycles = deltaMoonDays * 2 / 57;
+    const handAngle = mod(ref.handAngle + deltaDays * 360, 360);
+    const moonHandAngle = mod(ref.moonHandAngle + deltaMoonDays * 360, 360);
+    const siderealAngle = mod(ref.siderealAngle + deltaSiderealDays * 360, 360);
+
+    return {
+      handAngle,
+      moonAngle: AppComponent.calculateEclipticAngleFromHandAngle(moonHandAngle, siderealAngle),
+      moonHandAngle,
+      moonPhase: mod(ref.moonPhase + phaseCycles * 360, 360),
+      siderealAngle,
+      sunAngle: AppComponent.calculateEclipticAngleFromHandAngle(handAngle, siderealAngle),
+    };
+  }
+
+  private static calculateMoonHandAngle(moonAngle: number, siderealAngle: number): number {
+    const x = sin_deg(moonAngle) * ECLIPTIC_INNER_RADIUS;
+    const y = -cos_deg(moonAngle) * ECLIPTIC_INNER_RADIUS - ECLIPTIC_CENTER_OFFSET;
+
+    return 90 + atan2_deg(y, x) + siderealAngle;
+  }
+
+  private static calculateEclipticAngleFromHandAngle(handAngle: number, siderealAngle: number): number {
+    const eclipticHandAngle = handAngle - siderealAngle;
     const x2 = sin_deg(eclipticHandAngle) * CLOCK_RADIUS;
     const y2 = -cos_deg(eclipticHandAngle) * CLOCK_RADIUS + ECLIPTIC_CENTER_OFFSET;
     const y1 = ECLIPTIC_CENTER_OFFSET;
@@ -970,7 +1038,7 @@ export class AppComponent implements OnInit, SettingsHolder {
     const x = (D * dy + x2 * sqrt(r2 * dr ** 2 - D ** 2)) / dr ** 2;
     const y = (-D * x2 + dy * sqrt(r2 * dr ** 2 - D ** 2)) / dr ** 2;
 
-    this.sunAngle = 90 + atan2_deg(y, x);
+    return 90 + atan2_deg(y, x);
   }
 
   rotate(angle: number): string {
@@ -978,10 +1046,9 @@ export class AppComponent implements OnInit, SettingsHolder {
   }
 
   sunlitMoonPath(): string {
-    const phaseAngle = mod((this.baseMoonAngle - this.baseSunAngle) * this.rotateSign, 360);
-    const largeArcFlag = phaseAngle < 180 ? 1 : 0;
-    const sweepFlag = floor(phaseAngle / 90) % 2;
-    const x = (abs(cos_deg(phaseAngle)) * 12).toFixed(1);
+    const largeArcFlag = this.moonPhase < 180 ? 1 : 0;
+    const sweepFlag = floor(this.moonPhase / 90) % 2;
+    const x = (abs(cos_deg(this.moonPhase)) * 12).toFixed(1);
 
     return `M0 -12.0A12.0 12.0 0 0 ${largeArcFlag} 0 12.0A${x} 12.0 0 0 ${sweepFlag} 0 -12.0`;
   }
