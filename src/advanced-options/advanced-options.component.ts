@@ -3,6 +3,7 @@ import { Component, ElementRef } from '@angular/core';
 export enum Timing { MODERN, MECHANICAL_ORIGINAL, MECHANICAL_UPDATED }
 
 export interface SettingsHolder {
+  additionalPlanets: boolean;
   detailedMechanism: boolean;
   fasterGraphics: boolean;
   hideMap: boolean;

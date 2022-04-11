@@ -4,8 +4,9 @@ import { abs, atan2_deg, atan_deg, cos_deg, floor, max, min, mod, mod2, PI, Poin
 import { clone, forEach, getCssValue, isEqual, isLikelyMobile, isSafari, processMillis } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import {
-  AstroEvent, EventFinder, FALL_EQUINOX, FIRST_QUARTER, FULL_MOON, LAST_QUARTER, MOON, NEW_MOON, RISE_EVENT, SET_EVENT,
-  SkyObserver, SolarSystem, SPRING_EQUINOX, SUMMER_SOLSTICE, SUN, TRANSIT_EVENT, WINTER_SOLSTICE
+  AstroEvent, EventFinder, FALL_EQUINOX, FIRST_QUARTER, FULL_MOON, JUPITER, LAST_QUARTER, MARS, MERCURY, MOON,
+  NEW_MOON, RISE_EVENT, SATURN, SET_EVENT, SkyObserver, SolarSystem, SPRING_EQUINOX, SUMMER_SOLSTICE, SUN,
+  TRANSIT_EVENT, VENUS, WINTER_SOLSTICE
 } from '@tubular/astronomy';
 import ttime, { DateAndTime, DateTime, utToTdt } from '@tubular/time';
 import { TzsLocation } from '../timezone-selector/timezone-selector.component';
@@ -44,6 +45,7 @@ const MAX_SAVED_LOCATIONS = 10;
 
 const prague = $localize`Prague, CZE`;
 const defaultSettings = {
+  additionalPlanets: false,
   collapsed: false,
   detailedMechanism: false,
   disableDst: true,
@@ -158,13 +160,19 @@ function findCircleRadius(x1: number, y1: number, x2: number, y2: number, x3: nu
   return sqrt(sqr_of_r);
 }
 
+function adjustEcliptic(angle: number): number {
+  return 90 - angle + cos_deg(angle) * 26.6;
+}
+
 function bpKey(key: string): boolean { return !key.startsWith('_'); }
 
 interface BasicPositions {
   _date?: DateTime;
-  _hourOfDay?: number;
-  _referenceTime?: number;
   _endTime?: number;
+  _hourOfDay?: number;
+  _jde?: number;
+  _jdu?: number;
+  _referenceTime?: number;
   handAngle: number;
   moonAngle: number;
   moonHandAngle: number;
@@ -253,6 +261,7 @@ export class AppComponent implements OnInit, SettingsHolder {
       url: `assets/about${localeSuffix}.html` }
   ];
 
+  additionalPlanets = false;
   canEditName = false;
   canSaveName = false;
   darkCy: number;
@@ -278,8 +287,11 @@ export class AppComponent implements OnInit, SettingsHolder {
   innerSunriseAngle: number = null;
   inputLength = 0;
   inputName: string;
+  jupiterAngle = 0;
   lastHeight = -1;
+  marsAngle = 0;
   midnightSunR = 0;
+  mercuryAngle = 0;
   moonAngle = 0;
   moonHandAngle = 0;
   moonPhase = 0;
@@ -291,6 +303,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   recentLocations: TzsLocation[] = [];
   riseSetFontSize = '15px';
   rotateSign = 1;
+  saturnAngle = 0;
   siderealAngle = 0;
   solNoctisPath = '';
   southern = false;
@@ -306,6 +319,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   true_moonPhase = 0;
   true_siderealAngle = 0;
   true_sunAngle = 0;
+  venusAngle = 0;
 
   @ViewChild('advancedOptions', { static: true }) advancedOptions: AdvancedOptionsComponent;
 
@@ -1006,8 +1020,15 @@ export class AppComponent implements OnInit, SettingsHolder {
     const dayLength = this.sunsetB.ut - this.sunsetA.ut;
     const bohemianHour = (jdu - this.sunsetA.ut) / dayLength * 24;
     const basicPositions = this.calculateBasicPositions(this.time);
+    const jde = basicPositions._jde;
 
     forEach(basicPositions as any, (key, value) => bpKey(key) && ((this as any)['true_' + key] = value));
+
+    this.mercuryAngle = adjustEcliptic(this.solarSystem.getEclipticPosition(MERCURY, jde).longitude.degrees);
+    this.venusAngle = adjustEcliptic(this.solarSystem.getEclipticPosition(VENUS, jde).longitude.degrees);
+    this.marsAngle = adjustEcliptic(this.solarSystem.getEclipticPosition(MARS, jde).longitude.degrees);
+    this.jupiterAngle = adjustEcliptic(this.solarSystem.getEclipticPosition(JUPITER, jde).longitude.degrees);
+    this.saturnAngle = adjustEcliptic(this.solarSystem.getEclipticPosition(SATURN, jde).longitude.degrees);
 
     if (this.timing !== Timing.MODERN) {
       if (!this.timingReference || this.time < this.timingReference._referenceTime ||
@@ -1028,22 +1049,22 @@ export class AppComponent implements OnInit, SettingsHolder {
   }
 
   private calculateBasicPositions(time: number): BasicPositions {
-    const jdu = julianDay(time);
-    const jde = utToTdt(jdu);
+    const _jdu = julianDay(time);
+    const _jde = utToTdt(_jdu);
     const _date = new DateTime(time, this.zone);
     const wt = this.lastWallTime = _date.wallTime;
     const _hourOfDay = wt.hour + wt.minute / 60 -
       (this.disableDst || this.timing !== Timing.MODERN ? wt.dstOffset / 3600 : 0);
     const handAngle = _hourOfDay * 15 - 180;
-    const baseSunAngle = this.solarSystem.getEclipticPosition(SUN, jde).longitude.degrees;
-    const baseMoonAngle = this.solarSystem.getEclipticPosition(MOON, jde).longitude.degrees;
-    const sunAngle = 90 - baseSunAngle + cos_deg(baseSunAngle) * 26.6;
-    const moonAngle = 90 - baseMoonAngle + cos_deg(baseMoonAngle) * 26.6;
-    const siderealAngle = this.observer.getLocalHourAngle(jdu, true).degrees - 90;
+    const baseSunAngle = this.solarSystem.getEclipticPosition(SUN, _jde).longitude.degrees;
+    const baseMoonAngle = this.solarSystem.getEclipticPosition(MOON, _jde).longitude.degrees;
+    const sunAngle = adjustEcliptic(baseSunAngle);
+    const moonAngle = adjustEcliptic(baseMoonAngle);
+    const siderealAngle = this.observer.getLocalHourAngle(_jdu, true).degrees - 90;
     const moonPhase = mod((baseMoonAngle - baseSunAngle) * this.rotateSign, 360);
     const moonHandAngle = AppComponent.calculateMoonHandAngle(moonAngle, siderealAngle);
 
-    return { _hourOfDay, _date, handAngle, moonAngle, moonHandAngle, moonPhase, siderealAngle, sunAngle };
+    return { _jde, _jdu, _hourOfDay, _date, handAngle, moonAngle, moonHandAngle, moonPhase, siderealAngle, sunAngle };
   }
 
   private calculateMechanicalPositions(time: number, ref: BasicPositions): BasicPositions {
