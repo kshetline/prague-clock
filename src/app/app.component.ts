@@ -1,8 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService, PrimeNGConfig } from 'primeng/api';
-import {
-  abs, atan2_deg, atan_deg, cos_deg, floor, max, min, mod, mod2, PI, Point, sign, sin_deg, sqrt, tan_deg
-} from '@tubular/math';
+import { abs, atan2_deg, atan_deg, cos_deg, floor, max, min, mod, mod2, PI, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
 import { clone, forEach, getCssValue, isEqual, isLikelyMobile, isSafari, processMillis } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import {
@@ -10,14 +8,13 @@ import {
   SkyObserver, SolarSystem, SPRING_EQUINOX, SUMMER_SOLSTICE, SUN, TRANSIT_EVENT, WINTER_SOLSTICE
 } from '@tubular/astronomy';
 import ttime, { DateAndTime, DateTime, utToTdt } from '@tubular/time';
-import julianDay = ttime.julianDay;
 import { TzsLocation } from '../timezone-selector/timezone-selector.component';
 import { Globe } from '../globe/globe';
 import { localeSuffix, SOUTH_NORTH, specificLocale, WEST_EAST } from '../locales/locale-info';
 import { faForward, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
+import { AdvancedOptionsComponent, SettingsHolder, Timing } from '../advanced-options/advanced-options.component';
+import julianDay = ttime.julianDay;
 import DATETIME_LOCAL = ttime.DATETIME_LOCAL;
-import { AdvancedOptionsComponent, SettingsHolder } from '../advanced-options/advanced-options.component';
-import DATETIME_LOCAL_SECONDS = ttime.DATETIME_LOCAL_SECONDS;
 
 const CLOCK_RADIUS = 250;
 const INCLINATION = 23.5;
@@ -32,6 +29,7 @@ const MAX_UNEVEN_HOUR_LATITUDE = 86;
 const RESUME_FILTERING_DELAY = 1000;
 const STOP_FILTERING_DELAY = isSafari() ? 1000 : 3000;
 const MILLIS_PER_DAY = 86_400_000;
+const RECOMPUTED_WHEN_NEEDED: null = null;
 
 interface CircleAttributes {
   cy: number;
@@ -50,11 +48,11 @@ const defaultSettings = {
   detailedMechanism: false,
   disableDst: true,
   eventType: EventType.EQUISOLSTICE,
+  fasterGraphics: true,
   hideMap: false,
   isoFormat: false,
   latitude: 50.0870,
   longitude: 14.4185,
-  mechanicalTiming: false,
   placeName: prague,
   post2018: true,
   recentLocations: [{
@@ -65,6 +63,7 @@ const defaultSettings = {
     zone: 'Europe/Prague'
   }] as TzsLocation[],
   suppressOsKeyboard: false,
+  timing: Timing.MODERN,
   trackTime: true,
   translucentEcliptic: false,
   zone: 'Europe/Prague'
@@ -164,6 +163,7 @@ interface BasicPositions {
   _date?: DateTime;
   _hourOfDay?: number;
   _referenceTime?: number;
+  _endTime?: number;
   handAngle: number;
   moonAngle: number;
   moonHandAngle: number;
@@ -185,6 +185,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   DD = AngleStyle.DD;
   DDD = AngleStyle.DDD;
   FAST = PlaySpeed.FAST;
+  MODERN = Timing.MODERN;
   MAX_YEAR = 2399;
   MIN_YEAR = 1400;
   NORMAL = PlaySpeed.NORMAL;
@@ -217,7 +218,6 @@ export class AppComponent implements OnInit, SettingsHolder {
   private lastWallTime: DateAndTime;
   private _latitude = 50.0870;
   private _longitude = 14.4185;
-  private _mechanicalTiming = false;
   private observer: SkyObserver;
   private _playing = false;
   private playTimeBase: number;
@@ -229,7 +229,8 @@ export class AppComponent implements OnInit, SettingsHolder {
   private _suppressOsKeyboard = false;
   private _time = 0;
   private timeCheck: any;
-  private timingReference: BasicPositions;
+  private _timing = Timing.MODERN;
+  private timingReference: BasicPositions| null | undefined;
   private _trackTime = false;
   private _zone = 'Europe/Prague';
   private zoneFixTimeout: any;
@@ -265,6 +266,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   duskLabelPath: string;
   duskTextOffset: number;
   equatorSunriseAngle: number = null;
+  fasterGraphics = true;
   handAngle = 0;
   hourStroke = 2;
   horizonCy: number;
@@ -305,9 +307,17 @@ export class AppComponent implements OnInit, SettingsHolder {
 
   @ViewChild('advancedOptions', { static: true }) advancedOptions: AdvancedOptionsComponent;
 
-  get filterEcliptic(): string { return 'url("#filterEcliptic")'; } // TODO put back
-  get filterHand(): string { return 'url("#filterHand")'; }
-  get filterRelief(): string { return 'url("#filterRelief")'; }
+  get filterEcliptic(): string {
+    return this.fasterGraphics && (!this.svgFilteringOn || this.playing) ? null : 'url("#filterEcliptic")';
+  }
+
+  get filterHand(): string {
+    return this.fasterGraphics && (!this.svgFilteringOn || this.playing) ? null : 'url("#filterHand")';
+  }
+
+  get filterRelief(): string {
+    return this.fasterGraphics &&  (!this.svgFilteringOn || this.playing) ? null : 'url("#filterRelief")';
+  }
 
   constructor(
     private confirmService: ConfirmationService,
@@ -326,6 +336,7 @@ export class AppComponent implements OnInit, SettingsHolder {
       settings = JSON.parse(localStorage.getItem('pac-settings') ?? 'null');
 
       if (settings?.recentLocations && settings.recentLocations.length > 0) {
+        delete settings.constrainedSun;
         settings.recentLocations.forEach((loc: any) => { loc.name = loc.name || loc.placeName; delete loc.placeName; });
         settings.recentLocations[0].name = prague;
       }
@@ -355,9 +366,6 @@ export class AppComponent implements OnInit, SettingsHolder {
     this.globe = new Globe('globe-host');
     this.globe.setColorScheme(this.post2018);
     this.adjustLatitude();
-
-    if (this.mechanicalTiming)
-      this.adjustMechanicalTimingReference();
 
     this.setNow();
     this.placeName = placeName;
@@ -484,13 +492,13 @@ export class AppComponent implements OnInit, SettingsHolder {
     }
   }
 
-  get mechanicalTiming(): boolean { return this._mechanicalTiming; }
-  set mechanicalTiming(value: boolean) {
-    if (this._mechanicalTiming !== value) {
-      this._mechanicalTiming = value;
+  get timing(): Timing { return this._timing; }
+  set timing(value: Timing) {
+    if (this._timing !== value) {
+      this._timing = value;
 
-      if (value && this.observer)
-        this.adjustMechanicalTimingReference();
+      if (value !== Timing.MODERN)
+        this.timingReference = RECOMPUTED_WHEN_NEEDED;
       else
         this.timingReference = undefined;
 
@@ -498,11 +506,34 @@ export class AppComponent implements OnInit, SettingsHolder {
     }
   }
 
-  private adjustMechanicalTimingReference(): void {
-    const t = floor(Date.now() / 60000) * 60000;
+  private clearTimingReferenceIfNeeded(): void {
+    if (this.timing !== Timing.MODERN)
+      this.timingReference = RECOMPUTED_WHEN_NEEDED;
+  }
 
-    this.timingReference = this.calculateBasicPositions(t);
-    this.timingReference._referenceTime = t;
+  private adjustMechanicalTimingReference(): void {
+    if (this.timing === Timing.MODERN) {
+      this.timingReference = undefined;
+      return;
+    }
+
+    const date = new DateTime(this.time, this.zone);
+    const wt = date.wallTime;
+    let refTime: number;
+    let endTime: number;
+
+    if (this.timing === Timing.MECHANICAL_UPDATED) {
+      refTime = new DateTime([wt.y, 1, 1], this.zone).utcMillis;
+      endTime = new DateTime([wt.y + 1, 1, 1], this.zone).utcMillis;
+    }
+    else {
+      refTime = new DateTime([wt.y, wt.m - (wt.m % 3), 1], this.zone).utcMillis;
+      endTime = new DateTime([wt.y, wt.m - (wt.m % 3), 1], this.zone).add('months', 3).utcMillis;
+    }
+
+    this.timingReference = this.calculateBasicPositions(refTime);
+    this.timingReference._referenceTime = refTime;
+    this.timingReference._endTime = endTime;
   }
 
   get playing(): boolean { return this._playing; }
@@ -616,6 +647,7 @@ export class AppComponent implements OnInit, SettingsHolder {
       if (this.initDone) {
         this.placeName = '';
         this.updateObserver();
+        this.clearTimingReferenceIfNeeded();
         this.updateTime(true);
         this.updateGlobe();
       }
@@ -630,7 +662,7 @@ export class AppComponent implements OnInit, SettingsHolder {
       if (this.initDone) {
         this.placeName = '';
         this.updateObserver();
-        this.adjustMechanicalTimingReference();
+        this.clearTimingReferenceIfNeeded();
         this.updateTime(true);
       }
     }
@@ -734,6 +766,7 @@ export class AppComponent implements OnInit, SettingsHolder {
 
     this.southern = (this._latitude < 0);
     this.rotateSign = (this.southern ? -1 : 1);
+    this.clearTimingReferenceIfNeeded();
     this.updateObserver();
     this.placeName = '';
     ({ cy: this.horizonCy, d: this.horizonPath, r: this.horizonR } = this.getAltitudeCircle(0, true));
@@ -974,24 +1007,22 @@ export class AppComponent implements OnInit, SettingsHolder {
 
     forEach(basicPositions as any, (key, value) => bpKey(key) && ((this as any)['true_' + key] = value));
 
-    if (this.timingReference)
-      forEach(AppComponent.calculateMechanicalPositions(this.time, this.timingReference) as any,
+    if (this.timing !== Timing.MODERN) {
+      if (!this.timingReference || this.time < this.timingReference._referenceTime ||
+          this.time >= this.timingReference._endTime)
+        this.adjustMechanicalTimingReference();
+
+      forEach(this.calculateMechanicalPositions(this.time, this.timingReference) as any,
         (key, value) => bpKey(key) && ((this as any)[key] = value));
+    }
     else
       forEach(basicPositions as any, (key, value) => bpKey(key) && ((this as any)[key] = value));
 
     const format = this.isoFormat ? DATETIME_LOCAL : 'ISS{year:numeric,month:2-digit,day:2-digit,hour:2-digit}';
 
     this.timeText = basicPositions._date.format(format);
+    this.timeText = this.isoFormat ? this.timeText.replace('T', '\xA0') : this.timeText;
     this.outerRingAngle = 180 - (bohemianHour - basicPositions._hourOfDay) * 15;
-
-    console.log({ // TODO remove
-      time: basicPositions._date.format(DATETIME_LOCAL_SECONDS),
-      ref: this.timingReference ? new DateTime(this.timingReference._referenceTime).format(DATETIME_LOCAL_SECONDS) : null,
-      dS: (mod2(this.sunAngle - this.true_sunAngle, 360) / 360 * 1440).toFixed(2) + ' minutes',
-      dM: mod2(this.moonAngle - this.true_moonAngle, 360).toFixed(2) + '°',
-      dP: (mod2(this.moonPhase - this.true_moonPhase, 360) / 360 * 29.53059).toFixed(2) + ' days'
-    });
   }
 
   private calculateBasicPositions(time: number): BasicPositions {
@@ -999,7 +1030,8 @@ export class AppComponent implements OnInit, SettingsHolder {
     const jde = utToTdt(jdu);
     const _date = new DateTime(time, this.zone);
     const wt = this.lastWallTime = _date.wallTime;
-    const _hourOfDay = wt.hour + wt.minute / 60 - (this.disableDst || this.mechanicalTiming ? wt.dstOffset / 3600 : 0);
+    const _hourOfDay = wt.hour + wt.minute / 60 -
+      (this.disableDst || this.timing !== Timing.MODERN ? wt.dstOffset / 3600 : 0);
     const handAngle = _hourOfDay * 15 - 180;
     const baseSunAngle = this.solarSystem.getEclipticPosition(SUN, jde).longitude.degrees;
     const baseMoonAngle = this.solarSystem.getEclipticPosition(MOON, jde).longitude.degrees;
@@ -1012,10 +1044,11 @@ export class AppComponent implements OnInit, SettingsHolder {
     return { _hourOfDay, _date, handAngle, moonAngle, moonHandAngle, moonPhase, siderealAngle, sunAngle };
   }
 
-  private static calculateMechanicalPositions(time: number, ref: BasicPositions): BasicPositions {
+  private calculateMechanicalPositions(time: number, ref: BasicPositions): BasicPositions {
     const deltaDays = (time - ref._referenceTime) / MILLIS_PER_DAY;
     const deltaSiderealDays = deltaDays * 366 / 365;
-    const deltaMoonDays = deltaDays * 366 / 379;
+    // The moon is off by about one day every three months with the original 366 / 379 gear ratio.
+    const deltaMoonDays = deltaDays * (this.timing === Timing.MECHANICAL_ORIGINAL ? 366 / 379 : 0.966137);
     const phaseCycles = deltaMoonDays * 2 / 57;
     const handAngle = mod(ref.handAngle + deltaDays * 360, 360);
     const moonHandAngle = mod(ref.moonHandAngle + deltaMoonDays * 360, 360);
@@ -1040,7 +1073,7 @@ export class AppComponent implements OnInit, SettingsHolder {
     return 90 + atan2_deg(y, x) + siderealAngle;
   }
 
-  private static calculateEclipticAngleFromHandAngle(handAngle: number, siderealAngle: number, check?: number): number {
+  private static calculateEclipticAngleFromHandAngle(handAngle: number, siderealAngle: number): number {
     let result: number;
     const t = mod2(handAngle - siderealAngle, 360);
 
@@ -1060,18 +1093,11 @@ export class AppComponent implements OnInit, SettingsHolder {
       const b = 2 * M * B;
       const R2 = ECLIPTIC_INNER_RADIUS ** 2;
       const c = B ** 2 - R2;
-      const x = (-b + sqrt(b ** 2 - 4 * a * c)) / 2 / a;
-      const y = sqrt(R2 - x ** 2);
+      const root = sqrt(b ** 2 - 4 * a * c);
+      const x = (-b + root) / 2 / a;
+      const y = sqrt(R2 - x ** 2) * (abs(t) > 66.173 ? -1 : 1);
 
-      result = atan2_deg(x, y);
-
-      if (check !== null) {
-        const dif = mod2(result - check, 360);
-        if (abs(dif) > 0.01)
-          console.log('bad', abs(mod2(check, 360)) > 90, mod(result, 360), mod(check, 360), dif, t);
-        else
-          console.log('good!', mod(result, 360), mod(check, 360), t);
-      }
+      result = atan2_deg(x, y) * sign(t);
     }
 
     return result;

@@ -98,7 +98,7 @@ p-toast, p-confirmDialog {
     padding: 0.125em;
   }
 
-  i.pi-bars {
+  i.pi-bars, i.pi-plus {
     cursor: pointer;
     padding: 0.5em;
     position: absolute;
@@ -110,6 +110,10 @@ p-toast, p-confirmDialog {
     &.collapsed {
       opacity: 0;
     }
+  }
+
+  i.pi-plus {
+    left: 2em;
   }
 
   i.pi-chevron-down {

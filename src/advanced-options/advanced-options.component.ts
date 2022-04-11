@@ -1,10 +1,13 @@
 import { Component, ElementRef } from '@angular/core';
 
+export enum Timing { MODERN, MECHANICAL_ORIGINAL, MECHANICAL_UPDATED }
+
 export interface SettingsHolder {
   detailedMechanism: boolean;
+  fasterGraphics: boolean;
   hideMap: boolean;
-  mechanicalTiming: boolean;
   post2018: boolean;
+  timing: Timing;
   translucentEcliptic: boolean;
 }
 
@@ -14,6 +17,10 @@ export interface SettingsHolder {
   styleUrls: ['./advanced-options.component.scss']
 })
 export class AdvancedOptionsComponent {
+  MODERN = Timing.MODERN;
+  MECHANICAL_ORIGINAL = Timing.MECHANICAL_ORIGINAL;
+  MECHANICAL_UPDATED = Timing.MECHANICAL_UPDATED;
+
   private shown = false;
 
   settingsHolder: SettingsHolder;

@@ -4,6 +4,7 @@
     [class.collapsed]="collapsed">
   <p-menu #menu [popup]="true" [model]="menuItems" appendTo="body"></p-menu>
   <i class="pi pi-bars" (click)="menu.toggle($event)" [class.collapsed]="collapsed"></i>
+  <i class="pi pi-plus" (click)="advancedOptions.show()" [class.collapsed]="collapsed"></i>
   <i class="pi pi-chevron-down" (click)="collapsed = !collapsed" [class.collapsed]="collapsed"></i>
   <div class="place-name-group" [class.collapsed]="collapsed">
     <span *ngIf="!canSaveName && placeName" class="place-name">{{placeName}}</span>
@@ -37,7 +38,7 @@
   <div class="button-row">
     <p-checkbox [(ngModel)]="isoFormat" [binary]="true"
         i18n-label label="ISO time format"></p-checkbox>
-    <p-checkbox [(ngModel)]="disableDst" [binary]="true" [disabled]="mechanicalTiming"
+    <p-checkbox [(ngModel)]="disableDst" [binary]="true" [disabled]="timing !== MODERN"
         i18n-label label="Disable DST on clock" (onChange)="updateTime(true)"></p-checkbox>
   </div>
   <tze-zone-selector [(ngModel)]="zone" [recents]="recentLocations" (clearItem)='clearItem($event)' (clearRecents)="clearRecents()"

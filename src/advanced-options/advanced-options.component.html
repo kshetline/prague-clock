@@ -17,5 +17,13 @@
 <p-checkbox [(ngModel)]="settingsHolder.detailedMechanism" [binary]="true"
     i18n-label label="Mechanically detailed"></p-checkbox>
 
-<p-checkbox [(ngModel)]="settingsHolder.mechanicalTiming" [binary]="true"
-    i18n-label label="Emulate mechanical timekeeping"></p-checkbox>
+<p-checkbox [(ngModel)]="settingsHolder.fasterGraphics" [binary]="true"
+    i18n-label label="Faster graphics / less shading"></p-checkbox>
+
+<div class="spacer">&nbsp;</div>
+<p-radioButton [value]="MODERN" [(ngModel)]="settingsHolder.timing"
+    i18n-label label="Astronomically-accurate, non-mechanical timing"></p-radioButton>
+<p-radioButton [value]="MECHANICAL_ORIGINAL" [(ngModel)]="settingsHolder.timing"
+    i18n-label label="Original mechanical timing, recalibrated quarterly"></p-radioButton>
+<p-radioButton [value]="MECHANICAL_UPDATED" [(ngModel)]="settingsHolder.timing"
+    i18n-label label="Updated mechanical timing, recalibrated yearly"></p-radioButton>
