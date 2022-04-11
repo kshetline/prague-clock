@@ -7,6 +7,7 @@ export interface SettingsHolder {
   fasterGraphics: boolean;
   hideMap: boolean;
   post2018: boolean;
+  realPositionMarkers: boolean;
   timing: Timing;
   translucentEcliptic: boolean;
 }

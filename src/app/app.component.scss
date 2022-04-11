@@ -603,3 +603,14 @@ svg {
     border: 2px $gold-trim solid;
   }
 }
+
+#moon-true, #sun-true {
+  stroke-width: 0.5;
+  stroke: #4D4D4D;
+
+  text {
+    fill: black;
+    font: 9px Arial, sans-serif;
+    text-anchor: middle;
+  }
+}

@@ -55,6 +55,7 @@ const defaultSettings = {
   longitude: 14.4185,
   placeName: prague,
   post2018: true,
+  realPositionMarkers: false,
   recentLocations: [{
     lastTimeUsed: 0,
     latitude: 50.0870,
@@ -286,6 +287,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   outerSunriseAngle: number = null;
   placeName = 'Prague, CZE';
   playSpeed = PlaySpeed.NORMAL;
+  realPositionMarkers = false;
   recentLocations: TzsLocation[] = [];
   riseSetFontSize = '15px';
   rotateSign = 1;

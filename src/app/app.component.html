@@ -369,6 +369,13 @@
   <div id="globe-host"></div>
 
   <svg viewBox="0 0 600 600" xml:space="preserve" class="svg-overlay" [class.controls-collapsed]="collapsed">
+    <defs>
+      <radialGradient cx="25%" cy="25%" r="65%" id="sphere-effect">
+        <stop offset="0%" stop-color="rgba(255, 255, 255, 0.5)"/>
+        <stop offset="40%" stop-color="rgba(255, 255, 255, 0)"/>
+        <stop offset="100%" stop-color="rgba(0, 0, 0, 0.25)"/>
+      </radialGradient>
+    </defs>
     <g transform="translate(300, 300)" class="content">
       <g id="frontPart">
         <g [attr.filter]="filterHand">
@@ -620,8 +627,10 @@
                     </g>
                   </g>
                 </g>
-                <g id="sun_true" [attr.transform]="rotate(true_sunAngle * rotateSign)">
-                  <circle cx="0" cy="-178.9" r="3" fill="yellow"/>
+                <g *ngIf="realPositionMarkers" id="sun-true" [attr.transform]="rotate(true_sunAngle * rotateSign)">
+                  <circle cx="0" cy="-178.9" r="7" fill="yellow"/>
+                  <circle cx="0" cy="-178.9" r="7" fill="url('#sphere-effect')"/>
+                  <text x="0" y="-176.5" width="7" height="7">☉</text>
                 </g>
               </g>
             </g>
@@ -656,8 +665,10 @@
                     </g>
                   </g>
                 </g>
-                <g id="moon_true" [attr.transform]="rotate(true_moonAngle * rotateSign)">
-                  <circle cx="0" cy="-178.9" r="3" fill="white"/>
+                <g *ngIf="realPositionMarkers" id="moon-true" [attr.transform]="rotate(true_moonAngle * rotateSign)">
+                  <circle cx="0" cy="-178.9" r="7" fill="white"/>
+                  <circle cx="0" cy="-178.9" r="7" fill="url('#sphere-effect')"/>
+                  <text x="0" y="-176.5" width="7" height="7">☽</text>
                 </g>
               </g>
             </g>
