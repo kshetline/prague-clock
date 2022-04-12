@@ -227,20 +227,34 @@ svg {
   top: 0;
 }
 
-.info-error-panel {
+.info-panel {
+  align-items: baseline;
   background-color: $controls-background;
   color: $controls-text;
   display: grid;
-  font: 14px sans-serif;
+  font: 14px Arial, sans-serif;
   gap: 0.33em;
   grid-template-columns: auto auto auto auto;
-  padding: 0.5em;
+  padding: 0.5em 2.5em 0.5em 0.5em;
+  position: relative;
+
+  .closer {
+    cursor: pointer;
+    padding: 0.5em;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
 
   span {
     text-align: end;
   }
 
-  span:nth-child(4n) {
+  span:nth-child(4n+3), span:nth-child(4n+4) {
+    font: 12.5px Verdana, sans-serif;
+  }
+
+  span:nth-child(4n + 1) {
     text-align: start;
   }
 }

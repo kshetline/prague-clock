@@ -9,7 +9,7 @@ export interface SettingsHolder {
   hideMap: boolean;
   post2018: boolean;
   realPositionMarkers: boolean;
-  showErrorValues: boolean;
+  showInfoPanel: boolean;
   timing: Timing;
   translucentEcliptic: boolean;
 }

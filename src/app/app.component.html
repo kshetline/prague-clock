@@ -1,5 +1,26 @@
-<ng-template #infoErrorPanel> <!-- *ngIf="showErrorValues && timing !== MODERN" -->
-  <div class="info-error-panel">
+<ng-template #infoErrorPanel>
+  <div class="info-panel">
+    <i class="pi pi-times closer" (click)="showInfoPanel = false"></i>
+    <span>{{ zoneOffset }}</span>
+    <span>{{ localTime }}</span>
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+    <span i18n>Local mean time:</span>
+    <span>{{ localMeanTime }}</span>
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+    <span i18n>Local solar time:</span>
+    <span>{{ localSolarTime }}</span>
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+    <span i18n>Sidereal time:</span>
+    <span>{{ siderealTime }}</span>
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
+    <span i18n>Bohemian time:</span>
+    <span>{{ bohemianTime }}</span>
+    <span>&nbsp;</span>
+    <span>&nbsp;</span>
     <span i18n>Moon phase error:</span>
     <span>{{ errorPhase | number: '1.1-1' }}°,</span>
     <span>{{ errorPhaseDays | number: '1.1-1' }}</span>
@@ -82,7 +103,7 @@
 
   <app-advanced-options #advancedOptions></app-advanced-options>
 
-  <div *ngIf="showErrorValues && timing !== MODERN" class="below-control-panel">
+  <div *ngIf="showInfoPanel && !collapsed" class="below-control-panel">
     <ng-container *ngTemplateOutlet="infoErrorPanel"></ng-container>
   </div>
 </div>
@@ -731,7 +752,7 @@
     </g>
   </svg>
 
-  <div *ngIf="showErrorValues && timing !== MODERN" class="svg-info-overlay">
+  <div *ngIf="showInfoPanel" class="svg-info-overlay" [style.display]="showInfoPanel && collapsed ? 'block' : null">
     <ng-container *ngTemplateOutlet="infoErrorPanel"></ng-container>
   </div>
 </div>

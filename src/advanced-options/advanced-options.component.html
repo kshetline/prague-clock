@@ -15,7 +15,7 @@
     i18n-label label="Translucent ecliptic"></p-checkbox>
 
 <p-checkbox [(ngModel)]="settingsHolder.detailedMechanism" [binary]="true"
-    i18n-label label="Mechanically detailed"></p-checkbox>
+    i18n-label label="Mechanically detailed clock face"></p-checkbox>
 
 <p-checkbox [(ngModel)]="settingsHolder.fasterGraphics" [binary]="true"
     i18n-label label="Faster graphics / less shading"></p-checkbox>
@@ -25,6 +25,8 @@
 
 <p-checkbox [(ngModel)]="settingsHolder.additionalPlanets" [binary]="true"
     i18n-label label="Additional planet markers"></p-checkbox>
+<p-checkbox [(ngModel)]="settingsHolder.showInfoPanel" [binary]="true"
+    i18n-label label="Show info panel"></p-checkbox>
 
 <div class="spacer">&nbsp;</div>
 <p-radioButton [value]="MODERN" [(ngModel)]="settingsHolder.timing"
@@ -33,6 +35,3 @@
     i18n-label label="Pre-1866 mechanical timing, recalibrated quarterly"></p-radioButton>
 <p-radioButton [value]="MECHANICAL_UPDATED" [(ngModel)]="settingsHolder.timing"
     i18n-label label="Updated mechanical timing, recalibrated yearly"></p-radioButton>
-<p-checkbox [(ngModel)]="settingsHolder.showErrorValues" [binary]="true"
-    [disabled]="settingsHolder.timing === MODERN"
-    i18n-label label="Show error values"></p-checkbox>

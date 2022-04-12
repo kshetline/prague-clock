@@ -10,14 +10,14 @@ import {
   NEW_MOON, RISE_EVENT, SATURN, SET_EVENT, SkyObserver, SolarSystem, SPRING_EQUINOX, SUMMER_SOLSTICE, SUN,
   TRANSIT_EVENT, VENUS, WINTER_SOLSTICE
 } from '@tubular/astronomy';
-import ttime, { DateAndTime, DateTime, utToTdt } from '@tubular/time';
+import ttime, { DateAndTime, DateTime, Timezone, utToTdt } from '@tubular/time';
 import { TzsLocation } from '../timezone-selector/timezone-selector.component';
 import { Globe } from '../globe/globe';
 import { localeSuffix, SOUTH_NORTH, specificLocale, WEST_EAST } from '../locales/locale-info';
 import { faForward, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 import { AdvancedOptionsComponent, SettingsHolder, Timing } from '../advanced-options/advanced-options.component';
-import julianDay = ttime.julianDay;
-import DATETIME_LOCAL = ttime.DATETIME_LOCAL;
+
+const { DATETIME_LOCAL, julianDay, TIME } = ttime;
 
 const CLOCK_RADIUS = 250;
 const INCLINATION = 23.5;
@@ -67,7 +67,7 @@ const defaultSettings = {
     name: prague,
     zone: 'Europe/Prague'
   }] as TzsLocation[],
-  showErrorValues: false,
+  showInfoPanel: false,
   suppressOsKeyboard: false,
   timing: Timing.MODERN,
   trackTime: true,
@@ -219,6 +219,19 @@ interface BasicPositions {
   sunAngle: AngleTriplet;
 }
 
+function formatTimeOfDay(hours: number, force24 = false, zeroIs24 = false): string {
+  const minutes = min(floor(hours * 60 + 0.001), 1439);
+  const hour = floor(minutes / 60);
+  const minute = minutes % 60;
+  const format = force24 ? TIME : 'IxS{hour:2-digit}';
+  let time = new DateTime([1970, 1, 1, hour, minute], 'UTC', specificLocale).format(format);
+
+  if (zeroIs24)
+    time = time.replace(/^00/, '24');
+
+  return time;
+}
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -265,6 +278,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   private lastSavedSettings: any = null;
   private lastWallTime: DateAndTime;
   private _latitude = 50.0870;
+  private localTimezone = Timezone.OS_ZONE;
   private _longitude = 14.4185;
   private observer: SkyObserver;
   private _playing = false;
@@ -301,6 +315,7 @@ export class AppComponent implements OnInit, SettingsHolder {
       url: `assets/about${localeSuffix}.html` }
   ];
 
+  bohemianTime = '';
   canEditName = false;
   canSaveName = false;
   darkCy: number;
@@ -336,6 +351,9 @@ export class AppComponent implements OnInit, SettingsHolder {
   inputName: string;
   jupiterAngle = ZeroAngles;
   lastHeight = -1;
+  localMeanTime = '';
+  localSolarTime = '';
+  localTime = '';
   marsAngle = ZeroAngles;
   midnightSunR = 0;
   mercuryAngle = ZeroAngles;
@@ -351,8 +369,9 @@ export class AppComponent implements OnInit, SettingsHolder {
   riseSetFontSize = '15px';
   rotateSign = 1;
   saturnAngle = ZeroAngles;
-  showErrorValues: false;
+  showInfoPanel: false;
   siderealAngle = 0;
+  siderealTime = '';
   solNoctisPath = '';
   southern = false;
   sunAngle = ZeroAngles;
@@ -368,6 +387,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   true_siderealAngle = 0;
   true_sunAngle = ZeroAngles;
   venusAngle = ZeroAngles;
+  zoneOffset = '';
 
   @ViewChild('advancedOptions', { static: true }) advancedOptions: AdvancedOptionsComponent;
 
@@ -724,6 +744,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   set longitude(newValue: number) {
     if (this._longitude !== newValue) {
       this._longitude = newValue;
+      this.localTimezone = Timezone.getTimezone('LMT', this.longitude);
 
       if (this.initDone) {
         this.placeName = '';
@@ -1085,6 +1106,8 @@ export class AppComponent implements OnInit, SettingsHolder {
     const dayLength = this.sunsetB.ut - this.sunsetA.ut;
     const bohemianHour = (jdu - this.sunsetA.ut) / dayLength * 24;
     const basicPositions = this.calculateBasicPositions(this.time);
+    const date = basicPositions._date;
+    const dateLocal = new DateTime(this.time, this.localTimezone);
     const jde = basicPositions._jde;
 
     forEach(basicPositions as any, (key, value) => bpKey(key) && ((this as any)['true_' + key] = value));
@@ -1108,9 +1131,15 @@ export class AppComponent implements OnInit, SettingsHolder {
 
     const format = this.isoFormat ? DATETIME_LOCAL : 'ISS{year:numeric,month:2-digit,day:2-digit,hour:2-digit}';
 
-    this.timeText = basicPositions._date.format(format);
+    this.timeText = date.format(format);
     this.timeText = this.isoFormat ? this.timeText.replace('T', '\xA0') : this.timeText;
     this.outerRingAngle = 180 - (bohemianHour - basicPositions._hourOfDay) * 15;
+    this.zoneOffset = 'UTC' + Timezone.formatUtcOffset(date.utcOffsetSeconds);
+    this.localTime = formatTimeOfDay(date.wallTime.hour + date.wallTime.minute / 60, this.isoFormat);
+    this.localMeanTime = formatTimeOfDay(dateLocal.wallTime.hour + dateLocal.wallTime.minute / 60, this.isoFormat);
+    this.localSolarTime = formatTimeOfDay(this.observer.getApparentSolarTime(jdu).hours, this.isoFormat);
+    this.siderealTime = formatTimeOfDay(mod(this.true_siderealAngle + 90, 360) / 15, true);
+    this.bohemianTime = formatTimeOfDay(bohemianHour, true, true);
 
     this.errorMoon = mod2(this.moonAngle.orig - this.true_moonAngle.orig, 360);
     this.errorMoonDays = this.errorMoon / 360 * 27.321;
