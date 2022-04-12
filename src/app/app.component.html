@@ -2,41 +2,47 @@
   <div class="info-panel">
     <i class="pi pi-times closer" (click)="showInfoPanel = false"></i>
     <span>{{ zoneOffset }}</span>
-    <span>{{ localTime }}</span>
+    <span class="num">{{ localTime }}</span>
     <span>&nbsp;</span>
     <span>&nbsp;</span>
     <span i18n>Local mean time:</span>
-    <span>{{ localMeanTime }}</span>
+    <span class="num">{{ localMeanTime }}</span>
     <span>&nbsp;</span>
     <span>&nbsp;</span>
     <span i18n>Local solar time:</span>
-    <span>{{ localSolarTime }}</span>
+    <span class="num">{{ localSolarTime }}</span>
     <span>&nbsp;</span>
     <span>&nbsp;</span>
     <span i18n>Sidereal time:</span>
-    <span>{{ siderealTime }}</span>
+    <span class="num">{{ siderealTime }}</span>
     <span>&nbsp;</span>
     <span>&nbsp;</span>
     <span i18n>Bohemian time:</span>
-    <span>{{ bohemianTime }}</span>
+    <span class="num">{{ bohemianTime }}</span>
     <span>&nbsp;</span>
     <span>&nbsp;</span>
-    <span i18n>Moon phase error:</span>
-    <span>{{ errorPhase | number: '1.1-1' }}°,</span>
-    <span>{{ errorPhaseDays | number: '1.1-1' }}</span>
-    <span i18n>days</span>
-    <span i18n>Moon ecliptic error:</span>
-    <span>{{ errorMoon | number: '1.1-1' }}°,</span>
-    <span>{{ errorMoonDays | number: '1.1-1' }}</span>
-    <span i18n>days</span>
-    <span i18n>Sidereal time error:</span>
-    <span>{{ errorSidereal | number: '1.1-1' }}°,</span>
-    <span>{{ errorSiderealMinutes | number: '1.1-1' }}</span>
-    <span i18n>minutes</span>
-    <span i18n>Sun hour-angle error:</span>
-    <span>{{ errorSun | number: '1.1-1' }}°,</span>
-    <span>{{ errorSunMinutes | number: '1.1-1' }}</span>
-    <span i18n>minutes</span>
+    <ng-container *ngIf="timing !== MODERN">
+      <span i18n>Last recalibration:</span>
+      <span class="num">{{ lastRecalibration }}</span>
+      <span>&nbsp;</span>
+      <span>&nbsp;</span>
+      <span i18n>Moon phase error:</span>
+      <span class="num">{{ errorPhase | number: '1.1-1' }}°,</span>
+      <span class="num">{{ errorPhaseDays | number: '1.1-1' }}</span>
+      <span i18n class="end">days</span>
+      <span i18n>Moon ecliptic error:</span>
+      <span class="num">{{ errorMoon | number: '1.1-1' }}°,</span>
+      <span class="num">{{ errorMoonDays | number: '1.1-1' }}</span>
+      <span i18n class="end">days</span>
+      <span i18n>Sidereal time error:</span>
+      <span class="num">{{ errorSidereal | number: '1.1-1' }}°,</span>
+      <span class="num">{{ errorSiderealMinutes | number: '1.1-1' }}</span>
+      <span i18n class="end">minutes</span>
+      <span i18n>Sun hour-angle error:</span>
+      <span class="num">{{ errorSun | number: '1.1-1' }}°,</span>
+      <span class="num">{{ errorSunMinutes | number: '1.1-1' }}</span>
+      <span i18n class="end">minutes</span>
+    </ng-container>
   </div>
 </ng-template>
 
@@ -428,7 +434,7 @@
         <g [attr.filter]="filterHand">
           <g [attr.filter]="filterRelief">
             <g *ngIf="detailedMechanism" id="moon-hand" [attr.transform]="rotate(moonHandAngle * rotateSign)"
-                [style.opacity]="translucentEcliptic ? '0.33' : '1'">
+                [style.opacity]="translucentEcliptic ? '0.4' : '1'">
               <use xlink:href="#leverRafieSymbol" class="leverRafieSymbol"/>
               <path d="M0 0L0 -250.0" class="leverRafieSymbol"/>
             </g>

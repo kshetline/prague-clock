@@ -17,7 +17,7 @@ import { localeSuffix, SOUTH_NORTH, specificLocale, WEST_EAST } from '../locales
 import { faForward, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 import { AdvancedOptionsComponent, SettingsHolder, Timing } from '../advanced-options/advanced-options.component';
 
-const { DATETIME_LOCAL, julianDay, TIME } = ttime;
+const { DATE, DATETIME_LOCAL, julianDay, TIME } = ttime;
 
 const CLOCK_RADIUS = 250;
 const INCLINATION = 23.5;
@@ -27,6 +27,7 @@ const EQUATOR_RADIUS = 164.1;
 const HORIZON_RADIUS = CLOCK_RADIUS * tan_deg((90 - INCLINATION) / 2);
 const TROPIC_RADIUS = HORIZON_RADIUS * tan_deg((90 - INCLINATION) / 2);
 const ECLIPTIC_INNER_RADIUS = 161;
+// const ECLIPTIC_OUTER_RADIUS = 178.9;
 const ECLIPTIC_CENTER_OFFSET = 71.1;
 const MAX_UNEVEN_HOUR_LATITUDE = 86;
 const RESUME_FILTERING_DELAY = 1000;
@@ -278,8 +279,8 @@ export class AppComponent implements OnInit, SettingsHolder {
   private lastSavedSettings: any = null;
   private lastWallTime: DateAndTime;
   private _latitude = 50.0870;
-  private localTimezone = Timezone.OS_ZONE;
   private _longitude = 14.4185;
+  private localTimezone = Timezone.getTimezone('LMT', this._longitude);
   private observer: SkyObserver;
   private _playing = false;
   private playTimeBase: number;
@@ -351,6 +352,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   inputName: string;
   jupiterAngle = ZeroAngles;
   lastHeight = -1;
+  lastRecalibration = '';
   localMeanTime = '';
   localSolarTime = '';
   localTime = '';
@@ -538,6 +540,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   set isoFormat(value: boolean) {
     if (this._isoFormat !== value) {
       this._isoFormat = value;
+      this.clearTimingReferenceIfNeeded();
       this.updateTime();
     }
   }
@@ -604,21 +607,23 @@ export class AppComponent implements OnInit, SettingsHolder {
 
     const date = new DateTime(this.time, this.zone);
     const wt = date.wallTime;
-    let refTime: number;
-    let endTime: number;
+    let refTime: DateTime;
+    let endTime: DateTime;
 
     if (this.timing === Timing.MECHANICAL_UPDATED) {
-      refTime = new DateTime([wt.y, 1, 1], this.zone).utcMillis;
-      endTime = new DateTime([wt.y + 1, 1, 1], this.zone).utcMillis;
+      refTime = new DateTime([wt.y, 1, 1], this.zone);
+      endTime = new DateTime([wt.y + 1, 1, 1], this.zone);
     }
     else {
-      refTime = new DateTime([wt.y, wt.m - (wt.m % 3), 1], this.zone).utcMillis;
-      endTime = new DateTime([wt.y, wt.m - (wt.m % 3), 1], this.zone).add('months', 3).utcMillis;
+      refTime = new DateTime([wt.y, wt.m - (wt.m % 3), 1], this.zone);
+      endTime = new DateTime([wt.y, wt.m - (wt.m % 3), 1], this.zone).add('months', 3);
     }
 
-    this.timingReference = this.calculateBasicPositions(refTime);
-    this.timingReference._referenceTime = refTime;
-    this.timingReference._endTime = endTime;
+    this.timingReference = this.calculateBasicPositions(refTime.utcMillis);
+    this.timingReference._referenceTime = refTime.utcMillis;
+    this.timingReference._endTime = endTime.utcMillis;
+    this.lastRecalibration = refTime.format(this.isoFormat ? DATE :
+      'IS{year:numeric,month:2-digit,day:2-digit}', specificLocale);
   }
 
   get additionalPlanets(): boolean { return this._additionalPlanets; }
@@ -1131,7 +1136,7 @@ export class AppComponent implements OnInit, SettingsHolder {
 
     const format = this.isoFormat ? DATETIME_LOCAL : 'ISS{year:numeric,month:2-digit,day:2-digit,hour:2-digit}';
 
-    this.timeText = date.format(format);
+    this.timeText = date.format(format, specificLocale);
     this.timeText = this.isoFormat ? this.timeText.replace('T', '\xA0') : this.timeText;
     this.outerRingAngle = 180 - (bohemianHour - basicPositions._hourOfDay) * 15;
     this.zoneOffset = 'UTC' + Timezone.formatUtcOffset(date.utcOffsetSeconds);
@@ -1225,7 +1230,7 @@ export class AppComponent implements OnInit, SettingsHolder {
     return 90 + atan2_deg(y, x) + siderealAngle;
   }
 
-  private static calculateEclipticAnglesFromHandAngle(handAngle: number, siderealAngle: number): AngleTriplet {
+  private static calculateEclipticAnglesFromHandAngle(handAngle: number, siderealAngle = 0): AngleTriplet {
     let result: number;
     const t = mod2(handAngle - siderealAngle, 360);
 
@@ -1234,10 +1239,9 @@ export class AppComponent implements OnInit, SettingsHolder {
     else if (abs(t - 180) < 0.01)
       result = 180;
     // Avoid tan explosions
-    else if (abs(t - 90) < 0.01)
-      result = 142.83;
-    else if (abs(t + 90) < 0.01)
-      result = -142.83;
+    else if (abs(abs(t) - 90) < 0.001)
+      result = (this.calculateEclipticAnglesFromHandAngle(t - 0.0011).ie +
+                this.calculateEclipticAnglesFromHandAngle(t + 0.0011).ie) / 2;
     else {
       const M = tan_deg(90 - abs(t)); // As in y = mx + b
       const B = -ECLIPTIC_CENTER_OFFSET; // As in y = mx + b

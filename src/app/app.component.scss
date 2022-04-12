@@ -250,11 +250,11 @@ svg {
     text-align: end;
   }
 
-  span:nth-child(4n+3), span:nth-child(4n+4) {
+  span.num {
     font: 12.5px Verdana, sans-serif;
   }
 
-  span:nth-child(4n + 1) {
+  span.end {
     text-align: start;
   }
 }
