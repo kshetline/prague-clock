@@ -172,7 +172,11 @@ interface AngleTriplet {
 const ZeroAngles: AngleTriplet = { ie: 0, oe: 0, orig: 0 };
 
 function adjustEcliptic(angle: number): AngleTriplet {
-  return { orig: angle, ie: 90 - angle + cos_deg(angle) * 26.6, oe: 90 - angle + cos_deg(angle) * 23.97 };
+  return {
+    orig: angle,
+    ie: mod2(90 - angle + cos_deg(angle) * 26.6, 360),
+    oe: mod2(90 - angle + cos_deg(angle) * 23.97, 360)
+  };
 }
 
 function revertEcliptic(angle: number): number {
@@ -246,6 +250,7 @@ export class AppComponent implements OnInit, SettingsHolder {
 
   ISO_OPTS = ['ISO', this.LOCAL_OPTS, { showUtcOffset: true }];
 
+  private _additionalPlanets = false;
   private _collapsed = false;
   private delayedCollapse = false;
   private eventFinder = new EventFinder();
@@ -266,6 +271,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   private playTimeBase: number;
   private playTimeProcessBase: number;
   private _post2018 = false;
+  private _realPositionMarkers = false;
   private solarSystem = new SolarSystem();
   private sunsetA: AstroEvent = null;
   private sunsetB: AstroEvent = null;
@@ -295,7 +301,6 @@ export class AppComponent implements OnInit, SettingsHolder {
       url: `assets/about${localeSuffix}.html` }
   ];
 
-  additionalPlanets = false;
   canEditName = false;
   canSaveName = false;
   darkCy: number;
@@ -337,9 +342,9 @@ export class AppComponent implements OnInit, SettingsHolder {
   moonPhase = 0;
   outerRingAngle = 0;
   outerSunriseAngle: number = null;
+  overlapShift = [0, 0, 0, 0, 0];
   placeName = 'Prague, CZE';
   playSpeed = PlaySpeed.NORMAL;
-  realPositionMarkers = false;
   recentLocations: TzsLocation[] = [];
   riseSetFontSize = '15px';
   rotateSign = 1;
@@ -592,6 +597,22 @@ export class AppComponent implements OnInit, SettingsHolder {
     this.timingReference = this.calculateBasicPositions(refTime);
     this.timingReference._referenceTime = refTime;
     this.timingReference._endTime = endTime;
+  }
+
+  get additionalPlanets(): boolean { return this._additionalPlanets; }
+  set additionalPlanets(value: boolean) {
+    if (this._additionalPlanets !== value) {
+      this._additionalPlanets = value;
+      this.checkPlanetOverlaps();
+    }
+  }
+
+  get realPositionMarkers(): boolean { return this._realPositionMarkers; }
+  set realPositionMarkers(value: boolean) {
+    if (this._realPositionMarkers !== value) {
+      this._realPositionMarkers = value;
+      this.checkPlanetOverlaps();
+    }
   }
 
   get playing(): boolean { return this._playing; }
@@ -1095,6 +1116,32 @@ export class AppComponent implements OnInit, SettingsHolder {
     this.errorPhaseDays = this.errorPhase / 360 * 29.53059;
     this.errorSun = mod2(this.sunAngle.orig - this.true_sunAngle.orig, 360);
     this.errorSunMinutes = this.errorSun / 360 * 1440;
+
+    this.checkPlanetOverlaps();
+  }
+
+  private checkPlanetOverlaps(): void {
+    const angles =
+      [this.mercuryAngle.oe, this.venusAngle.oe, this.marsAngle.oe, this.jupiterAngle.oe, this.saturnAngle.oe, -999, -999];
+
+    if (this.realPositionMarkers) {
+      angles[5] = this.true_sunAngle.oe;
+      angles[6] = this.true_moonAngle.oe;
+    }
+
+    this.overlapShift.fill(0);
+
+    for (let i = 0; i <= 4; ++i) {
+      let maxShift = 0;
+      const angle = angles[i];
+
+      for (let j = i + 1; j <= 6; ++j) {
+        if (abs(mod2(angle - angles[j], 360)) < 2.5)
+          maxShift = max((this.overlapShift[j] || 0) + 3, maxShift);
+      }
+
+      this.overlapShift[i] = maxShift;
+    }
   }
 
   private calculateBasicPositions(time: number): BasicPositions {

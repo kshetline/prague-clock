@@ -627,37 +627,7 @@
                     </g>
                   </g>
                 </g>
-                <g *ngIf="additionalPlanets" id="mercury" [attr.transform]="rotate(mercuryAngle.oe * rotateSign)">
-                  <circle cx="0" cy="-178.9" r="7" fill="#C0C0C0"/>
-                  <circle cx="0" cy="-178.9" r="7" fill="url('#sphere-effect')"/>
-                  <text x="0" y="-176.5" width="7" height="7">☿</text>
-                </g>
-                <g *ngIf="additionalPlanets" id="venus" [attr.transform]="rotate(venusAngle.oe * rotateSign)">
-                  <circle cx="0" cy="-178.9" r="7" fill="#CCCCFF"/>
-                  <circle cx="0" cy="-178.9" r="7" fill="url('#sphere-effect')"/>
-                  <text x="0" y="-176.5" width="7" height="7">♀</text>
-                </g>
-                <g *ngIf="additionalPlanets" id="mars" [attr.transform]="rotate(marsAngle.oe * rotateSign)">
-                  <circle cx="0" cy="-178.9" r="7" fill="red"/>
-                  <circle cx="0" cy="-178.9" r="7" fill="url('#sphere-effect')"/>
-                  <text x="0" y="-176.5" width="7" height="7">♂</text>
-                </g>
-                <g *ngIf="additionalPlanets" id="jupiter" [attr.transform]="rotate(jupiterAngle.oe * rotateSign)">
-                  <circle cx="0" cy="-178.9" r="7" fill="orange"/>
-                  <circle cx="0" cy="-178.9" r="7" fill="url('#sphere-effect')"/>
-                  <text x="0" y="-176.5" width="7" height="7">♃</text>
-                </g>
-                <g *ngIf="additionalPlanets" id="saturn" [attr.transform]="rotate(saturnAngle.oe * rotateSign)">
-                  <circle cx="0" cy="-178.9" r="7" fill="#FFFF99"/>
-                  <circle cx="0" cy="-178.9" r="7" fill="url('#sphere-effect')"/>
-                  <text x="0" y="-176.5" width="7" height="7">♄</text>
-                </g>
-                <g *ngIf="realPositionMarkers" id="sun-true" [attr.transform]="rotate(true_sunAngle.oe * rotateSign)">
-                  <circle cx="0" cy="-178.9" r="7" fill="yellow"/>
-                  <circle cx="0" cy="-178.9" r="7" fill="url('#sphere-effect')"/>
-                  <text x="0" y="-176.5" width="7" height="7">☉</text>
-                </g>
-              </g>
+             </g>
             </g>
           </g>
           <g *ngIf="detailedMechanism" [attr.filter]="filterHand">
@@ -690,7 +660,37 @@
                     </g>
                   </g>
                 </g>
-                <g *ngIf="realPositionMarkers" id="moon-true" [attr.transform]="rotate(true_moonAngle.oe * rotateSign)">
+                <g *ngIf="additionalPlanets" id="mercury" [attr.transform]="rotate(mercuryAngle.oe * rotateSign)">
+                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[0]" r="7" fill="#C0C0C0"/>
+                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[0]" r="7" fill="url('#sphere-effect')"/>
+                  <text x="0" y="-176.5" [attr.dy]="overlapShift[0]" width="7" height="7">☿</text>
+                </g>
+                <g *ngIf="additionalPlanets" id="venus" [attr.transform]="rotate(venusAngle.oe * rotateSign)">
+                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[1]" r="7" fill="#CCCCFF"/>
+                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[1]" r="7" fill="url('#sphere-effect')"/>
+                  <text x="0" y="-176.5" [attr.dy]="overlapShift[1]" width="7" height="7">♀</text>
+                </g>
+                <g *ngIf="additionalPlanets" id="mars" [attr.transform]="rotate(marsAngle.oe * rotateSign)">
+                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[2]" r="7" fill="red"/>
+                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[2]" r="7" fill="url('#sphere-effect')"/>
+                  <text x="0" y="-176.5" [attr.dy]="overlapShift[2]" width="7" height="7">♂</text>
+                </g>
+                <g *ngIf="additionalPlanets" id="jupiter" [attr.transform]="rotate(jupiterAngle.oe * rotateSign)">
+                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[3]" r="7" fill="orange"/>
+                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[3]" r="7" fill="url('#sphere-effect')"/>
+                  <text x="0" y="-176.5" [attr.dy]="overlapShift[3]" width="7" height="7">♃</text>
+                </g>
+                <g *ngIf="additionalPlanets" id="saturn" [attr.transform]="rotate(saturnAngle.oe * rotateSign)">
+                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[4]" r="7" fill="#FFFF99"/>
+                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[4]" r="7" fill="url('#sphere-effect')"/>
+                  <text x="0" y="-176.5" [attr.dy]="overlapShift[4]" width="7" height="7">♄</text>
+                </g>
+                <g *ngIf="realPositionMarkers" id="sun-true" [attr.transform]="rotate(true_sunAngle.oe * rotateSign)">
+                  <circle cx="0" cy="-178.9" r="7" fill="yellow"/>
+                  <circle cx="0" cy="-178.9" r="7" fill="url('#sphere-effect')"/>
+                  <text x="0" y="-176.5" width="7" height="7">☉</text>
+                </g>
+                 <g *ngIf="realPositionMarkers" id="moon-true" [attr.transform]="rotate(true_moonAngle.oe * rotateSign)">
                   <circle cx="0" cy="-178.9" r="7" fill="white"/>
                   <circle cx="0" cy="-178.9" r="7" fill="url('#sphere-effect')"/>
                   <text x="0" y="-176.5" width="7" height="7">☽</text>
