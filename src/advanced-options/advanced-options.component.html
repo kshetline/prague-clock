@@ -33,3 +33,6 @@
     i18n-label label="Original mechanical timing, recalibrated quarterly"></p-radioButton>
 <p-radioButton [value]="MECHANICAL_UPDATED" [(ngModel)]="settingsHolder.timing"
     i18n-label label="Updated mechanical timing, recalibrated yearly"></p-radioButton>
+<p-checkbox [(ngModel)]="settingsHolder.showErrorValues" [binary]="true"
+    [disabled]="settingsHolder.timing === MODERN"
+    i18n-label label="Show error values"></p-checkbox>

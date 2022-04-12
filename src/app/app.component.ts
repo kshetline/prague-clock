@@ -1,6 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService, PrimeNGConfig } from 'primeng/api';
-import { abs, atan2_deg, atan_deg, cos_deg, floor, max, min, mod, mod2, PI, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
+import {
+  abs, atan2_deg, atan_deg, cos_deg, floor, max, min, mod, mod2, PI, Point, sign, sin_deg, sqrt, tan_deg
+} from '@tubular/math';
 import { clone, forEach, getCssValue, isEqual, isLikelyMobile, isSafari, processMillis } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import {
@@ -65,6 +67,7 @@ const defaultSettings = {
     name: prague,
     zone: 'Europe/Prague'
   }] as TzsLocation[],
+  showErrorValues: false,
   suppressOsKeyboard: false,
   timing: Timing.MODERN,
   trackTime: true,
@@ -160,8 +163,39 @@ function findCircleRadius(x1: number, y1: number, x2: number, y2: number, x3: nu
   return sqrt(sqr_of_r);
 }
 
-function adjustEcliptic(angle: number): number {
-  return 90 - angle + cos_deg(angle) * 26.6;
+interface AngleTriplet {
+  ie: number; // outer ecliptic
+  oe?: number; // outer ecliptic
+  orig: number;
+}
+
+const ZeroAngles: AngleTriplet = { ie: 0, oe: 0, orig: 0 };
+
+function adjustEcliptic(angle: number): AngleTriplet {
+  return { orig: angle, ie: 90 - angle + cos_deg(angle) * 26.6, oe: 90 - angle + cos_deg(angle) * 23.97 };
+}
+
+function revertEcliptic(angle: number): number {
+  let a = mod2(angle, 360);
+
+  if (a < -160)
+    a += 360;
+
+  return 8.9999999984614234e+001
+    - 6.6332233812159713e-001 * a
+    + 2.3389691314831506e-011 * a ** 2
+    - 1.5792576669476430e-005 * a ** 3
+    - 6.0222139948410238e-015 * a ** 4
+    + 1.5070052507741876e-009 * a ** 5
+    + 5.9520108482720510e-019 * a ** 6
+    - 9.5776714390600572e-014 * a ** 7
+    - 2.8435133497605280e-023 * a ** 8
+    + 2.4104018034444760e-018 * a ** 9
+    + 7.0399683226780882e-028 * a ** 10
+    - 2.5620395767654543e-023 * a ** 11
+    - 8.6947165717662011e-033 * a ** 12
+    + 9.5219686117688832e-029 * a ** 13
+    + 4.2345499213097502e-038 * a ** 14;
 }
 
 function bpKey(key: string): boolean { return !key.startsWith('_'); }
@@ -174,11 +208,11 @@ interface BasicPositions {
   _jdu?: number;
   _referenceTime?: number;
   handAngle: number;
-  moonAngle: number;
+  moonAngle: AngleTriplet;
   moonHandAngle: number;
   moonPhase: number;
   siderealAngle: number;
-  sunAngle: number;
+  sunAngle: AngleTriplet;
 }
 
 @Component({
@@ -276,6 +310,12 @@ export class AppComponent implements OnInit, SettingsHolder {
   duskLabelPath: string;
   duskTextOffset: number;
   equatorSunriseAngle: number = null;
+  errorMoon = 0;
+  errorMoonDays = 0;
+  errorPhase = 0;
+  errorPhaseDays = 0;
+  errorSun = 0;
+  errorSunMinutes = 0;
   fasterGraphics = true;
   handAngle = 0;
   hourStroke = 2;
@@ -287,12 +327,12 @@ export class AppComponent implements OnInit, SettingsHolder {
   innerSunriseAngle: number = null;
   inputLength = 0;
   inputName: string;
-  jupiterAngle = 0;
+  jupiterAngle = ZeroAngles;
   lastHeight = -1;
-  marsAngle = 0;
+  marsAngle = ZeroAngles;
   midnightSunR = 0;
-  mercuryAngle = 0;
-  moonAngle = 0;
+  mercuryAngle = ZeroAngles;
+  moonAngle = ZeroAngles;
   moonHandAngle = 0;
   moonPhase = 0;
   outerRingAngle = 0;
@@ -303,23 +343,24 @@ export class AppComponent implements OnInit, SettingsHolder {
   recentLocations: TzsLocation[] = [];
   riseSetFontSize = '15px';
   rotateSign = 1;
-  saturnAngle = 0;
+  saturnAngle = ZeroAngles;
+  showErrorValues: false;
   siderealAngle = 0;
   solNoctisPath = '';
   southern = false;
-  sunAngle = 0;
+  sunAngle = ZeroAngles;
   sunriseLabelPath: string;
   sunsetLabelPath: string;
   svgFilteringOn = true;
   timeText = '';
   translucentEcliptic = false;
   true_handAngle = 0;
-  true_moonAngle = 0;
+  true_moonAngle = ZeroAngles;
   true_moonHandleAngle = 0;
   true_moonPhase = 0;
   true_siderealAngle = 0;
-  true_sunAngle = 0;
-  venusAngle = 0;
+  true_sunAngle = ZeroAngles;
+  venusAngle = ZeroAngles;
 
   @ViewChild('advancedOptions', { static: true }) advancedOptions: AdvancedOptionsComponent;
 
@@ -381,6 +422,7 @@ export class AppComponent implements OnInit, SettingsHolder {
     this.initDone = true;
     this.globe = new Globe('globe-host');
     this.globe.setColorScheme(this.post2018);
+    this.globe.setHideMap(this.hideMap);
     this.adjustLatitude();
 
     this.setNow();
@@ -1046,6 +1088,13 @@ export class AppComponent implements OnInit, SettingsHolder {
     this.timeText = basicPositions._date.format(format);
     this.timeText = this.isoFormat ? this.timeText.replace('T', '\xA0') : this.timeText;
     this.outerRingAngle = 180 - (bohemianHour - basicPositions._hourOfDay) * 15;
+
+    this.errorMoon = mod2(this.moonAngle.orig - this.true_moonAngle.orig, 360);
+    this.errorMoonDays = this.errorMoon / 360 * 27.321;
+    this.errorPhase = mod2(this.moonPhase - this.true_moonPhase, 360) * this.rotateSign;
+    this.errorPhaseDays = this.errorPhase / 360 * 29.53059;
+    this.errorSun = mod2(this.sunAngle.orig - this.true_sunAngle.orig, 360);
+    this.errorSunMinutes = this.errorSun / 360 * 1440;
   }
 
   private calculateBasicPositions(time: number): BasicPositions {
@@ -1062,7 +1111,7 @@ export class AppComponent implements OnInit, SettingsHolder {
     const moonAngle = adjustEcliptic(baseMoonAngle);
     const siderealAngle = this.observer.getLocalHourAngle(_jdu, true).degrees - 90;
     const moonPhase = mod((baseMoonAngle - baseSunAngle) * this.rotateSign, 360);
-    const moonHandAngle = AppComponent.calculateMoonHandAngle(moonAngle, siderealAngle);
+    const moonHandAngle = AppComponent.calculateMoonHandAngle(moonAngle.ie, siderealAngle);
 
     return { _jde, _jdu, _hourOfDay, _date, handAngle, moonAngle, moonHandAngle, moonPhase, siderealAngle, sunAngle };
   }
@@ -1079,11 +1128,11 @@ export class AppComponent implements OnInit, SettingsHolder {
 
     return {
       handAngle,
-      moonAngle: AppComponent.calculateEclipticAngleFromHandAngle(moonHandAngle, siderealAngle),
+      moonAngle: AppComponent.calculateEclipticAnglesFromHandAngle(moonHandAngle, siderealAngle),
       moonHandAngle,
       moonPhase: mod(ref.moonPhase + phaseCycles * 360, 360),
       siderealAngle,
-      sunAngle: AppComponent.calculateEclipticAngleFromHandAngle(handAngle, siderealAngle),
+      sunAngle: AppComponent.calculateEclipticAnglesFromHandAngle(handAngle, siderealAngle)
     };
   }
 
@@ -1096,7 +1145,7 @@ export class AppComponent implements OnInit, SettingsHolder {
     return 90 + atan2_deg(y, x) + siderealAngle;
   }
 
-  private static calculateEclipticAngleFromHandAngle(handAngle: number, siderealAngle: number): number {
+  private static calculateEclipticAnglesFromHandAngle(handAngle: number, siderealAngle: number): AngleTriplet {
     let result: number;
     const t = mod2(handAngle - siderealAngle, 360);
 
@@ -1123,7 +1172,7 @@ export class AppComponent implements OnInit, SettingsHolder {
       result = atan2_deg(x, y) * sign(t);
     }
 
-    return result;
+    return { orig: revertEcliptic(result), ie: result };
   }
 
   rotate(angle: number): string {

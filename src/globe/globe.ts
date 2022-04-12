@@ -2,7 +2,7 @@ import {
   BufferGeometry, CanvasTexture, CylinderGeometry, DoubleSide, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene,
   SphereGeometry, WebGLRenderer
 } from 'three';
-import { isString } from '@tubular/util';
+import { isFirefox, isString } from '@tubular/util';
 import { cos, PI, sin, to_radian } from '@tubular/math';
 import { mergeBufferGeometries } from '../three/three-utils';
 
@@ -53,7 +53,12 @@ export class Globe {
         const image = new Image();
 
         image.onload = (): void => {
-          resolve(image);
+          requestAnimationFrame(() => {
+            if (isFirefox())
+              setTimeout(() => resolve(image), 250);
+            else
+              resolve(image);
+          });
         };
         image.onerror = (): void => {
           reject(new Error('Map image failed to load from: ' + image.src));
@@ -93,11 +98,11 @@ export class Globe {
   }
 
   private static getGoldTrimColor(): string {
-    return getComputedStyle(document.documentElement).getPropertyValue('--gold-trim').trim();
+    return getComputedStyle(document.documentElement).getPropertyValue('--gold-trim').trim() || '#FFE696';
   }
 
   private static getSkyColorColor2018(): string {
-    return getComputedStyle(document.documentElement).getPropertyValue('--sky-color-2018').trim();
+    return getComputedStyle(document.documentElement).getPropertyValue('--sky-color-2018').trim() || '#2F9DE7';
   }
 
   constructor(rendererHost: string | HTMLElement) {

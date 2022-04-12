@@ -580,7 +580,7 @@
             <g [attr.filter]="filterRelief">
               <g id="ecliptic_positive_sunBeamLargeSymbol_A" [attr.transform]="rotate(siderealAngle * rotateSign)">
                 <g transform="translate(0, -71.1)">
-                  <g id="sun_positive_sunBeamLargeSymbol_A" [attr.transform]="rotate(sunAngle * rotateSign)">
+                  <g id="sun_positive_sunBeamLargeSymbol_A" [attr.transform]="rotate(sunAngle.ie * rotateSign)">
                     <g id="sun_translate_sunBeamLargeSymbol_A" transform="translate(0,-161.0)">
                       <use xlink:href="#sunBeamLargeSymbol"/>
                     </g>
@@ -590,11 +590,11 @@
             </g>
             <g id="ecliptic_positive_sunBeamLargeSymbol_B0" [attr.transform]="rotate(siderealAngle * rotateSign)">
               <g transform="translate(0, -71.1)">
-                <g id="sun_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(sunAngle * rotateSign)">
+                <g id="sun_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(sunAngle.ie * rotateSign)">
                   <g id="sun_translate_sunBeamLargeSymbol_B" transform="translate(0,-161.0)">
                     <rect *ngIf="detailedMechanism" x="-1" y="0" width="2" height="161"
                         class="sun-moon-arms" [attr.filter]="filterRelief"/>
-                    <g id="sun_negative_sunBeamLargeSymbol_B" [attr.transform]="rotate(-sunAngle * rotateSign)">
+                    <g id="sun_negative_sunBeamLargeSymbol_B" [attr.transform]="rotate(-sunAngle.ie * rotateSign)">
                       <g id="ecliptic_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(-siderealAngle * rotateSign)">
                         <path d="M0.0 -9.6C5.3 -9.6 9.6 -5.3 9.6 0.0C9.6 5.3 5.3 9.6 0.0 9.6C-5.3 9.6 -9.6 5.3 -9.6 0.0C-9.6 -5.3 -5.3 -9.6 0.0 -9.6" class="sunSphere"/>
                       </g>
@@ -608,7 +608,7 @@
             <g [attr.filter]="filterRelief">
               <g id="ecliptic_positive_sunBeamSmallSymbol_A" [attr.transform]="rotate(siderealAngle * rotateSign)">
                 <g transform="translate(0, -71.1)">
-                  <g id="sun_positive_sunBeamSmallSymbol_A" [attr.transform]="rotate(sunAngle * rotateSign)">
+                  <g id="sun_positive_sunBeamSmallSymbol_A" [attr.transform]="rotate(sunAngle.ie * rotateSign)">
                     <g id="sun_translate_sunBeamSmallSymbol_A" transform="translate(0,-161.0)">
                       <use xlink:href="#sunBeamSmallSymbol"/>
                     </g>
@@ -618,41 +618,41 @@
             </g>
             <g id="ecliptic_positive_sunBeamSmallSymbol_B0" [attr.transform]="rotate(siderealAngle * rotateSign)">
               <g transform="translate(0, -71.1)">
-                <g id="sun_positive_sunBeamSmallSymbol_B" [attr.transform]="rotate(sunAngle * rotateSign)">
+                <g id="sun_positive_sunBeamSmallSymbol_B" [attr.transform]="rotate(sunAngle.ie * rotateSign)">
                   <g id="sun_translate_sunBeamSmallSymbol_B" transform="translate(0,-161.0)">
-                    <g id="sun_negative_sunBeamSmallSymbol_B" [attr.transform]="rotate(sunAngle * rotateSign)">
-                      <g id="ecliptic_positive_sunBeamSmallSymbol_B" [attr.transform]="rotate(-sunAngle * rotateSign)">
+                    <g id="sun_negative_sunBeamSmallSymbol_B" [attr.transform]="rotate(sunAngle.ie * rotateSign)">
+                      <g id="ecliptic_positive_sunBeamSmallSymbol_B" [attr.transform]="rotate(-sunAngle.ie * rotateSign)">
                         <path d="M0.0 -9.6C5.3 -9.6 9.6 -5.3 9.6 0.0C9.6 5.3 5.3 9.6 0.0 9.6C-5.3 9.6 -9.6 5.3 -9.6 0.0C-9.6 -5.3 -5.3 -9.6 0.0 -9.6" class="sunSphere"/>
                       </g>
                     </g>
                   </g>
                 </g>
-                <g *ngIf="additionalPlanets" id="mercury" [attr.transform]="rotate(mercuryAngle * rotateSign)">
+                <g *ngIf="additionalPlanets" id="mercury" [attr.transform]="rotate(mercuryAngle.oe * rotateSign)">
                   <circle cx="0" cy="-178.9" r="7" fill="#C0C0C0"/>
                   <circle cx="0" cy="-178.9" r="7" fill="url('#sphere-effect')"/>
                   <text x="0" y="-176.5" width="7" height="7">☿</text>
                 </g>
-                <g *ngIf="additionalPlanets" id="venus" [attr.transform]="rotate(venusAngle * rotateSign)">
+                <g *ngIf="additionalPlanets" id="venus" [attr.transform]="rotate(venusAngle.oe * rotateSign)">
                   <circle cx="0" cy="-178.9" r="7" fill="#CCCCFF"/>
                   <circle cx="0" cy="-178.9" r="7" fill="url('#sphere-effect')"/>
                   <text x="0" y="-176.5" width="7" height="7">♀</text>
                 </g>
-                <g *ngIf="additionalPlanets" id="mars" [attr.transform]="rotate(marsAngle * rotateSign)">
+                <g *ngIf="additionalPlanets" id="mars" [attr.transform]="rotate(marsAngle.oe * rotateSign)">
                   <circle cx="0" cy="-178.9" r="7" fill="red"/>
                   <circle cx="0" cy="-178.9" r="7" fill="url('#sphere-effect')"/>
                   <text x="0" y="-176.5" width="7" height="7">♂</text>
                 </g>
-                <g *ngIf="additionalPlanets" id="jupiter" [attr.transform]="rotate(jupiterAngle * rotateSign)">
+                <g *ngIf="additionalPlanets" id="jupiter" [attr.transform]="rotate(jupiterAngle.oe * rotateSign)">
                   <circle cx="0" cy="-178.9" r="7" fill="orange"/>
                   <circle cx="0" cy="-178.9" r="7" fill="url('#sphere-effect')"/>
                   <text x="0" y="-176.5" width="7" height="7">♃</text>
                 </g>
-                <g *ngIf="additionalPlanets" id="saturn" [attr.transform]="rotate(saturnAngle * rotateSign)">
+                <g *ngIf="additionalPlanets" id="saturn" [attr.transform]="rotate(saturnAngle.oe * rotateSign)">
                   <circle cx="0" cy="-178.9" r="7" fill="#FFFF99"/>
                   <circle cx="0" cy="-178.9" r="7" fill="url('#sphere-effect')"/>
                   <text x="0" y="-176.5" width="7" height="7">♄</text>
                 </g>
-                <g *ngIf="realPositionMarkers" id="sun-true" [attr.transform]="rotate(true_sunAngle * rotateSign)">
+                <g *ngIf="realPositionMarkers" id="sun-true" [attr.transform]="rotate(true_sunAngle.oe * rotateSign)">
                   <circle cx="0" cy="-178.9" r="7" fill="yellow"/>
                   <circle cx="0" cy="-178.9" r="7" fill="url('#sphere-effect')"/>
                   <text x="0" y="-176.5" width="7" height="7">☉</text>
@@ -671,7 +671,7 @@
           <g [attr.filter]="filterRelief">
             <g id="ecliptic_positive_moonGroup" [attr.transform]="rotate(siderealAngle * rotateSign)">
               <g transform="translate(0, -71.1)">
-                <g id="moon_positive" [attr.transform]="rotate(moonAngle * rotateSign)">
+                <g id="moon_positive" [attr.transform]="rotate(moonAngle.ie * rotateSign)">
                   <g transform="translate(0,-161.0)">
                     <ng-container *ngIf="detailedMechanism">
                       <rect x="-1" y="0" width="2" height="161" class="sun-moon-arms"/>
@@ -683,14 +683,14 @@
                     <path id="moonSunlit" [attr.d]="sunlitMoonPath()" class="moonSunlit"/>
                   </g>
                   <g transform="translate(0,-161.0)">
-                    <g id="moon_negative" [attr.transform]="rotate(moonAngle * rotateSign)">
-                      <g id="ecliptic_negative_moon" [attr.transform]="rotate(-moonAngle * rotateSign)">
+                    <g id="moon_negative" [attr.transform]="rotate(moonAngle.ie * rotateSign)">
+                      <g id="ecliptic_negative_moon" [attr.transform]="rotate(-moonAngle.ie * rotateSign)">
                         <circle cx="0" cy="0" r="12" class="moonSphere"/>
                       </g>
                     </g>
                   </g>
                 </g>
-                <g *ngIf="realPositionMarkers" id="moon-true" [attr.transform]="rotate(true_moonAngle * rotateSign)">
+                <g *ngIf="realPositionMarkers" id="moon-true" [attr.transform]="rotate(true_moonAngle.oe * rotateSign)">
                   <circle cx="0" cy="-178.9" r="7" fill="white"/>
                   <circle cx="0" cy="-178.9" r="7" fill="url('#sphere-effect')"/>
                   <text x="0" y="-176.5" width="7" height="7">☽</text>
@@ -704,6 +704,18 @@
       </g>
     </g>
   </svg>
+
+  <div *ngIf="showErrorValues && timing !== MODERN" class="svg-error-overlay">
+    <label i18n>Moon phase error:</label>
+    <span>{{ errorPhase | number: '1.1-1' }}°,</span>
+    <span>{{ errorPhaseDays | number: '1.1-1' }} <span i18n>days</span></span>
+    <label i18n>Moon ecliptic error:</label>
+    <span>{{ errorMoon | number: '1.1-1' }}°,</span>
+    <span>{{ errorMoonDays | number: '1.1-1' }} <span i18n>days</span></span>
+    <label i18n>Sun hour-angle error:</label>
+    <span>{{ errorSun | number: '1.1-1' }}°,</span>
+    <span>{{ errorSunMinutes | number: '1.1-1' }} <span i18n>minutes</span></span>
+  </div>
 </div>
 
 <div i18n id="graphics-credit">Original SVG clock graphics by Jan Tošovský</div>

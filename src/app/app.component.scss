@@ -227,6 +227,23 @@ svg {
   top: 0;
 }
 
+.svg-error-overlay {
+  background-color: $controls-background;
+  color: $controls-text;
+  display: grid;
+  font: 14px sans-serif;
+  gap: 0.5em;
+  grid-template-columns: auto auto auto;
+  left: 1em;
+  padding: 0.5em;
+  position: fixed;
+  top: 1em;
+
+  label {
+    text-align: end;
+  }
+}
+
 #globe-host {
   border-radius: 50%;
   left: 36.333%;
