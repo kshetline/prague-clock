@@ -227,21 +227,34 @@ svg {
   top: 0;
 }
 
-.svg-error-overlay {
+.info-error-panel {
   background-color: $controls-background;
   color: $controls-text;
   display: grid;
   font: 14px sans-serif;
-  gap: 0.5em;
-  grid-template-columns: auto auto auto;
-  left: 1em;
+  gap: 0.33em;
+  grid-template-columns: auto auto auto auto;
   padding: 0.5em;
-  position: fixed;
-  top: 1em;
 
-  label {
+  span {
     text-align: end;
   }
+
+  span:nth-child(4n) {
+    text-align: start;
+  }
+}
+
+.svg-info-overlay {
+  bottom: 8px;
+  position: fixed;
+  right: 8px;
+}
+
+.below-control-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
 }
 
 #globe-host {
@@ -316,6 +329,16 @@ svg {
       height: calc(max(min(var(--mfvh) - 28px - 2.25em, 100vw - 16px), 320px));
       width: calc(max(min(var(--mfvh) - 28px - 2.25em, 100vw - 16px), 320px));
     }
+  }
+
+  .below-control-panel {
+    display: none;
+  }
+}
+
+@media screen and (orientation: landscape) {
+  .svg-info-overlay {
+    display: none;
   }
 }
 

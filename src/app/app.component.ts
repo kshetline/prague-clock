@@ -171,7 +171,7 @@ interface AngleTriplet {
 
 const ZeroAngles: AngleTriplet = { ie: 0, oe: 0, orig: 0 };
 
-function adjustEcliptic(angle: number): AngleTriplet {
+function adjustForEclipticWheel(angle: number): AngleTriplet {
   return {
     orig: angle,
     ie: mod2(90 - angle + cos_deg(angle) * 26.6, 360),
@@ -185,21 +185,21 @@ function revertEcliptic(angle: number): number {
   if (a < -160)
     a += 360;
 
-  return 8.9999999984614234e+001
-    - 6.6332233812159713e-001 * a
-    + 2.3389691314831506e-011 * a ** 2
-    - 1.5792576669476430e-005 * a ** 3
-    - 6.0222139948410238e-015 * a ** 4
-    + 1.5070052507741876e-009 * a ** 5
-    + 5.9520108482720510e-019 * a ** 6
-    - 9.5776714390600572e-014 * a ** 7
-    - 2.8435133497605280e-023 * a ** 8
-    + 2.4104018034444760e-018 * a ** 9
-    + 7.0399683226780882e-028 * a ** 10
-    - 2.5620395767654543e-023 * a ** 11
-    - 8.6947165717662011e-033 * a ** 12
-    + 9.5219686117688832e-029 * a ** 13
-    + 4.2345499213097502e-038 * a ** 14;
+  return 90
+    - 6.6332233812159713E-01 * a
+    + 2.3389691314831506E-11 * a ** 2
+    - 1.5792576669476430E-05 * a ** 3
+    - 6.0222139948410238E-15 * a ** 4
+    + 1.5070052507741876E-09 * a ** 5
+    + 5.9520108482720510E-19 * a ** 6
+    - 9.5776714390600572E-14 * a ** 7
+    - 2.8435133497605280E-23 * a ** 8
+    + 2.4104018034444760E-18 * a ** 9
+    + 7.0399683226780882E-28 * a ** 10
+    - 2.5620395767654543E-23 * a ** 11
+    - 8.6947165717662011E-33 * a ** 12
+    + 9.5219686117688832E-29 * a ** 13
+    + 4.2345499213097502E-38 * a ** 14;
 }
 
 function bpKey(key: string): boolean { return !key.startsWith('_'); }
@@ -319,6 +319,8 @@ export class AppComponent implements OnInit, SettingsHolder {
   errorMoonDays = 0;
   errorPhase = 0;
   errorPhaseDays = 0;
+  errorSidereal = 0;
+  errorSiderealMinutes = 0;
   errorSun = 0;
   errorSunMinutes = 0;
   fasterGraphics = true;
@@ -1087,11 +1089,11 @@ export class AppComponent implements OnInit, SettingsHolder {
 
     forEach(basicPositions as any, (key, value) => bpKey(key) && ((this as any)['true_' + key] = value));
 
-    this.mercuryAngle = adjustEcliptic(this.solarSystem.getEclipticPosition(MERCURY, jde).longitude.degrees);
-    this.venusAngle = adjustEcliptic(this.solarSystem.getEclipticPosition(VENUS, jde).longitude.degrees);
-    this.marsAngle = adjustEcliptic(this.solarSystem.getEclipticPosition(MARS, jde).longitude.degrees);
-    this.jupiterAngle = adjustEcliptic(this.solarSystem.getEclipticPosition(JUPITER, jde).longitude.degrees);
-    this.saturnAngle = adjustEcliptic(this.solarSystem.getEclipticPosition(SATURN, jde).longitude.degrees);
+    this.mercuryAngle = adjustForEclipticWheel(this.solarSystem.getEclipticPosition(MERCURY, jde).longitude.degrees);
+    this.venusAngle = adjustForEclipticWheel(this.solarSystem.getEclipticPosition(VENUS, jde).longitude.degrees);
+    this.marsAngle = adjustForEclipticWheel(this.solarSystem.getEclipticPosition(MARS, jde).longitude.degrees);
+    this.jupiterAngle = adjustForEclipticWheel(this.solarSystem.getEclipticPosition(JUPITER, jde).longitude.degrees);
+    this.saturnAngle = adjustForEclipticWheel(this.solarSystem.getEclipticPosition(SATURN, jde).longitude.degrees);
 
     if (this.timing !== Timing.MODERN) {
       if (!this.timingReference || this.time < this.timingReference._referenceTime ||
@@ -1114,6 +1116,8 @@ export class AppComponent implements OnInit, SettingsHolder {
     this.errorMoonDays = this.errorMoon / 360 * 27.321;
     this.errorPhase = mod2(this.moonPhase - this.true_moonPhase, 360) * this.rotateSign;
     this.errorPhaseDays = this.errorPhase / 360 * 29.53059;
+    this.errorSidereal = mod2(this.siderealAngle - this.true_siderealAngle, 360);
+    this.errorSiderealMinutes = this.errorSidereal / 360 * 1440;
     this.errorSun = mod2(this.sunAngle.orig - this.true_sunAngle.orig, 360);
     this.errorSunMinutes = this.errorSun / 360 * 1440;
 
@@ -1154,8 +1158,8 @@ export class AppComponent implements OnInit, SettingsHolder {
     const handAngle = _hourOfDay * 15 - 180;
     const baseSunAngle = this.solarSystem.getEclipticPosition(SUN, _jde).longitude.degrees;
     const baseMoonAngle = this.solarSystem.getEclipticPosition(MOON, _jde).longitude.degrees;
-    const sunAngle = adjustEcliptic(baseSunAngle);
-    const moonAngle = adjustEcliptic(baseMoonAngle);
+    const sunAngle = adjustForEclipticWheel(baseSunAngle);
+    const moonAngle = adjustForEclipticWheel(baseMoonAngle);
     const siderealAngle = this.observer.getLocalHourAngle(_jdu, true).degrees - 90;
     const moonPhase = mod((baseMoonAngle - baseSunAngle) * this.rotateSign, 360);
     const moonHandAngle = AppComponent.calculateMoonHandAngle(moonAngle.ie, siderealAngle);
@@ -1390,7 +1394,6 @@ export class AppComponent implements OnInit, SettingsHolder {
     const jdu = julianDay(this.time);
     let eventsToCheck: number[] = [];
     const eventsFound: AstroEvent[] = [];
-    let altitude: number;
 
     switch (this.eventType) {
       case EventType.EQUISOLSTICE:
@@ -1401,12 +1404,11 @@ export class AppComponent implements OnInit, SettingsHolder {
         break;
       case EventType.RISE_SET:
         eventsToCheck = [RISE_EVENT, TRANSIT_EVENT, SET_EVENT];
-        altitude = 0;
         break;
     }
 
     for (const eventType of eventsToCheck) {
-      const evt = this.eventFinder.findEvent(SUN, eventType, jdu, this.observer, undefined, undefined, previous, altitude);
+      const evt = this.eventFinder.findEvent(SUN, eventType, jdu, this.observer, undefined, undefined, previous);
 
       if (evt)
         eventsFound.push(evt);

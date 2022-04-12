@@ -1,3 +1,24 @@
+<ng-template #infoErrorPanel> <!-- *ngIf="showErrorValues && timing !== MODERN" -->
+  <div class="info-error-panel">
+    <span i18n>Moon phase error:</span>
+    <span>{{ errorPhase | number: '1.1-1' }}°,</span>
+    <span>{{ errorPhaseDays | number: '1.1-1' }}</span>
+    <span i18n>days</span>
+    <span i18n>Moon ecliptic error:</span>
+    <span>{{ errorMoon | number: '1.1-1' }}°,</span>
+    <span>{{ errorMoonDays | number: '1.1-1' }}</span>
+    <span i18n>days</span>
+    <span i18n>Sidereal time error:</span>
+    <span>{{ errorSidereal | number: '1.1-1' }}°,</span>
+    <span>{{ errorSiderealMinutes | number: '1.1-1' }}</span>
+    <span i18n>minutes</span>
+    <span i18n>Sun hour-angle error:</span>
+    <span>{{ errorSun | number: '1.1-1' }}°,</span>
+    <span>{{ errorSunMinutes | number: '1.1-1' }}</span>
+    <span i18n>minutes</span>
+  </div>
+</ng-template>
+
 <div class="controls tbw-dark-mode"
     [class.short]="lastHeight <= 420 && lastHeight > 380"
     [class.extra-short]="lastHeight <= 380"
@@ -58,7 +79,12 @@
         [options]="{ angleStyle: DDD, compass: WEST_EAST, decimalPrecision: 1, locale: specificLocale }"></tbw-angle-editor>
   </div>
   <div class="time-text" [class.collapsed]="collapsed" [class.track-time]="trackTime">{{timeText}}</div>
+
   <app-advanced-options #advancedOptions></app-advanced-options>
+
+  <div *ngIf="showErrorValues && timing !== MODERN" class="below-control-panel">
+    <ng-container *ngTemplateOutlet="infoErrorPanel"></ng-container>
+  </div>
 </div>
 
 <div id="svg-wrapper" [class.post-2018]="post2018">
@@ -705,16 +731,8 @@
     </g>
   </svg>
 
-  <div *ngIf="showErrorValues && timing !== MODERN" class="svg-error-overlay">
-    <label i18n>Moon phase error:</label>
-    <span>{{ errorPhase | number: '1.1-1' }}°,</span>
-    <span>{{ errorPhaseDays | number: '1.1-1' }} <span i18n>days</span></span>
-    <label i18n>Moon ecliptic error:</label>
-    <span>{{ errorMoon | number: '1.1-1' }}°,</span>
-    <span>{{ errorMoonDays | number: '1.1-1' }} <span i18n>days</span></span>
-    <label i18n>Sun hour-angle error:</label>
-    <span>{{ errorSun | number: '1.1-1' }}°,</span>
-    <span>{{ errorSunMinutes | number: '1.1-1' }} <span i18n>minutes</span></span>
+  <div *ngIf="showErrorValues && timing !== MODERN" class="svg-info-overlay">
+    <ng-container *ngTemplateOutlet="infoErrorPanel"></ng-container>
   </div>
 </div>
 
