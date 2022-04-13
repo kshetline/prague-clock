@@ -1,3 +1,9 @@
+export const languageList = [
+  'English',
+  'Čeština',
+  'Español'
+];
+
 export const SOUTH_NORTH = [
   $localize`:Single-letter abbreviation for South:S`,
   $localize`:Single-letter abbreviation for North:N`

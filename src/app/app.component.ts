@@ -13,7 +13,7 @@ import {
 import ttime, { DateAndTime, DateTime, Timezone, utToTdt } from '@tubular/time';
 import { TzsLocation } from '../timezone-selector/timezone-selector.component';
 import { Globe } from '../globe/globe';
-import { localeSuffix, SOUTH_NORTH, specificLocale, WEST_EAST } from '../locales/locale-info';
+import { languageList, localeSuffix, SOUTH_NORTH, specificLocale, WEST_EAST } from '../locales/locale-info';
 import { faForward, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 import { AdvancedOptionsComponent, SettingsHolder, Timing } from '../advanced-options/advanced-options.component';
 
@@ -241,6 +241,12 @@ function formatTimeOfDay(hours: number | DateTime | DateAndTime, force24 = false
   return time;
 }
 
+const menuLanguageList: MenuItem[] = [];
+
+menuLanguageList.push({ label: $localize`Default` });
+menuLanguageList.push({ separator: true });
+languageList.forEach(language => menuLanguageList.push({ label: language }));
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -317,6 +323,7 @@ export class AppComponent implements OnInit, SettingsHolder {
     { label: $localize`↔ Sunrise/transit/sunset`, icon: 'pi pi-circle',
       command: (): void => this.setEventType(EventType.RISE_SET) },
     { separator : true },
+    { label: $localize`Language`, items: menuLanguageList },
     { label: $localize`Advanced options...`, icon: 'pi pi-circle', command: (): void => this.advancedOptions?.show() },
     { separator : true },
     { label: $localize`Code on GitHub`, icon: 'pi pi-github', url: 'https://github.com/kshetline/prague-clock' },
