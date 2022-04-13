@@ -228,13 +228,9 @@ svg {
 }
 
 .info-panel {
-  align-items: baseline;
   background-color: $controls-background;
   color: $controls-text;
-  display: grid;
   font: 14px Arial, sans-serif;
-  gap: 0.33em;
-  grid-template-columns: auto auto auto auto;
   padding: 0.5em 2.5em 0.5em 0.5em;
   position: relative;
 
@@ -246,16 +242,29 @@ svg {
     top: 0;
   }
 
+  .num {
+    color: #64B5F6;
+    font: 12.5px Verdana, sans-serif;
+  }
+
   span {
     text-align: end;
   }
 
-  span.num {
-    font: 12.5px Verdana, sans-serif;
+  .recalibration {
+    padding: 0.5em;
   }
 
-  span.end {
-    text-align: start;
+  .time-grid {
+    align-items: baseline;
+    display: grid;
+    gap: 0.33em;
+    grid-template-columns: repeat(4, auto);
+    justify-content: start;
+  }
+
+  table {
+    border-spacing: 1em 0;
   }
 }
 

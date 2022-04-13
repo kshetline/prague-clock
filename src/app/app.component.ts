@@ -3,7 +3,7 @@ import { ConfirmationService, MenuItem, MessageService, PrimeNGConfig } from 'pr
 import {
   abs, atan2_deg, atan_deg, cos_deg, floor, max, min, mod, mod2, PI, Point, sign, sin_deg, sqrt, tan_deg
 } from '@tubular/math';
-import { clone, forEach, getCssValue, isEqual, isLikelyMobile, isSafari, processMillis } from '@tubular/util';
+import { clone, extendDelimited, forEach, getCssValue, isEqual, isLikelyMobile, isObject, isSafari, processMillis } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import {
   AstroEvent, EventFinder, FALL_EQUINOX, FIRST_QUARTER, FULL_MOON, JUPITER, LAST_QUARTER, MARS, MERCURY, MOON,
@@ -31,6 +31,7 @@ const ECLIPTIC_INNER_RADIUS = 161;
 const ECLIPTIC_CENTER_OFFSET = 71.1;
 const MAX_UNEVEN_HOUR_LATITUDE = 86;
 const RESUME_FILTERING_DELAY = 1000;
+const START_FILTERING_DELAY = 500;
 const STOP_FILTERING_DELAY = isSafari() ? 1000 : 3000;
 const MILLIS_PER_DAY = 86_400_000;
 const RECOMPUTED_WHEN_NEEDED: null = null;
@@ -220,7 +221,13 @@ interface BasicPositions {
   sunAngle: AngleTriplet;
 }
 
-function formatTimeOfDay(hours: number, force24 = false, zeroIs24 = false): string {
+function formatTimeOfDay(hours: number | DateTime | DateAndTime, force24 = false, zeroIs24 = false): string {
+  if (hours instanceof DateTime)
+    hours = hours.wallTime;
+
+  if (isObject(hours))
+    hours = hours.hour + hours.minute / 60;
+
   const minutes = min(floor(hours * 60 + 0.001), 1439);
   const hour = floor(minutes / 60);
   const minute = minutes % 60;
@@ -335,9 +342,6 @@ export class AppComponent implements OnInit, SettingsHolder {
   errorMoonDays = 0;
   errorPhase = 0;
   errorPhaseDays = 0;
-  errorSidereal = 0;
-  errorSiderealMinutes = 0;
-  errorSun = 0;
   errorSunMinutes = 0;
   fasterGraphics = true;
   handAngle = 0;
@@ -362,6 +366,8 @@ export class AppComponent implements OnInit, SettingsHolder {
   moonAngle = ZeroAngles;
   moonHandAngle = 0;
   moonPhase = 0;
+  moonrise = '';
+  moonset = '';
   outerRingAngle = 0;
   outerSunriseAngle: number = null;
   overlapShift = [0, 0, 0, 0, 0];
@@ -371,13 +377,17 @@ export class AppComponent implements OnInit, SettingsHolder {
   riseSetFontSize = '15px';
   rotateSign = 1;
   saturnAngle = ZeroAngles;
+  showErrors = false;
   showInfoPanel: false;
   siderealAngle = 0;
   siderealTime = '';
+  siderealTimeOrloj = '';
   solNoctisPath = '';
   southern = false;
   sunAngle = ZeroAngles;
+  sunrise: string;
   sunriseLabelPath: string;
+  sunset: string;
   sunsetLabelPath: string;
   svgFilteringOn = true;
   timeText = '';
@@ -585,10 +595,14 @@ export class AppComponent implements OnInit, SettingsHolder {
     if (this._timing !== value) {
       this._timing = value;
 
-      if (value !== Timing.MODERN)
+      if (value !== Timing.MODERN) {
+        this.showErrors = true;
         this.timingReference = RECOMPUTED_WHEN_NEEDED;
-      else
+      }
+      else {
+        this.showErrors = false;
         this.timingReference = undefined;
+      }
 
       this.updateTime(true);
     }
@@ -1019,7 +1033,9 @@ export class AppComponent implements OnInit, SettingsHolder {
 
     if (this.svgFilteringOn) {
       if (!suppressFilteringImmediately &&
-          (this.graphicsChangeStartTime < 0 || now > this.graphicsChangeLastTime  + STOP_FILTERING_DELAY))
+          (this.graphicsChangeStartTime < 0 ||
+           (this.graphicsChangeStartTime > 0 && now > this.graphicsChangeLastTime + START_FILTERING_DELAY) ||
+           now > this.graphicsChangeLastTime + STOP_FILTERING_DELAY))
         this.graphicsChangeStartTime = now;
       else if (now > this.graphicsChangeStartTime + STOP_FILTERING_DELAY || suppressFilteringImmediately) {
         this.graphicsChangeStartTime = -1;
@@ -1103,7 +1119,7 @@ export class AppComponent implements OnInit, SettingsHolder {
     const jdu = julianDay(this.time);
 
     // Finding sunset events can be slow at high latitudes, so use cached values when possible.
-    if (forceUpdate || !this.sunsetA || !this.sunsetB || jdu < this.sunsetA.ut || jdu > this.sunsetB.ut) {
+    if (forceUpdate || !this.sunsetA || !this.sunsetB || jdu <= this.sunsetA.ut || jdu > this.sunsetB.ut) {
       this.sunsetA = this.eventFinder.findEvent(SUN, SET_EVENT, jdu, this.observer, undefined, undefined, true);
       this.sunsetB = this.eventFinder.findEvent(SUN, SET_EVENT, this.sunsetA.ut, this.observer, undefined, undefined, false);
     }
@@ -1112,6 +1128,7 @@ export class AppComponent implements OnInit, SettingsHolder {
     const bohemianHour = (jdu - this.sunsetA.ut) / dayLength * 24;
     const basicPositions = this.calculateBasicPositions(this.time);
     const date = basicPositions._date;
+    const wt = date.wallTime;
     const dateLocal = new DateTime(this.time, this.localTimezone);
     const jde = basicPositions._jde;
 
@@ -1140,22 +1157,46 @@ export class AppComponent implements OnInit, SettingsHolder {
     this.timeText = this.isoFormat ? this.timeText.replace('T', '\xA0') : this.timeText;
     this.outerRingAngle = 180 - (bohemianHour - basicPositions._hourOfDay) * 15;
     this.zoneOffset = 'UTC' + Timezone.formatUtcOffset(date.utcOffsetSeconds);
-    this.localTime = formatTimeOfDay(date.wallTime.hour + date.wallTime.minute / 60, this.isoFormat);
-    this.localMeanTime = formatTimeOfDay(dateLocal.wallTime.hour + dateLocal.wallTime.minute / 60, this.isoFormat);
+    this.localTime = formatTimeOfDay(date, this.isoFormat);
+    this.localMeanTime = formatTimeOfDay(dateLocal, this.isoFormat);
     this.localSolarTime = formatTimeOfDay(this.observer.getApparentSolarTime(jdu).hours, this.isoFormat);
     this.siderealTime = formatTimeOfDay(mod(this.true_siderealAngle + 90, 360) / 15, true);
-    this.bohemianTime = formatTimeOfDay(bohemianHour, true, true);
+    this.siderealTimeOrloj = formatTimeOfDay(mod(this.siderealAngle + 90, 360) / 15, true);
+    this.bohemianTime = formatTimeOfDay(bohemianHour, true, true); // Round to match rounded sunrise/sunset times
 
     this.errorMoon = mod2(this.moonAngle.orig - this.true_moonAngle.orig, 360);
     this.errorMoonDays = this.errorMoon / 360 * 27.321;
     this.errorPhase = mod2(this.moonPhase - this.true_moonPhase, 360) * this.rotateSign;
     this.errorPhaseDays = this.errorPhase / 360 * 29.53059;
-    this.errorSidereal = mod2(this.siderealAngle - this.true_siderealAngle, 360);
-    this.errorSiderealMinutes = this.errorSidereal / 360 * 1440;
-    this.errorSun = mod2(this.sunAngle.orig - this.true_sunAngle.orig, 360);
-    this.errorSunMinutes = this.errorSun / 360 * 1440;
+    this.errorSunMinutes = mod2(this.sunAngle.orig - this.true_sunAngle.orig, 360) / 360 * 1440;
+
+    [this.sunrise, this.sunset] =
+      this.extractRiseAndSetTimes(
+        this.eventFinder.getRiseAndSetTimes(SUN, wt.year, wt.month, wt.day, this.observer, date.timezone));
+
+    [this.moonrise, this.moonset] =
+      this.extractRiseAndSetTimes(
+        this.eventFinder.getRiseAndSetTimes(MOON, wt.year, wt.month, wt.day, this.observer, date.timezone));
 
     this.checkPlanetOverlaps();
+  }
+
+  private extractRiseAndSetTimes(events: AstroEvent[]): string[] {
+    let rise = '';
+    let set = '';
+
+    if (events) {
+      for (const evt of events) {
+        const time = formatTimeOfDay(evt.eventTime, this.isoFormat);
+
+        if (evt.eventType === RISE_EVENT)
+          rise = extendDelimited(rise, time, ', ');
+        else if (evt.eventType === SET_EVENT)
+          set = extendDelimited(set, time, ', ');
+      }
+    }
+
+    return [rise || '---', set || '---'];
   }
 
   private checkPlanetOverlaps(): void {

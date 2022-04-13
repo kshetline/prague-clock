@@ -1,48 +1,67 @@
 <ng-template #infoErrorPanel>
   <div class="info-panel">
     <i class="pi pi-times closer" (click)="showInfoPanel = false"></i>
-    <span>{{ zoneOffset }}</span>
-    <span class="num">{{ localTime }}</span>
-    <span>&nbsp;</span>
-    <span>&nbsp;</span>
-    <span i18n>Local mean time:</span>
-    <span class="num">{{ localMeanTime }}</span>
-    <span>&nbsp;</span>
-    <span>&nbsp;</span>
-    <span i18n>Local solar time:</span>
-    <span class="num">{{ localSolarTime }}</span>
-    <span>&nbsp;</span>
-    <span>&nbsp;</span>
-    <span i18n>Sidereal time:</span>
-    <span class="num">{{ siderealTime }}</span>
-    <span>&nbsp;</span>
-    <span>&nbsp;</span>
-    <span i18n>Bohemian time:</span>
-    <span class="num">{{ bohemianTime }}</span>
-    <span>&nbsp;</span>
-    <span>&nbsp;</span>
-    <ng-container *ngIf="timing !== MODERN">
-      <span i18n>Last recalibration:</span>
-      <span class="num">{{ lastRecalibration }}</span>
+    <div class="time-grid">
+      <span>{{ zoneOffset }}</span>
+      <span class="num">{{ localTime }}</span>
       <span>&nbsp;</span>
       <span>&nbsp;</span>
-      <span i18n>Moon phase error:</span>
-      <span class="num">{{ errorPhase | number: '1.1-1' }}°,</span>
-      <span class="num">{{ errorPhaseDays | number: '1.1-1' }}</span>
-      <span i18n class="end">days</span>
-      <span i18n>Moon ecliptic error:</span>
-      <span class="num">{{ errorMoon | number: '1.1-1' }}°,</span>
-      <span class="num">{{ errorMoonDays | number: '1.1-1' }}</span>
-      <span i18n class="end">days</span>
-      <span i18n>Sidereal time error:</span>
-      <span class="num">{{ errorSidereal | number: '1.1-1' }}°,</span>
-      <span class="num">{{ errorSiderealMinutes | number: '1.1-1' }}</span>
-      <span i18n class="end">minutes</span>
-      <span i18n>Sun hour-angle error:</span>
-      <span class="num">{{ errorSun | number: '1.1-1' }}°,</span>
-      <span class="num">{{ errorSunMinutes | number: '1.1-1' }}</span>
-      <span i18n class="end">minutes</span>
-    </ng-container>
+      <span i18n>Local mean time:</span>
+      <span class="num">{{ localMeanTime }}</span>
+      <span>&nbsp;</span>
+      <span>&nbsp;</span>
+      <span i18n>Local solar time:</span>
+      <span class="num">{{ localSolarTime }}</span>
+      <span>&nbsp;</span>
+      <span>&nbsp;</span>
+      <span i18n>Sidereal time:</span>
+      <span class="num">{{ siderealTime }}</span>
+      <span>&nbsp;</span>
+      <span>&nbsp;</span>
+      <span i18n>Bohemian time:</span>
+      <span class="num">{{ bohemianTime }}</span>
+      <span>&nbsp;</span>
+      <span>&nbsp;</span>
+      <span i18n>Sun rise/set:</span>
+      <span class="num" [style.text-align]="sunrise === '---' ? 'center' : null">{{ sunrise }}</span>
+      <span>•</span>
+      <span class="num" [style.text-align]="sunset === '---' ? 'center' : null">{{ sunset }}</span>
+      <span i18n>Moon rise/set:</span>
+      <span class="num" [style.text-align]="moonrise === '---' ? 'center' : null">{{ moonrise }}</span>
+       <span>•</span>
+      <span class="num" [style.text-align]="moonset === '---' ? 'center' : null">{{ moonset }}</span>
+    </div>
+    <div *ngIf="showErrors" class="recalibration">
+      <span i18n>Last virtual recalibration:</span>&nbsp;<span class="num">{{ lastRecalibration }}</span>
+    </div>
+    <table [style.margin-top]="showErrors ? '0' : '1em'">
+      <ng-container *ngIf="showErrors">
+        <tr>
+          <th>&nbsp;</th>
+          <th i18n>Actual</th>
+          <th i18n>Orloj</th>
+          <th>Δ</th>
+        </tr>
+      </ng-container>
+      <tr>
+        <td i18n>Moon λ</td>
+        <td class="num">{{ true_moonAngle.orig | number: '1.0-0' }}°</td>
+        <ng-container *ngIf="showErrors">
+          <td class="num">{{ moonAngle.orig | number: '1.0-0' }}°</td>
+          <td>{{ errorMoon | number: '1.1-1' }}°, {{ errorMoonDays | number: '1.1-1' }}
+            &nbsp;<span i18n>days</span></td>
+        </ng-container>
+      </tr>
+      <tr>
+        <td i18n>Moon phase</td>
+        <td class="num">{{ true_moonPhase | number: '1.0-0' }}°</td>
+        <ng-container *ngIf="showErrors">
+          <td class="num">{{ moonPhase | number: '1.0-0' }}°</td>
+          <td>{{ errorPhase | number: '1.1-1' }}°, {{ errorPhaseDays | number: '1.1-1' }}
+            &nbsp;<span i18n>days</span></td>
+        </ng-container>
+      </tr>
+    </table>
   </div>
 </ng-template>
 
