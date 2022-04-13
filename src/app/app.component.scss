@@ -114,6 +114,10 @@ p-toast, p-confirmDialog {
 
   i.pi-plus {
     left: 2em;
+
+    &.collapsed {
+      pointer-events: none;
+    }
   }
 
   i.pi-chevron-down {
@@ -140,6 +144,7 @@ p-toast, p-confirmDialog {
 
     &.collapsed {
       opacity: 0;
+      pointer-events: none;
     }
   }
 

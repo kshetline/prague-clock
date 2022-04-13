@@ -12,9 +12,10 @@
 }
 
 :root {
+  --background: #{$app-background};
+  --gold-trim: #{$gold-trim};
   --mfvh: 100vh; // mobile full height
   --mvh: 1vh; // mobile vh-like unit
-  --gold-trim: #{$gold-trim};
   --sky-color-2018: #{$sky-color-2018};
 }
 
@@ -26,7 +27,7 @@ html {
 }
 
 body {
-  background-color: #4D4D4D;
+  background-color: var(--background);
   font: 14px sans-serif;
   height: var(--mfvh);
   left: 0;

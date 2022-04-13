@@ -50,6 +50,7 @@ const MAX_SAVED_LOCATIONS = 10;
 const prague = $localize`Prague, CZE`;
 const defaultSettings = {
   additionalPlanets: false,
+  background: '#4D4D4D',
   collapsed: false,
   detailedMechanism: false,
   disableDst: true,
@@ -273,6 +274,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   ISO_OPTS = ['ISO', this.LOCAL_OPTS, { showUtcOffset: true }];
 
   private _additionalPlanets = false;
+  private _background = '#4D4D4D';
   private _collapsed = false;
   private delayedCollapse = false;
   private eventFinder = new EventFinder();
@@ -515,7 +517,7 @@ export class AppComponent implements OnInit, SettingsHolder {
     poll();
     doResize();
 
-    setTimeout(() => document.getElementById('graphics-credit').style.opacity = '0', 30000);
+    setTimeout(() => document.getElementById('graphics-credit').style.opacity = '0', 15000);
     this.graphicsChangeStartTime = -1;
   }
 
@@ -546,6 +548,14 @@ export class AppComponent implements OnInit, SettingsHolder {
         this.canEditName = true;
       }
     });
+  }
+
+  get background(): string { return this._background; }
+  set background(value: string) {
+    if (this._background !== value) {
+      this._background = value;
+      document.documentElement.style.setProperty('--background', value);
+    }
   }
 
   get isoFormat(): boolean { return this._isoFormat; }

@@ -4,6 +4,7 @@ export enum Timing { MODERN, MECHANICAL_ORIGINAL, MECHANICAL_UPDATED }
 
 export interface SettingsHolder {
   additionalPlanets: boolean;
+  background: string;
   detailedMechanism: boolean;
   fasterGraphics: boolean;
   hideMap: boolean;
