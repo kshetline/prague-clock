@@ -18,7 +18,7 @@ export const WEST_EAST = [
   $localize`:Single-letter abbreviation for East:E`
 ];
 
-export let basePath = location.origin + location.pathname.replace(/[a-z][a-z]()\/?$/, '');
+export let basePath = location.origin + location.pathname.replace(/\/[a-z][a-z]()\/?$/, '');
 
 if (!basePath.endsWith('/'))
   basePath += '/';
