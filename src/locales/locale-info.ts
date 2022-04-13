@@ -18,7 +18,10 @@ export const WEST_EAST = [
   $localize`:Single-letter abbreviation for East:E`
 ];
 
-export const basePath = location.origin + location.pathname.replace(/[a-z][a-z](-[a-z][a-z])?\/?$/i, '');
+export let basePath = location.origin + location.pathname.replace(/[a-z][a-z]()\/?$/, '');
+
+if (!basePath.endsWith('/'))
+  basePath += '/';
 
 export let currentLocale = 'en-US';
 export let specificLocale: string = (/\?(.*)\blang=([^&]+)/.exec(window.location.href) ?? [])[2];
