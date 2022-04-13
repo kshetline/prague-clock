@@ -36,7 +36,7 @@
       </trans-unit>
       <trans-unit id="6279790077821649421" datatype="html">
         <source>Translucent ecliptic</source>
-        <target state>Průsvitná ekliptika</target>
+        <target>Průsvitná ekliptika</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
           <context context-type="linenumber">19</context>
@@ -312,7 +312,7 @@
       </trans-unit>
       <trans-unit id="7956486165830795688" datatype="html">
         <source>↔ Sunrise/transit/sunset</source>
-        <target state>>↔ Východ/kulminace/západ slunce</target>
+        <target>↔ Východ/kulminace/západ slunce</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">323</context>
@@ -519,7 +519,7 @@
       </trans-unit>
       <trans-unit id="3251116876185403930" datatype="html">
         <source>S</source>
-        <target state>S</target> <!-- (Z)ápad in Czech, but using English anyway -->
+        <target>S</target> <!-- (Z)ápad in Czech, but using English anyway -->
         <context-group purpose="location">
           <context context-type="sourcefile">src/locales/locale-info.ts</context>
           <context context-type="linenumber">13</context>
@@ -528,7 +528,7 @@
       </trans-unit>
       <trans-unit id="2986159287834234807" datatype="html">
         <source>N</source>
-        <target state>N</target> <!-- (S)everní in Czech, but using English anyway -->
+        <target>N</target> <!-- (S)everní in Czech, but using English anyway -->
         <context-group purpose="location">
           <context context-type="sourcefile">src/locales/locale-info.ts</context>
           <context context-type="linenumber">14</context>
@@ -537,7 +537,7 @@
       </trans-unit>
       <trans-unit id="6896217175159042594" datatype="html">
         <source>W</source>
-        <target state></target> <!-- (Z)ápad in Czech, but using English anyway -->
+        <target>W</target> <!-- (Z)ápad in Czech, but using English anyway -->
         <context-group purpose="location">
           <context context-type="sourcefile">src/locales/locale-info.ts</context>
           <context context-type="linenumber">17</context>
@@ -546,7 +546,7 @@
       </trans-unit>
       <trans-unit id="2566834560864089198" datatype="html">
         <source>E</source>
-        <target state>E</target> <!-- (V)ýchodní in Czech, but using English anyway -->
+        <target>E</target> <!-- (V)ýchodní in Czech, but using English anyway -->
         <context-group purpose="location">
           <context context-type="sourcefile">src/locales/locale-info.ts</context>
           <context context-type="linenumber">18</context>
@@ -693,7 +693,7 @@
       </trans-unit>
       <trans-unit id="332727176552750241" datatype="html">
         <source>UTC<x id="PH" equiv-text="off"/><x id="PH_1" equiv-text="dst"/></source>
-        <target state>UTC<x id="PH" equiv-text="off"/><x id="PH_1" equiv-text="dst"/></target>
+        <target>UTC<x id="PH" equiv-text="off"/><x id="PH_1" equiv-text="dst"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/timezone-selector/timezone-selector.component.ts</context>
           <context context-type="linenumber">88</context>
