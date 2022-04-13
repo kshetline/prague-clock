@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientJsonpModule, HttpClientModule } from '@angular/common/http';
 import { MenuModule } from 'primeng/menu';
 import { RadioButtonModule } from 'primeng/radiobutton';
+import { TieredMenuModule } from 'primeng/tieredmenu';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { TubularNgWidgetsModule } from '@tubular/ng-widgets';
@@ -38,6 +39,7 @@ import { AdvancedOptionsComponent } from './advanced-options/advanced-options.co
     HttpClientModule,
     MenuModule,
     RadioButtonModule,
+    TieredMenuModule,
     ToastModule,
     TooltipModule,
     TubularNgWidgetsModule

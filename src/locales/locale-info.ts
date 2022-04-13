@@ -1,7 +1,12 @@
-export const languageList = [
-  'English',
-  'Čeština',
-  'Español'
+export interface LanguageInfo {
+  directory: string;
+  name: string;
+}
+
+export const languageList: LanguageInfo[] = [
+  { directory: 'en-US', name: 'English' },
+  { directory: 'cs', name: 'Čeština' },
+  { directory: 'es', name: 'Español' }
 ];
 
 export const SOUTH_NORTH = [
@@ -12,6 +17,8 @@ export const WEST_EAST = [
   $localize`:Single-letter abbreviation for West:W`,
   $localize`:Single-letter abbreviation for East:E`
 ];
+
+export const basePath = location.origin + location.pathname.replace(/[a-z][a-z](-[a-z][a-z])?\/?$/i, '');
 
 export let currentLocale = 'en-US';
 export let specificLocale: string = (/\?(.*)\blang=([^&]+)/.exec(window.location.href) ?? [])[2];

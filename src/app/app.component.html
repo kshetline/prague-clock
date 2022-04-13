@@ -61,10 +61,10 @@
 </ng-template>
 
 <div class="controls tbw-dark-mode"
-    [class.short]="lastHeight <= 420 && lastHeight > 380"
-    [class.extra-short]="lastHeight <= 380"
+    [class.short]="lastHeight &lt;= 420 && lastHeight > 380"
+    [class.extra-short]="lastHeight &lt;= 380"
     [class.collapsed]="collapsed">
-  <p-menu #menu [popup]="true" [model]="menuItems" appendTo="body"></p-menu>
+  <p-tieredMenu #menu [popup]="true" [model]="menuItems" appendTo="body"></p-tieredMenu>
   <i class="pi pi-bars" (click)="menu.toggle($event)" [class.collapsed]="collapsed"></i>
   <i class="pi pi-plus" (click)="advancedOptions.show()" [class.collapsed]="collapsed"></i>
   <i class="pi pi-info-circle" (click)="showInfoPanel = !showInfoPanel" [class.collapsed]="collapsed"></i>
