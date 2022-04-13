@@ -3,7 +3,7 @@
 :host {
   box-sizing: border-box;
   display: grid;
-  font-family: Horologium, sans-serif;
+  font-family: Horologium, NoEmojiAstronomy, sans-serif;
   gap: 12px;
   grid-template-columns: 1fr auto;
   min-height: var(--mfvh);
@@ -22,7 +22,7 @@ p-toast, p-confirmDialog {
   color: $controls-text;
   display: flex;
   flex-direction: column;
-  font: 14px sans-serif;
+  font: 14px Arial, sans-serif;
   gap: 4px;
   grid-area: 1 / 2;
   min-height: 400px;
@@ -129,6 +129,20 @@ p-toast, p-confirmDialog {
     }
   }
 
+  i.pi-info-circle {
+    bottom: 0;
+    cursor: pointer;
+    padding: 0.5em;
+    position: absolute;
+    right: 0;
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+
+    &.collapsed {
+      opacity: 0;
+    }
+  }
+
   ::ng-deep .p-checkbox-label {
     white-space: nowrap;
   }
@@ -229,8 +243,11 @@ svg {
 
 .info-panel {
   background-color: $controls-background;
+  border: 1px solid #999;
+  box-sizing: border-box;
   color: $controls-text;
-  font: 14px Arial, sans-serif;
+  font: 14px NoEmojiAstronomy, Arial, sans-serif;
+  max-width: 400px;
   padding: 0.5em 2.5em 0.5em 0.5em;
   position: relative;
 
@@ -242,24 +259,36 @@ svg {
     top: 0;
   }
 
-  .num {
-    color: #64B5F6;
-    font: 12.5px Verdana, sans-serif;
+  td {
+    white-space: nowrap;
   }
 
-  span {
-    text-align: end;
+  .num {
+    color: #64B5F6;
+    font: 12.5px NoEmojiAstronomy, Verdana, sans-serif;
+    min-width: 52px;
+    white-space: nowrap;
+  }
+
+  .diff {
+    color: #F63;
+    font: 12.5px Verdana, sans-serif;
+    white-space: nowrap;
+  }
+
+  .wide {
+    min-width: 125px;
   }
 
   .recalibration {
-    padding: 0.5em;
+    padding: 0.5em 0;
   }
 
   .time-grid {
     align-items: baseline;
     display: grid;
     gap: 0.33em;
-    grid-template-columns: repeat(4, auto);
+    grid-template-columns: auto auto;
     justify-content: start;
   }
 
@@ -302,6 +331,21 @@ svg {
       margin: -2px;
     }
   }
+
+  .info-panel {
+    margin: -20px 13px;
+    transform: scale(0.9);
+  }
+}
+
+@media screen and (max-height: 820px) {
+  .info-panel {
+    bottom: 8px;
+    left: unset;
+    position: fixed;
+    right: 8px;
+    top: unset;
+  }
 }
 
 @media screen and (orientation: portrait) and (max-height: 380px) {
@@ -312,6 +356,11 @@ svg {
     &.collapsed {
       margin: -4px -40px;
     }
+  }
+
+  .info-panel {
+    margin: -40px 26px;
+    transform: scale(0.8);
   }
 }
 

@@ -4,32 +4,18 @@
     <div class="time-grid">
       <span>{{ zoneOffset }}</span>
       <span class="num">{{ localTime }}</span>
-      <span>&nbsp;</span>
-      <span>&nbsp;</span>
       <span i18n>Local mean time:</span>
       <span class="num">{{ localMeanTime }}</span>
-      <span>&nbsp;</span>
-      <span>&nbsp;</span>
       <span i18n>Local solar time:</span>
       <span class="num">{{ localSolarTime }}</span>
-      <span>&nbsp;</span>
-      <span>&nbsp;</span>
       <span i18n>Sidereal time:</span>
       <span class="num">{{ siderealTime }}</span>
-      <span>&nbsp;</span>
-      <span>&nbsp;</span>
       <span i18n>Bohemian time:</span>
       <span class="num">{{ bohemianTime }}</span>
-      <span>&nbsp;</span>
-      <span>&nbsp;</span>
       <span i18n>Sun rise/set:</span>
-      <span class="num" [style.text-align]="sunrise === '---' ? 'center' : null">{{ sunrise }}</span>
-      <span>•</span>
-      <span class="num" [style.text-align]="sunset === '---' ? 'center' : null">{{ sunset }}</span>
+      <span class="num">{{ sunrise }} • {{ sunset }}</span>
       <span i18n>Moon rise/set:</span>
-      <span class="num" [style.text-align]="moonrise === '---' ? 'center' : null">{{ moonrise }}</span>
-       <span>•</span>
-      <span class="num" [style.text-align]="moonset === '---' ? 'center' : null">{{ moonset }}</span>
+      <span class="num">{{ moonrise }} • {{ moonset }}</span>
     </div>
     <div *ngIf="showErrors" class="recalibration">
       <span i18n>Last virtual recalibration:</span>&nbsp;<span class="num">{{ lastRecalibration }}</span>
@@ -44,12 +30,21 @@
         </tr>
       </ng-container>
       <tr>
+        <td i18n>Sun λ</td>
+        <td class="num">{{ true_sunAngle.orig | number: '1.0-0' }}° {{ toZodiac(true_sunAngle.orig) }}</td>
+        <ng-container *ngIf="showErrors">
+          <td class="num">{{ sunAngle.orig | number: '1.0-0' }}°</td>
+          <td class="diff wide">{{ errorSun | number: '1.1-1' }}°, {{ errorSunMinutes | number: '1.1-1' }}
+            <span i18n>mins</span></td>
+        </ng-container>
+      </tr>
+      <tr>
         <td i18n>Moon λ</td>
-        <td class="num">{{ true_moonAngle.orig | number: '1.0-0' }}°</td>
+        <td class="num">{{ true_moonAngle.orig | number: '1.0-0' }}° {{ toZodiac(true_moonAngle.orig) }}</td>
         <ng-container *ngIf="showErrors">
           <td class="num">{{ moonAngle.orig | number: '1.0-0' }}°</td>
-          <td>{{ errorMoon | number: '1.1-1' }}°, {{ errorMoonDays | number: '1.1-1' }}
-            &nbsp;<span i18n>days</span></td>
+          <td class="diff wide">{{ errorMoon | number: '1.1-1' }}°, {{ errorMoonDays | number: '1.1-1' }}
+            <span i18n>days</span></td>
         </ng-container>
       </tr>
       <tr>
@@ -57,8 +52,8 @@
         <td class="num">{{ true_moonPhase | number: '1.0-0' }}°</td>
         <ng-container *ngIf="showErrors">
           <td class="num">{{ moonPhase | number: '1.0-0' }}°</td>
-          <td>{{ errorPhase | number: '1.1-1' }}°, {{ errorPhaseDays | number: '1.1-1' }}
-            &nbsp;<span i18n>days</span></td>
+          <td class="diff wide">{{ errorPhase | number: '1.1-1' }}°, {{ errorPhaseDays | number: '1.1-1' }}
+            <span i18n>days</span></td>
         </ng-container>
       </tr>
     </table>
@@ -72,6 +67,7 @@
   <p-menu #menu [popup]="true" [model]="menuItems" appendTo="body"></p-menu>
   <i class="pi pi-bars" (click)="menu.toggle($event)" [class.collapsed]="collapsed"></i>
   <i class="pi pi-plus" (click)="advancedOptions.show()" [class.collapsed]="collapsed"></i>
+  <i class="pi pi-info-circle" (click)="showInfoPanel = !showInfoPanel" [class.collapsed]="collapsed"></i>
   <i class="pi pi-chevron-down" (click)="collapsed = !collapsed" [class.collapsed]="collapsed"></i>
   <div class="place-name-group" [class.collapsed]="collapsed">
     <span *ngIf="!canSaveName && placeName" class="place-name">{{placeName}}</span>

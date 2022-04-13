@@ -8,6 +8,7 @@
 * For greater consistency with post-2018 appearance, globe map can be hidden.
 * Collapsed control panel displays currently-set time.
 * Option added for keeping SVG shading at the risk of slower graphics.
+* Add info panel with time readouts, sun/moon rise/set times, and other data.
 
 ## 1.2.0
 

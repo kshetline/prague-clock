@@ -259,6 +259,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   NORMAL = PlaySpeed.NORMAL;
   SOUTH_NORTH = SOUTH_NORTH;
   specificLocale = specificLocale;
+  toZodiac = (angle: number): string => '♈♉♊♋♌♍♎♏♐♑♒♓'.charAt(floor(mod(angle, 360) / 30));
   WEST_EAST = WEST_EAST;
 
   LOCAL_OPTS: TimeEditorOptions = {
@@ -342,6 +343,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   errorMoonDays = 0;
   errorPhase = 0;
   errorPhaseDays = 0;
+  errorSun = 0;
   errorSunMinutes = 0;
   fasterGraphics = true;
   handAngle = 0;
@@ -378,7 +380,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   rotateSign = 1;
   saturnAngle = ZeroAngles;
   showErrors = false;
-  showInfoPanel: false;
+  showInfoPanel = false;
   siderealAngle = 0;
   siderealTime = '';
   siderealTimeOrloj = '';
@@ -1168,7 +1170,8 @@ export class AppComponent implements OnInit, SettingsHolder {
     this.errorMoonDays = this.errorMoon / 360 * 27.321;
     this.errorPhase = mod2(this.moonPhase - this.true_moonPhase, 360) * this.rotateSign;
     this.errorPhaseDays = this.errorPhase / 360 * 29.53059;
-    this.errorSunMinutes = mod2(this.sunAngle.orig - this.true_sunAngle.orig, 360) / 360 * 1440;
+    this.errorSun = mod2(this.sunAngle.orig - this.true_sunAngle.orig, 360);
+    this.errorSunMinutes = this.errorSun / 360 * 1440;
 
     [this.sunrise, this.sunset] =
       this.extractRiseAndSetTimes(
@@ -1297,7 +1300,7 @@ export class AppComponent implements OnInit, SettingsHolder {
       result = atan2_deg(x, y) * sign(t);
     }
 
-    return { orig: revertEcliptic(result), ie: result };
+    return { orig: mod(revertEcliptic(result), 360), ie: mod(result, 360) };
   }
 
   rotate(angle: number): string {
