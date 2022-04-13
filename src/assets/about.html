@@ -52,7 +52,9 @@
     <img id="clock" src="clock.jpg" width="435" height="435" alt="clock face">
 
     <h2>Animation</h2>
-    <p>To see the clock change quickly through time or location changes, click on a digit in the time, longitude,
+    <p>Play and Fast Forward buttons (▶️ ⏩) are available to watch time progress quickly, by the minute or by the day.
+      Click Stop (⏹) to end the animation.</p>
+    <p>You can also see rapid time and location changes by clicking on a digit in the time, longitude,
       or latitude fields, then either click and hold on the associated up/down arrow icons, or use up/down arrow keys,
       and the clock will quickly progress through a series of times or locations.
 
@@ -62,18 +64,24 @@
     <p>The color scheme here has been altered (with two different color schemes available), the graphics have been
       modified to cover a full range of latitudes, and the graphics can now be updated quickly within a web browser,
       rather than relying on server-based updates. A central world map, similar to one featured in the original Prague
-      clock (before October 2018), has been added.</p>
+      clock (before October 2018), can be optionally added to the updated color scheme.</p>
 
     <h2>Differences between the simulator and the original Prague clock</h2>
     <ul>
-      <li>The positioning of the simulator’s clock hands, hour dial, sun, moon, and ecliptic wheel are done using
-        your computer’s clock and modern astronomical calculations, rather than simulating the internal gearing of
-        the mechanical clock.</li>
+      <li>The positioning of the simulator’s clock hands, hour dial, sun, moon, and ecliptic wheel are done by
+        default using your computer’s clock and modern astronomical calculations, rather than simulating the
+        internal gearing of the mechanical clock. Optional <em>approximate</em> simulations of mechanical timing are
+        also available, where the hour hand is treated as running in perfect time, with sidereal time, the position
+        of the moon, and moon phases derived as fixed ratios from hourly time. Periodic virtual recalibrations are
+        performed (just as are necessary in real life) to prevent the clock from getting too far out of sync.
+        Bohemian time (the outer ring of the clock) is always maintained using astronomical calculations.</li>
       <li>Normally this simulator shows the position of the sun more accurately than the real clock can because the
         sun symbol is free to move along the ecliptic circle as needed. With the real clock the sun is constrained
         to line up with the hand pointer, producing a possible error of about plus or minus 15 minutes, in addition
-        to any error produced by the difference between local mean solar time and the selected timezone. An option
-        is provided, however, to display the sun in a less accurate, but more authenticate manner.</li>
+        to any error produced by the difference between local mean solar time and the selected timezone. When
+        simulating mechanical timing, this real-world limitation of the position of the sun will be in effect.</li>
+      <li>The positions of the visible planets (Mercury, Venus, Mars, Jupiter, and Saturn) can optionally be
+        displayed, as well as more accurate markers for the positions of the sun and the moon.
       <li>Before October 2018, the original clock displayed a map of the world in the center of the clock face, done
         using a
         <a href="https://en.wikipedia.org/wiki/Stereographic_projection" target="_blank">stereographic projection</a>,
@@ -81,7 +89,7 @@
         Earth, not only Prague, this map will rotate in order to center on the currently set latitude and longitude.</li>
       <li>After renovations in October 2018 the map was removed, replaced with a simple wire-frame globe. When using
         the post-2018 color scheme, this simulator nevertheless retains the map, but with colors and perspective in
-        tune with the new look of the clock.</li>
+        tune with the new look of the clock. This map can be optionally deactivated.</li>
       <li>The simulator can operate within the Arctic and Antarctic circles. This leads to the possibility of all-day
         darkness and all-day light. A new region of the clock face, marked “SOL NOCTIS” (Latin for <em>evening sun</em>)
         will appear at these extreme latitudes. The lines of unequal hours can become very narrow, and may be dropped
