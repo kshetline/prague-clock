@@ -90,11 +90,25 @@
           document.getElementById('loading').innerText = 'Načítání...';
           break;
         }
+        else if (locale.startsWith('de')) {
+          /* cSpell:disable-next-line */ // noinspection SpellCheckingInspection
+          document.querySelector('title').innerText = 'Pražský Orloj - Simulator der Prager astronomischen Uhr';
+          /* cSpell:disable-next-line */ // noinspection SpellCheckingInspection
+          document.getElementById('loading').innerText = 'Wird geladen...';
+          break;
+        }
         else if (locale.startsWith('es')) {
           /* cSpell:disable-next-line */ // noinspection SpellCheckingInspection
           document.querySelector('title').innerText = 'Pražský Orloj - Simulador de Reloj Astronómico de Praga';
           /* cSpell:disable-next-line */ // noinspection SpellCheckingInspection
           document.getElementById('loading').innerText = 'Cargando...';
+          break;
+        }
+        else if (locale.startsWith('fr')) {
+          /* cSpell:disable-next-line */ // noinspection SpellCheckingInspection
+          document.querySelector('title').innerText = 'Pražský Orloj - Simulateur d\'horloge astronomique de Prague';
+          /* cSpell:disable-next-line */ // noinspection SpellCheckingInspection
+          document.getElementById('loading').innerText = 'Chargement...';
           break;
         }
         else if (locale.startsWith('en'))

@@ -4,9 +4,11 @@ export interface LanguageInfo {
 }
 
 export const languageList: LanguageInfo[] = [
-  { directory: 'en-US', name: 'English' },
   { directory: 'cs', name: 'Čeština' },
-  { directory: 'es', name: 'Español' }
+  { directory: 'de', name: 'Deutsch' },
+  { directory: 'en-US', name: 'English' },
+  { directory: 'es', name: 'Español' },
+  { directory: 'fr', name: 'Français' }
 ];
 
 export const SOUTH_NORTH = [
@@ -58,8 +60,16 @@ for (const locale of locales) {
     currentLocale = 'cs';
     break;
   }
+  if (locale.startsWith('de')) {
+    currentLocale = 'de';
+    break;
+  }
   else if (locale.startsWith('es')) {
     currentLocale = 'es';
+    break;
+  }
+  else if (locale.startsWith('fr')) {
+    currentLocale = 'fr';
     break;
   }
   else if (!specificLocale && locale.startsWith('en')) {
