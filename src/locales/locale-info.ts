@@ -31,10 +31,9 @@ if (!basePath.endsWith('/'))
 
 specificLocale = (/\?(.*)\blang=([^&]+)/.exec(window.location.href) ?? [])[2] || specificLocale;
 
-export let currentLocale = '';
+export let currentLocale: string;
 export let localeSuffix = '';
 
-const urlLocale = (/\borloj\/([^/]+)/.exec(window.location.href) ?? [])[1];
 let locales: string[] = [];
 
 if (navigator.languages)
@@ -42,9 +41,9 @@ if (navigator.languages)
 else if (navigator.language)
   locales = [navigator.language];
 
-if (urlLocale) {
+if (specificLocale) {
   for (const locale of locales) {
-    if (locale.startsWith(urlLocale)) {
+    if (locale.startsWith(specificLocale)) {
       specificLocale = locale;
       locales = [locale];
       break;
@@ -52,31 +51,38 @@ if (urlLocale) {
   }
 }
 
-if (!currentLocale)
-  currentLocale = specificLocale || 'en-US';
+currentLocale = specificLocale;
 
-for (const locale of locales) {
-  if (locale.startsWith('cs')) {
-    currentLocale = 'cs';
-    break;
-  }
-  if (locale.startsWith('de')) {
-    currentLocale = 'de';
-    break;
-  }
-  else if (locale.startsWith('es')) {
-    currentLocale = 'es';
-    break;
-  }
-  else if (locale.startsWith('fr')) {
-    currentLocale = 'fr';
-    break;
-  }
-  else if (!specificLocale && locale.startsWith('en')) {
-    specificLocale = locale;
-    break;
+if (!currentLocale) {
+  currentLocale = 'en-US';
+
+  for (const locale of locales) {
+    if (locale.startsWith('cs')) {
+      currentLocale = 'cs';
+      break;
+    }
+    if (locale.startsWith('de')) {
+      currentLocale = 'de';
+      break;
+    }
+    else if (locale.startsWith('es')) {
+      currentLocale = 'es';
+      break;
+    }
+    else if (locale.startsWith('fr')) {
+      currentLocale = 'fr';
+      break;
+    }
+    else if (!specificLocale && locale.startsWith('en')) {
+      specificLocale = locale;
+      break;
+    }
   }
 }
+else if (currentLocale.startsWith('en') || !/^(cs|de|es|fr)/i.test(currentLocale))
+  currentLocale = 'en-US';
+else
+  currentLocale = currentLocale.substring(0, 2).toLowerCase();
 
 if (currentLocale !== 'en-US')
   localeSuffix = '_' + currentLocale;

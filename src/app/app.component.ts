@@ -1268,7 +1268,7 @@ export class AppComponent implements OnInit, SettingsHolder {
     const deltaDays = (time - ref._referenceTime) / MILLIS_PER_DAY;
     const deltaSiderealDays = deltaDays * 366 / 365;
     // The moon is off by about one day every three months with the original 366 / 379 gear ratio.
-    const deltaMoonDays = deltaDays * (this.timing === Timing.MECHANICAL_ORIGINAL ? 366 / 379 : 0.966137);
+    const deltaMoonDays = deltaDays * (this.timing === Timing.MECHANICAL_ORIGINAL ? 366 / 379 : 0.966139); // 0.966137 is closer to the true mean synodic lunar month
     const phaseCycles = deltaMoonDays * 2 / 57;
     const handAngle = mod(ref.handAngle + deltaDays * 360, 360);
     const moonHandAngle = mod(ref.moonHandAngle + deltaMoonDays * 360, 360);

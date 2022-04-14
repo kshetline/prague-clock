@@ -563,7 +563,7 @@
       </trans-unit>
       <trans-unit id="3084183756871665369" datatype="html">
         <source>Search cities/timezones</source>
-        <target>Rechercher des villes/fuseaux horaires</target>
+        <target>Rechercher des villes/fuseaux</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/timezone-selector/timezone-selector.component.html</context>
           <context context-type="linenumber">4</context>
