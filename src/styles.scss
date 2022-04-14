@@ -103,6 +103,25 @@ input {
   overflow-y: auto;
 }
 
+.p-tieredmenu .p-submenu-list {
+  min-width: 50% !important;
+}
+
+.p-tieredmenu .p-menuitem-active>p-tieredmenusub > .p-submenu-list.p-submenu-list-flipped {
+  left: -50% !important;
+}
+
+@media screen and (max-width: 820px) {
+  .p-tieredmenu .p-menuitem-active>p-tieredmenusub > .p-submenu-list {
+    right: 2em !important;
+
+    &.p-submenu-list-flipped {
+      left: -2em !important;
+    }
+  }
+}
+
+
 .p-dialog-content {
   max-width: 95vw;
 }
