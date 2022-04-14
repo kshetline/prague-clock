@@ -336,7 +336,7 @@
       </trans-unit>
       <trans-unit id="2826581353496868063" datatype="html">
         <source>Language</source>
-        <target>Langue</target>
+        <target>Langue / Language</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">327</context>

@@ -101,15 +101,15 @@
   <div class="button-row">
     <p-checkbox [(ngModel)]="isoFormat" [binary]="true"
         i18n-label label="ISO time format"></p-checkbox>
-    <p-checkbox [(ngModel)]="disableDst" [binary]="true" [disabled]="timing !== MODERN"
+    <p-checkbox [(ngModel)]="disableDst" [binary]="true" [disabled]="timing !== MODERN" id="disable-dst"
         i18n-label label="Disable DST on clock" (onChange)="updateTime(true)"></p-checkbox>
   </div>
   <tze-zone-selector [(ngModel)]="zone" [recents]="recentLocations" (clearItem)='clearItem($event)' (clearRecents)="clearRecents()"
       [autofocus]="false" [disabled]="canSaveName" (location)="changeLocation($event)"></tze-zone-selector>
   <div class="button-row time-row">
-    <p-checkbox [(ngModel)]="trackTime" [binary]="true" [disabled]="playing" class="track-time"
+    <p-checkbox [(ngModel)]="trackTime" [binary]="true" [disabled]="playing" id="track-time"
         i18n-label label="Track current time"></p-checkbox><span>&nbsp;&nbsp;</span>
-    <button i18n type="button" pButton (click)="setNow()" class="now" [disabled]="trackTime">Now</button>
+    <button i18n type="button" pButton (click)="setNow()" class="now" [disabled]="trackTime" id="now">Now</button>
     <fa-icon [icon]="faPlay" class="fa-xl" [class.disabled]="playing && playSpeed === NORMAL" (click)="play()"></fa-icon>
     <fa-icon [icon]="faForward" class="fa-xl" [class.disabled]="playing && playSpeed === FAST" (click)="playFast()"></fa-icon>
     <fa-icon [icon]="faStop" class="fa-xl" [class.disabled]="!playing" (click)="stop()"></fa-icon>

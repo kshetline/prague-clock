@@ -197,6 +197,10 @@ p-toast, p-confirmDialog {
     }
   }
 
+  #now {
+    margin: -4px 0;
+  }
+
   &.collapsed {
     height: 2.25em;
     margin-left: -2em;
@@ -738,10 +742,28 @@ svg {
     transform: scale(0.85, 1);
   }
 
-  .track-time label {
+  #track-time label {
     line-height: 0.9;
     max-width: 90px;
     white-space: normal !important;
     width: 90px;
+  }
+}
+
+:lang(de) ::ng-deep {
+  #disable-dst label {
+    line-height: 0.9;
+    margin-bottom: -5px;
+    margin-top: -5px;
+    max-width: 140px;
+    white-space: normal !important;
+    width: 140px;
+  }
+
+  #track-time label {
+    line-height: 0.9;
+    max-width: 110px;
+    white-space: normal !important;
+    width: 110px;
   }
 }
