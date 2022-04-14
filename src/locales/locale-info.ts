@@ -18,13 +18,18 @@ export const WEST_EAST = [
   $localize`:Single-letter abbreviation for East:E`
 ];
 
-export let basePath = location.origin + location.pathname.replace(/\/[a-z][a-z]()\/?$/, '');
+export let specificLocale = '';
+export let basePath = location.origin + location.pathname.replace(/\/([a-z][a-z](-[a-z][a-z])?)\/?$/, (_match, $1) => {
+  specificLocale = $1;
+  return '';
+});
 
 if (!basePath.endsWith('/'))
   basePath += '/';
 
-export let currentLocale = 'en-US';
-export let specificLocale: string = (/\?(.*)\blang=([^&]+)/.exec(window.location.href) ?? [])[2];
+specificLocale = (/\?(.*)\blang=([^&]+)/.exec(window.location.href) ?? [])[2] || specificLocale;
+
+export let currentLocale = '';
 export let localeSuffix = '';
 
 const urlLocale = (/\borloj\/([^/]+)/.exec(window.location.href) ?? [])[1];
@@ -44,6 +49,9 @@ if (urlLocale) {
     }
   }
 }
+
+if (!currentLocale)
+  currentLocale = specificLocale || 'en-US';
 
 for (const locale of locales) {
   if (locale.startsWith('cs')) {
