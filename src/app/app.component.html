@@ -61,8 +61,8 @@
 </ng-template>
 
 <div class="controls tbw-dark-mode"
-    [class.short]="lastHeight &lt;= 420 && lastHeight > 380"
-    [class.extra-short]="lastHeight &lt;= 380"
+    [class.short]="lastHeight <= 420 && lastHeight > 380"
+    [class.extra-short]="lastHeight <= 380"
     [class.collapsed]="collapsed">
   <p-tieredMenu #menu [popup]="true" [model]="menuItems" appendTo="body"></p-tieredMenu>
   <i class="pi pi-bars" (click)="menu.toggle($event)" [class.collapsed]="collapsed"></i>
@@ -107,9 +107,9 @@
   <tze-zone-selector [(ngModel)]="zone" [recents]="recentLocations" (clearItem)='clearItem($event)' (clearRecents)="clearRecents()"
       [autofocus]="false" [disabled]="canSaveName" (location)="changeLocation($event)"></tze-zone-selector>
   <div class="button-row time-row">
-    <p-checkbox [(ngModel)]="trackTime" [binary]="true" [disabled]="playing"
+    <p-checkbox [(ngModel)]="trackTime" [binary]="true" [disabled]="playing" class="track-time"
         i18n-label label="Track current time"></p-checkbox><span>&nbsp;&nbsp;</span>
-    <button i18n type="button" pButton (click)="setNow()" [disabled]="trackTime">Now</button>
+    <button i18n type="button" pButton (click)="setNow()" class="now" [disabled]="trackTime">Now</button>
     <fa-icon [icon]="faPlay" class="fa-xl" [class.disabled]="playing && playSpeed === NORMAL" (click)="play()"></fa-icon>
     <fa-icon [icon]="faForward" class="fa-xl" [class.disabled]="playing && playSpeed === FAST" (click)="playFast()"></fa-icon>
     <fa-icon [icon]="faStop" class="fa-xl" [class.disabled]="!playing" (click)="stop()"></fa-icon>
