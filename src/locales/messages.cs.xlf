@@ -527,7 +527,7 @@
       </trans-unit>
       <trans-unit id="3251116876185403930" datatype="html">
         <source>S</source>
-        <target>S</target> <!-- (Z)ápad in Czech, but using English anyway -->
+        <target>S</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/locales/locale-info.ts</context>
           <context context-type="linenumber">13</context>
@@ -536,7 +536,7 @@
       </trans-unit>
       <trans-unit id="2986159287834234807" datatype="html">
         <source>N</source>
-        <target>N</target> <!-- (S)everní in Czech, but using English anyway -->
+        <target>N</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/locales/locale-info.ts</context>
           <context context-type="linenumber">14</context>
@@ -545,7 +545,7 @@
       </trans-unit>
       <trans-unit id="6896217175159042594" datatype="html">
         <source>W</source>
-        <target>W</target> <!-- (Z)ápad in Czech, but using English anyway -->
+        <target>W</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/locales/locale-info.ts</context>
           <context context-type="linenumber">17</context>
@@ -554,7 +554,7 @@
       </trans-unit>
       <trans-unit id="2566834560864089198" datatype="html">
         <source>E</source>
-        <target>E</target> <!-- (V)ýchodní in Czech, but using English anyway -->
+        <target>E</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/locales/locale-info.ts</context>
           <context context-type="linenumber">18</context>

@@ -4,7 +4,7 @@
     <body>
       <trans-unit id="6358767024326715915" datatype="html">
         <source>Advanced Options</source>
-        <target state="needs-translation"/>
+        <target>Opciones Avanzadas</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
           <context context-type="linenumber">2</context>
@@ -12,7 +12,7 @@
       </trans-unit>
       <trans-unit id="8878423859870707732" datatype="html">
         <source>Post-2018 colors</source>
-        <target state="needs-translation"/>
+        <target>Colores despues de 2018</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
           <context context-type="linenumber">6</context>
@@ -20,7 +20,7 @@
       </trans-unit>
       <trans-unit id="6570307737686849942" datatype="html">
         <source>Pre-2018 colors</source>
-        <target>Colores posteriores a 2018.</target>
+        <target>Colores antes de 2018</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
           <context context-type="linenumber">8</context>
@@ -28,7 +28,7 @@
       </trans-unit>
       <trans-unit id="2329568225243157511" datatype="html">
         <source>Hide globe map</source>
-        <target state="needs-translation"/>
+        <target>Ocultar mapa del mundo</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
           <context context-type="linenumber">13</context>
@@ -36,7 +36,7 @@
       </trans-unit>
       <trans-unit id="4531310590867542081" datatype="html">
         <source>Background</source>
-        <target state="needs-translation"/>
+        <target>Fondo</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
           <context context-type="linenumber">14</context>
@@ -52,7 +52,7 @@
       </trans-unit>
       <trans-unit id="3864890029983081377" datatype="html">
         <source>Mechanically detailed clock face</source>
-        <target state="needs-translation"/>
+        <target>Esfera de reloj con detalles mecánicos</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
           <context context-type="linenumber">22</context>
@@ -60,7 +60,7 @@
       </trans-unit>
       <trans-unit id="4567987203058794647" datatype="html">
         <source>Faster graphics / less shading</source>
-        <target state="needs-translation"/>
+        <target>Gráficos más rápidos / menos sombreado</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
           <context context-type="linenumber">25</context>
@@ -68,7 +68,7 @@
       </trans-unit>
       <trans-unit id="3014525842864089961" datatype="html">
         <source>Sun/moon real position markers</source>
-        <target state="needs-translation"/>
+        <target>Marcadores de posición real sol/luna</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
           <context context-type="linenumber">28</context>
@@ -76,7 +76,7 @@
       </trans-unit>
       <trans-unit id="5705294303388560916" datatype="html">
         <source>Additional planet markers</source>
-        <target state="needs-translation"/>
+        <target>Marcadores de planeta adicionales</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
           <context context-type="linenumber">31</context>
@@ -84,7 +84,7 @@
       </trans-unit>
       <trans-unit id="7916151852478572756" datatype="html">
         <source>Show info panel</source>
-        <target state="needs-translation"/>
+        <target>Mostrar panel de información</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
           <context context-type="linenumber">33</context>
@@ -92,7 +92,7 @@
       </trans-unit>
       <trans-unit id="4007552823040341727" datatype="html">
         <source>Astronomically-accurate, non-mechanical timing</source>
-        <target state="needs-translation"/>
+        <target>Temporización no mecánica con precisión astronómica</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
           <context context-type="linenumber">37</context>
@@ -100,7 +100,7 @@
       </trans-unit>
       <trans-unit id="7560881997360709341" datatype="html">
         <source>Pre-1866 mechanical timing, recalibrated quarterly</source>
-        <target state="needs-translation"/>
+        <target>Sincronización mecánica anterior a 1866, recalibrada trimestralmente</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
           <context context-type="linenumber">39</context>
@@ -108,7 +108,7 @@
       </trans-unit>
       <trans-unit id="669874847217859055" datatype="html">
         <source>Updated mechanical timing, recalibrated yearly</source>
-        <target state="needs-translation"/>
+        <target>Cronometraje mecánico actualizado, recalibrado anualmente</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
           <context context-type="linenumber">41</context>
@@ -116,7 +116,7 @@
       </trans-unit>
       <trans-unit id="2682762672767208455" datatype="html">
         <source>Local mean time:</source>
-        <target state="needs-translation"/>
+        <target>Hora media local:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
           <context context-type="linenumber">7</context>
@@ -124,7 +124,7 @@
       </trans-unit>
       <trans-unit id="2864532223389173205" datatype="html">
         <source>Local solar time:</source>
-        <target state="needs-translation"/>
+        <target>Hora solar local:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
           <context context-type="linenumber">9</context>
@@ -132,7 +132,7 @@
       </trans-unit>
       <trans-unit id="1650709550516945338" datatype="html">
         <source>Sidereal time:</source>
-        <target state="needs-translation"/>
+        <target>*Tiempo sideral:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
           <context context-type="linenumber">11</context>
@@ -140,7 +140,7 @@
       </trans-unit>
       <trans-unit id="4795976993769524506" datatype="html">
         <source>Bohemian time:</source>
-        <target state="needs-translation"/>
+        <target>Hora bohemia:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
           <context context-type="linenumber">13</context>
@@ -148,7 +148,7 @@
       </trans-unit>
       <trans-unit id="3288376117857210668" datatype="html">
         <source>Sun rise/set:</source>
-        <target state="needs-translation"/>
+        <target>Salida/puesta del sol</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
           <context context-type="linenumber">15</context>
@@ -156,7 +156,7 @@
       </trans-unit>
       <trans-unit id="3079002930575357550" datatype="html">
         <source>Moon rise/set:</source>
-        <target state="needs-translation"/>
+        <target>Salida/puesta de la luna:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
           <context context-type="linenumber">17</context>
@@ -164,7 +164,7 @@
       </trans-unit>
       <trans-unit id="5498655479619431482" datatype="html">
         <source>Last virtual recalibration:</source>
-        <target state="needs-translation"/>
+        <target>Última recalibración virtual:</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
           <context context-type="linenumber">21</context>
@@ -172,7 +172,7 @@
       </trans-unit>
       <trans-unit id="2628961601867476622" datatype="html">
         <source>Actual</source>
-        <target state="needs-translation"/>
+        <target>Actual</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
           <context context-type="linenumber">27</context>
@@ -180,7 +180,7 @@
       </trans-unit>
       <trans-unit id="7073749633842864463" datatype="html">
         <source>Sun λ</source>
-        <target state="needs-translation"/>
+        <target>Sol λ</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
           <context context-type="linenumber">33</context>
@@ -188,7 +188,7 @@
       </trans-unit>
       <trans-unit id="2552362010398373707" datatype="html">
         <source>mins</source>
-        <target state="needs-translation"/>
+        <target>min</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
           <context context-type="linenumber">38</context>
@@ -196,7 +196,7 @@
       </trans-unit>
       <trans-unit id="3958178598131965928" datatype="html">
         <source>Moon λ</source>
-        <target state="needs-translation"/>
+        <target>Luna λ</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
           <context context-type="linenumber">42</context>
@@ -204,7 +204,7 @@
       </trans-unit>
       <trans-unit id="7036284206110282007" datatype="html">
         <source>days</source>
-        <target state="needs-translation"/>
+        <target>dias</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
           <context context-type="linenumber">47</context>
@@ -216,7 +216,7 @@
       </trans-unit>
       <trans-unit id="301481621016419170" datatype="html">
         <source>Moon phase</source>
-        <target state="needs-translation"/>
+        <target>Fase lunar</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
           <context context-type="linenumber">51</context>
@@ -296,7 +296,7 @@
       </trans-unit>
       <trans-unit id="5607669932062416162" datatype="html">
         <source>Default</source>
-        <target state="needs-translation"/>
+        <target>Defecto</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">246</context>
@@ -328,7 +328,7 @@
       </trans-unit>
       <trans-unit id="1281087965480534519" datatype="html">
         <source>Advanced options...</source>
-        <target state="needs-translation"/>
+        <target>***needs-translation***</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">326</context>
@@ -336,7 +336,7 @@
       </trans-unit>
       <trans-unit id="2826581353496868063" datatype="html">
         <source>Language</source>
-        <target state="needs-translation"/>
+        <target>***needs-translation***</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">327</context>
