@@ -12,7 +12,7 @@
       </trans-unit>
       <trans-unit id="8878423859870707732" datatype="html">
         <source>Post-2018 colors</source>
-        <target>Colores despues de 2018</target>
+        <target>Colores &gt; 2018</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
           <context context-type="linenumber">6</context>
@@ -20,7 +20,7 @@
       </trans-unit>
       <trans-unit id="6570307737686849942" datatype="html">
         <source>Pre-2018 colors</source>
-        <target>Colores antes de 2018</target>
+        <target>Colores &lt; 2018</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
           <context context-type="linenumber">8</context>
@@ -92,7 +92,7 @@
       </trans-unit>
       <trans-unit id="4007552823040341727" datatype="html">
         <source>Astronomically-accurate, non-mechanical timing</source>
-        <target>Temporización no mecánica con precisión astronómica</target>
+        <target>Temporización no mecánica con prec. astronómica</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
           <context context-type="linenumber">37</context>
@@ -100,7 +100,7 @@
       </trans-unit>
       <trans-unit id="7560881997360709341" datatype="html">
         <source>Pre-1866 mechanical timing, recalibrated quarterly</source>
-        <target>Sincronización mecánica anterior a 1866, recalibrada trimestralmente</target>
+        <target>Temp. mecánica &lt; 1866, recalibrada trimestralmente</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
           <context context-type="linenumber">39</context>
@@ -108,7 +108,7 @@
       </trans-unit>
       <trans-unit id="669874847217859055" datatype="html">
         <source>Updated mechanical timing, recalibrated yearly</source>
-        <target>Cronometraje mecánico actualizado, recalibrado anualmente</target>
+        <target>Mejor temp. mecánica, recalibrada anualmente</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
           <context context-type="linenumber">41</context>

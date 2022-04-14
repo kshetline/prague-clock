@@ -52,36 +52,46 @@
     <img id="clock" src="clock.jpg" width="435" height="435" alt="clock face">
 
     <h2>Animace</h2>
-    <p>Chcete-li vidět, jak se hodiny rychle mění prostřednictvím změn času nebo místa, klikněte na číslici v polích
-      času, zeměpisné délky nebo zeměpisné šířky, poté klikněte a podržte na souvisejících ikonách šipek nahoru/dolů
-      nebo použijte šipky nahoru/dolů a hodiny budou rychle postupovat řadou časů nebo míst.
+    <p>Tlačítka Přehrát a Rychlý posun vpřed (▶️ ⏩) jsou k dispozici pro rychlé sledování času po minutách nebo dnech.
+      Klepnutím na tlačítko Stop (⏹) animaci ukončíte.</p>
+    <p>CMůžete také vidět rychlé změny času a místa kliknutím na číslici v polích času, zeměpisné délky nebo zeměpisné
+      šířky, poté buď klikněte a podržte na souvisejících ikonách šipek nahoru/dolů, nebo použijte klávesy šipek
+      nahoru/dolů a hodiny se rychle procházet řadou časů nebo míst.</p>
 
     <h2>Grafický design</h2>
     <p>Původní grafika hodin SVG a písmo zde použité byly původně vyvinuty Janem Tošovským, jak je najdete na
       <a href="https://drifted.in/horologium-app/" target="_blank">těchto stránkách</a>.</p>
     <p>Zde bylo změněno barevné schéma (k dispozici jsou dvě různá barevná schémata), grafika byla upravena tak, aby
       pokrývala celou škálu zeměpisných šířek, a grafiku lze nyní rychle aktualizovat ve webovém prohlížeči, spíše než
-      se spoléhat na aktualizace na serveru. Byla přidána centrální mapa světa podobná té na původním pražském orloji
-      (před říjnem 2018).</p>
+      se spoléhat na aktualizace na serveru. Do aktualizovaného barevného schématu lze volitelně přidat centrální mapu
+      světa, podobnou té na původních pražských hodinách (před říjnem 2018).</p>
+    <p>K dispozici je možnost zobrazit více skutečných mechanických detailů ciferníku orloje, než je zobrazeno ve
+      výchozím nastavení.</p>
 
     <h2>Rozdíly mezi simulátorem a Pražským orlojem</h2>
     <ul>
-      <li>Polohování orlojových ručiček, hodinového ciferníku, slunce, měsíce a ekliptického kola simulátoru se provádí
-        pomocí hodin vašeho počítače a moderních astronomických výpočtů, spíše než simulací vnitřního ozubení
-        mechanického orloje.</li>
-      <li>Normálně tento simulátor ukazuje polohu slunce přesněji než orloj, protože symbol slunce se může volně
-        pohybovat po kružnici ekliptiky podle potřeby. S orlojem je slunce nuceno se shodovat s ukazatelem ručičky,
-        což vytváří možnou chybu asi plus minus 15 minut, navíc k jakékoli chybě způsobené rozdílem mezi místním
-        středním slunečním časem a vybraným časovým pásmem. Nabízí se však možnost zobrazit slunce méně přesným, ale
-        autentičtějším způsobem.</li>
-      <li>Původní orloj ukazuje ve středu ciferníku orloje mapu světa, provedenou pomocí
+      <li>Umístění ručiček simulátoru, vnějšího ciferníku, Slunce, Měsíce a ekliptikálního kola se ve výchozím
+        nastavení provádí pomocí hodin počítače a moderních astronomických výpočtů, nikoli simulací vnitřního soukolí
+        orloje. K dispozici jsou také volitelné přibližné simulace mechanického měření času, kdy je hlavní hodinová
+        ručička považována za běžící v dokonalém čase, přičemž hvězdný čas, poloha Měsíce a fáze Měsíce jsou odvozeny
+        jako pevné poměry z hodinového času. Pravidelně se provádí virtuální rekalibrace (stejně jako je to nutné ve
+        skutečném životě), aby se zabránilo přílišnému vychýlení orloje ze synchronizace. Staročeský čas (vnější
+        prstenec orloje) je vždy udržován pomocí astronomických výpočtů.</li>
+      <li>Normálně tento simulátor ukazuje polohu slunce přesněji než skutečný orloj, protože symbol slunce se může
+        volně pohybovat po kružnici ekliptiky podle potřeby. Se skutečnými astronomickými hodinami je slunce nuceno
+        zarovnat se s ukazatelem ručičky, což vytváří možnou chybu asi plus minus 15 minut, navíc k jakékoli chybě
+        způsobené rozdílem mezi místním středním slunečním časem a vybraným časovým pásmem. Při simulaci mechanického
+        časování bude toto skutečné omezení polohy slunce účinné.</li>
+      <li>Volitelně lze zobrazit polohy viditelných planet (Merkur, Venuše, Mars, Jupiter a Saturn) a také přesnější
+        značky pro polohy Slunce a Měsíce.</li>
+      <li>Před říjnem 2018 se orloj zobrazil mapu světa, provedenou pomocí
         <a href="https://cs.wikipedia.org/wiki/Kartografie#Stereografick.C3.A1_pol.C3.A1rn.C3.AD_projekce" target="_blank">stereografické projekce</a>,
         s jižním pólem nahoře se středem na Prahu. Vzhledem k tomu, že tuto simulaci lze nastavit na libovolné místo na
         Zemi, nejen na Prahu, bude se mapa otáčet tak, aby se vycentrovala na aktuálně nastavenou zeměpisnou šířku a
         délku.</li>
-      <li>Po renovaci v říjnu 2018 byla mapa odstraněna a nahrazena jednoduchým drátěným globusem. Při použití
-        barevného schématu po roce 2018 si tento simulátor přesto zachovává mapu, ale s barvami a perspektivou
-        sladěnými s novým vzhledem orloje.</li>
+      <li>Po renovaci v říjnu 2018 byla mapa odstraněna a nahrazena jednoduchým drátěným glóbem. Při použití barevného
+        schématu po roce 2018 si tento simulátor přesto zachovává mapu, ale s barvami a perspektivou v souladu s novým
+        vzhledem orloje. Tuto mapu lze volitelně deaktivovat.</li>
       <li>Simulátor může fungovat v polárních a antarktických kruzích. To vede k možnosti celodenní tmy a celodenního
         světla. V těchto extrémních zeměpisných šířkách se objeví nová oblast ciferníku označená „SOL NOCTIS“ (latinsky
         „večerní slunce“). Hranice nestejných hodin se mohou velmi zúžit a mohou být úplně vypuštěny.</li>
