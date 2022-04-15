@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Pražský Orloj - About the Prague Astronomical Clock Simulator</title>
+  <title>Pražský Orloj - Über den Simulator der Prager astronomischen Uhr</title>
   <base href="./">
 <style>
   body {
@@ -48,59 +48,67 @@
 </head>
 <body>
   <div class="page">
-    <h1>Prague Astronomical Clock Simulator</h1>
+    <h1>Simulator der Prager astronomischen Uhr</h1>
     <img id="clock" src="clock.jpg" width="435" height="435" alt="clock face">
 
     <h2>Animation</h2>
-    <p>Play and Fast-Forward buttons (▶️ ⏩) are available to watch time progress quickly, by the minute or by the day.
-      Click Stop (⏹) to end the animation.</p>
-    <p>You can also see rapid time and location changes by clicking on a digit in the time, longitude,
-      or latitude fields, then either click and hold on the associated up/down arrow icons, or use up/down arrow keys,
-      and the clock will quickly progress through a series of times or locations.</p>
+    <p>Play- und Fast-Forward-Tasten (▶️ ⏩) sind verfügbar, um den Zeitverlauf schnell minuten- oder tageweise zu
+      verfolgen. Klicken Sie auf Stopp (⏹), um die Animation zu beenden.</p>
+    <p>Sie können auch schnelle Zeit- und Standortänderungen sehen, indem Sie auf eine Ziffer in den Zeit-, Längen-
+      oder Breitengradfeldern klicken und dann entweder auf die zugehörigen Aufwärts-/Abwärtspfeilsymbole klicken und
+      sie gedrückt halten oder die Aufwärts-/Abwärtspfeiltasten verwenden, und die Uhr wird angezeigt schnell durch
+      eine Reihe von Zeiten oder Orten voranschreiten.</p>
 
-    <h2>Graphic design</h2>
-    <p>The original SVG clock graphics and font used here were originally developed by Jan Tošovský, as found on
-      <a href="https://drifted.in/horologium-app/" target="_blank">this website</a>.</p>
-    <p>The color scheme here has been altered (with two different color schemes available), the graphics have been
-      modified to cover a full range of latitudes, and the graphics can now be updated quickly within a web browser,
-      rather than relying on server-based updates. A central world map, similar to one featured in the original Prague
-      clock (before October 2018), can be optionally added to the updated color scheme.</p>
-    <p>An option is provided to see more of the real-world mechanical details of the clock face than are displayed
-      by default.</p>
+    <h2>Grafikdesign</h2>
+    <p>Die hier verwendeten originalen SVG-Uhrengrafiken und Schriftarten wurden ursprünglich von Jan Tošovský
+      entwickelt, wie auf <a href="https://drifted.in/horologium-app/" target="_blank">dieser Website</a> zu finden.</p>
+    <p>Das Farbschema hier wurde geändert (mit zwei verschiedenen verfügbaren Farbschemata), die Grafiken wurden
+      modifiziert, um eine ganze Reihe von Breitengraden abzudecken, und die Grafiken können jetzt schnell in einem
+      Webbrowser aktualisiert werden, anstatt sich auf serverbasierte Updates zu verlassen . Dem aktualisierten
+      Farbschema kann optional eine zentrale Weltkarte hinzugefügt werden, ähnlich derjenigen, die in der
+      ursprünglichen Prager Uhr (vor Oktober 2018) enthalten war.</p>
+    <p>Es wird eine Option bereitgestellt, um mehr echte mechanische Details des Zifferblatts zu sehen, als
+      standardmäßig angezeigt werden.</p>
 
-    <h2>Differences between the simulator and the original Prague clock</h2>
+    <h2>Unterschiede zwischen dem Simulator und der originalen Prager Uhr</h2>
     <ul>
-      <li>The positioning of the simulator’s clock hands, outer dial, sun, moon, and ecliptic wheel are done by
-        default using your computer’s clock and modern astronomical calculations, rather than simulating the
-        internal gearing of the mechanical clock. Optional <em>approximate</em> simulations of mechanical timing are
-        also available, where the hour hand is treated as running in perfect time, with sidereal time, the position
-        of the moon, and moon phases derived as fixed ratios from hourly time. Periodic virtual recalibrations are
-        performed (just as are necessary in real life) to prevent the clock from getting too far out of sync.
-        Bohemian time (the outer ring of the clock) is always maintained using astronomical calculations.</li>
-      <li>Normally this simulator shows the position of the sun more accurately than the real clock can because the
-        sun symbol is free to move along the ecliptic circle as needed. With the real clock the sun is constrained
-        to line up with the hand pointer, producing a possible error of about plus or minus 15 minutes, in addition
-        to any error produced by the difference between local mean solar time and the selected timezone. When
-        simulating mechanical timing, this real-world limitation of the position of the sun will be in effect.</li>
-      <li>The positions of the visible planets (Mercury, Venus, Mars, Jupiter, and Saturn) can optionally be
-        displayed, as well as more accurate markers for the positions of the sun and the moon.</li>
-      <li>Before October 2018, the original clock displayed a map of the world in the center of the clock face, done
-        using a
-        <a href="https://en.wikipedia.org/wiki/Stereographic_projection" target="_blank">stereographic projection</a>,
-        with the south pole toward the top, centered on Prague. Since this simulation can be set to any location on
-        Earth, not only Prague, this map will rotate in order to center on the currently set latitude and longitude.</li>
-      <li>After renovations in October 2018 the map was removed, replaced with a simple wire-frame globe. When using
-        the post-2018 color scheme, this simulator nevertheless retains the map, but with colors and perspective in
-        tune with the new look of the clock. This map can be optionally deactivated.</li>
-      <li>The simulator can operate within the Arctic and Antarctic circles. This leads to the possibility of all-day
-        darkness and all-day light. A new region of the clock face, marked “SOL NOCTIS” (Latin for <em>evening sun</em>)
-        will appear at these extreme latitudes. The lines of unequal hours can become very narrow, and may be dropped
-        altogether.</li>
-      <li>The time between one sunset and the next is always divided into twenty four hours of
-        <a href="https://www.theflorentine.net/2016/03/03/the-duomo-clock/" target="_blank">Bohemian time</a> (aka
-        Italian time), including spans of time when days or even months might pass between sunsets.</li>
-      <li>The simulator can operate in the southern hemisphere. When the latitude is set south of the equator, the
-        clock markings and clock hand motion are reversed, becoming counter-clockwise.</li>
+      <li>Die Positionierung der Uhrzeiger, des äußeren Zifferblatts, der Sonne, des Mondes und des Ekliptikrads des
+        Simulators erfolgt standardmäßig unter Verwendung der Uhr Ihres Computers und moderner astronomischer
+        Berechnungen, anstatt das interne Getriebe der mechanischen Uhr zu simulieren. Optional sind auch
+        <em>ungefähre</em> Simulationen der mechanischen Zeitmessung verfügbar, bei denen der Stundenzeiger so
+        behandelt wird, als würde er in perfekter Zeit laufen, wobei die Sternzeit, die Position des Mondes und die
+        Mondphasen als feste Verhältnisse von der Stundenzeit abgeleitet werden. Periodische virtuelle
+        Neukalibrierungen werden durchgeführt (so wie es im wirklichen Leben notwendig ist), um zu verhindern, dass
+        die Uhr zu weit von der Synchronisation abweicht. Die böhmische Zeit (der äußere Ring der Uhr) wird immer
+        durch astronomische Berechnungen beibehalten.</li>
+      <li>Normalerweise zeigt dieser Simulator den Sonnenstand genauer an als die echte Uhr, da sich das Sonnensymbol
+        bei Bedarf frei entlang des Ekliptikkreises bewegen kann. Bei der realen Uhr ist die Sonne gezwungen, sich mit
+        dem Handzeiger auszurichten, wodurch ein möglicher Fehler von etwa plus oder minus 15 Minuten entsteht,
+        zusätzlich zu jedem Fehler, der durch die Differenz zwischen der mittleren lokalen Sonnenzeit und der
+        ausgewählten Zeitzone entsteht. Bei der Simulation der mechanischen Zeitmessung wird diese reale Begrenzung
+        des Sonnenstands wirksam.</li>
+      <li>Optional können die Positionen der sichtbaren Planeten (Merkur, Venus, Mars, Jupiter und Saturn) sowie
+        genauere Markierungen für die Positionen von Sonne und Mond angezeigt werden.</li>
+      <li>Vor Oktober 2018 zeigte die ursprüngliche Uhr eine Weltkarte in der Mitte des Zifferblatts, die mit einer
+        <a href="https://de.wikipedia.org/wiki/Stereografische_Projektion" target="_blank">stereografischen Projektion</a>
+        mit dem Südpol nach oben und Prag zentriert erstellt wurde. Da diese Simulation auf jeden Ort auf der Erde
+        eingestellt werden kann, nicht nur auf Prag, dreht sich diese Karte, um den aktuell eingestellten Breiten-
+        und Längengrad zu zentrieren.</li>
+      <li>Nach Renovierungsarbeiten im Oktober 2018 wurde die Karte entfernt und durch einen einfachen
+        Drahtgitter-Globus ersetzt. Bei Verwendung des Farbschemas nach 2018 behält dieser Simulator die Karte dennoch
+        bei, jedoch mit Farben und Perspektiven, die auf das neue Aussehen der Uhr abgestimmt sind. Diese Karte kann
+        optional deaktiviert werden.</li>
+      <li>Der Simulator kann innerhalb des arktischen und antarktischen Kreises betrieben werden. Dies führt zu der
+        Möglichkeit von ganztägiger Dunkelheit und ganztägigem Licht. In diesen extremen Breitengraden wird eine neue
+        Region des Zifferblatts mit der Aufschrift „SOL NOCTIS“ (lateinisch für <em>Abendsonne</em>) erscheinen. Die
+        Linien ungleicher Stunden können sehr schmal werden und ganz entfallen.</li>
+      <li>Die Zeit zwischen einem Sonnenuntergang und dem nächsten wird immer in vierundzwanzig Stunden
+        <a href="https://translate.google.com/translate?js=n&sl=en&tl=de&u=https%3A%2F%2Fwww.theflorentine.net%2F2016%2F03%2F03%2Fthe-duomo-clock%2F" target="_blank">böhmischer Zeit</a>
+        (auch bekannt als italienische Zeit) unterteilt, einschließlich Zeitspannen, in denen Tage oder sogar Monate
+        zwischen Sonnenuntergängen vergehen können.</li>
+      <li>Der Simulator kann auf der Südhalbkugel betrieben werden. Wenn der Breitengrad südlich des Äquators
+        eingestellt wird, werden die Uhrmarkierungen und die Bewegung des Uhrzeigers umgekehrt und werden gegen den
+        Uhrzeigersinn.</li>
     </ul>
   </div>
 </body>
