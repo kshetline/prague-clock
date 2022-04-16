@@ -11,6 +11,14 @@
     "no-descending-specificity": null,
     "no-empty-source": null,
     "no-invalid-position-at-import-rule": null,
+    "property-no-unknown": [
+      true,
+      {
+        "ignoreProperties": [
+          "alignment-baseline"
+        ]
+      }
+    ],
     "scss/at-rule-no-unknown": true,
     "selector-class-pattern": null,
     "selector-descendant-combinator-no-non-space": null,

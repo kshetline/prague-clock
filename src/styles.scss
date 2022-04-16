@@ -1,11 +1,22 @@
+@import "./colors";
+
+@font-face {
+  font-family: NoEmojiAstronomy;
+  src: local("Apple Symbol"), local("Segoe UI Symbol"), local("Arial Unicode MS"), local("Menlo"), local("sans-serif");
+  unicode-range: U+263C-2653;
+}
+
 @font-face {
   font-family: Horologium;
   src: url("assets/Horologium.ttf");
 }
 
 :root {
+  --background: #{$app-background};
+  --gold-trim: #{$gold-trim};
   --mfvh: 100vh; // mobile full height
   --mvh: 1vh; // mobile vh-like unit
+  --sky-color-2018: #{$sky-color-2018};
 }
 
 html {
@@ -16,7 +27,7 @@ html {
 }
 
 body {
-  background-color: #4D4D4D;
+  background-color: var(--background);
   font: 14px sans-serif;
   height: var(--mfvh);
   left: 0;
@@ -82,7 +93,7 @@ input {
   border-color: #555;
 }
 
-.p-menu {
+.p-menu, .p-tieredmenu {
   width: 22em;
 }
 
@@ -91,6 +102,25 @@ input {
   max-height: calc(90 * var(--mfvh));
   overflow-y: auto;
 }
+
+.p-tieredmenu .p-submenu-list {
+  min-width: 50% !important;
+}
+
+.p-tieredmenu .p-menuitem-active>p-tieredmenusub > .p-submenu-list.p-submenu-list-flipped {
+  left: -50% !important;
+}
+
+@media screen and (max-width: 820px) {
+  .p-tieredmenu .p-menuitem-active>p-tieredmenusub > .p-submenu-list {
+    right: 2em !important;
+
+    &.p-submenu-list-flipped {
+      left: -2em !important;
+    }
+  }
+}
+
 
 .p-dialog-content {
   max-width: 95vw;

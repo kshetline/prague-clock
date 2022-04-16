@@ -1,0 +1,54 @@
+:host {
+  align-items: start;
+  background-color: #2E2E2E;
+  box-sizing: border-box;
+  color: white;
+  display: none;
+  flex-direction: column;
+  gap: 0.75em;
+  height: 100% !important;
+  left: 0 !important;
+  overflow: auto;
+  padding: 1em;
+  position: absolute !important;
+  top: 0 !important;
+  width: 100% !important;
+}
+
+.header {
+  align-self: center;
+  font-weight: bold;
+  padding-bottom: 0.75em;
+}
+
+.closer {
+  cursor: pointer;
+  padding: 0.5em;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.colors {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+}
+
+.map-and-colors {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  margin-left: 3em;
+  margin-top: -0.5em;
+}
+
+:lang(de).map-and-colors {
+  margin-left: 1em;
+}
+
+.spacer {
+  height: 0.33em;
+}

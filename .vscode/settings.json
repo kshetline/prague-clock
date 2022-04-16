@@ -1,12 +1,17 @@
 {
   "cSpell.words": [
     "arya",
+    "čeština",
+    "confirmdialog",
     "CREPUSCULUM",
+    "DATETIME",
     "EQUISOLSTICE",
     "habs",
     "inputtext",
     "Kyiv",
+    "mfvh",
     "NOCTIS",
+    "nums",
     "OCCASUS",
     "orloj",
     "ORTUS",
@@ -15,9 +20,14 @@
     "primeng",
     "radiobutton",
     "Rafie",
+    "recalibrated",
+    "recalibrations",
     "Recents",
     "subzone",
     "subzones",
-    "Tošovský"
-  ]
+    "tieredmenu",
+    "Tošovský",
+    "tspan"
+  ],
+  "xliffSync.baseFile": "messages.xlf"
 }

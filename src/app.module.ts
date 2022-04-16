@@ -11,17 +11,20 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientJsonpModule, HttpClientModule } from '@angular/common/http';
 import { MenuModule } from 'primeng/menu';
 import { RadioButtonModule } from 'primeng/radiobutton';
+import { TieredMenuModule } from 'primeng/tieredmenu';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { TubularNgWidgetsModule } from '@tubular/ng-widgets';
 
-import { AppComponent } from './app.component';
-import { TimezoneSelectorComponent } from '../timezone-selector/timezone-selector.component';
+import { AppComponent } from './app/app.component';
+import { TimezoneSelectorComponent } from './timezone-selector/timezone-selector.component';
+import { AdvancedOptionsComponent } from './advanced-options/advanced-options.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    TimezoneSelectorComponent
+    TimezoneSelectorComponent,
+    AdvancedOptionsComponent
   ],
   imports: [
     AutoCompleteModule,
@@ -36,6 +39,7 @@ import { TimezoneSelectorComponent } from '../timezone-selector/timezone-selecto
     HttpClientModule,
     MenuModule,
     RadioButtonModule,
+    TieredMenuModule,
     ToastModule,
     TooltipModule,
     TubularNgWidgetsModule

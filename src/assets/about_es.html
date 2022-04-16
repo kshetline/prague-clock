@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <title>Pražský Orloj - Sobre el Simulador de Reloj Astronómico de Praga</title>
@@ -52,10 +52,11 @@
     <img id="clock" src="clock.jpg" width="435" height="435" alt="clock face">
 
     <h2>Animación</h2>
-    <p>Para ver el reloj cambiar rápidamente a través de cambios de hora o ubicación, haga clic en un dígito en la
-      hora, longitud, o campos de latitud, luego haga clic y mantenga presionados los íconos de flecha arriba/abajo
-      asociados, o use las teclas de flecha arriba/abajo, y el reloj avanzará rápidamente a través de una serie de
-      horas o ubicaciones.
+    <p>Los botones Play y Avance rápido (▶️ ⏩) están disponibles para ver el tiempo progresar rápidamente, por minutos
+      o por días. Haga clic en Detener (⏹) para finalizar la animación.</p>
+    <p>También puede ver cambios rápidos de hora y ubicación haciendo clic en un dígito en los campos de hora, longitud
+      o latitud, luego haga clic y mantenga presionados los íconos de flecha arriba/abajo asociados, o use las teclas
+      de flecha arriba/abajo, y el reloj progresar rápidamente a través de una serie de tiempos o lugares.</p>
 
     <h2>Diseño gráfico</h2>
     <p>La fuente y los gráficos de reloj SVG originales utilizados aquí fueron desarrollados originalmente por
@@ -63,20 +64,30 @@
       <a href="https://drifted.in/horologium-app/" target="_blank">en este sitio web</a>.</p>
     <p>El esquema de color aquí se modificó (con dos esquemas de color diferentes disponibles), los gráficos se
       modificaron para cubrir una gama completa de latitudes y los gráficos ahora se pueden actualizar rápidamente
-      dentro de un navegador web, en lugar de depender de actualizaciones basadas en servidor. Se ha agregado un mapa
-      mundial central, similar al que aparece en el reloj original de Praga (antes de octubre de 2018).</p>
+      dentro de un navegador web, en lugar de depender de actualizaciones basadas en servidor. Un mapa del mundo
+      central, similar al que aparece en el reloj de Praga original (antes de octubre de 2018), se puede agregar
+      opcionalmente al esquema de color actualizado.</p>
+    <p>Se proporciona una opción para ver más detalles mecánicos del mundo real de la esfera del reloj que los que se
+      muestran de forma predeterminada.</p>
 
     <h2>Diferencias entre el simulador y el reloj de Praga original</h2>
     <ul>
-      <li>El posicionamiento de las manecillas del reloj, la esfera de la hora, el sol, la luna y la rueda de la
-        eclíptica del simulador se realizan mediante el reloj de su computadora y los cálculos astronómicos modernos,
-        en lugar de simular el engranaje interno de el reloj mecanico.</li>
+      <li>El posicionamiento de las manecillas del reloj, la esfera exterior, el sol, la luna y la rueda eclíptica del
+        simulador se realizan de manera predeterminada utilizando el reloj de su computadora y cálculos astronómicos
+        modernos, en lugar de simular el engranaje interno del reloj mecánico. También están disponibles simulaciones
+        aproximadas opcionales de cronometraje mecánico, donde la manecilla de la hora se trata como si funcionara en
+        tiempo perfecto, con el tiempo sidéreo, la posición de la luna y las fases lunares derivadas como proporciones
+        fijas del tiempo por hora. Se realizan recalibraciones virtuales periódicas (tal como son necesarias en la vida
+        real) para evitar que el reloj se desincronice demasiado. El tiempo bohemio (el anillo exterior del reloj)
+        siempre se mantiene mediante cálculos astronómicos.</li>
       <li>Normalmente, este simulador muestra la posición del sol con mayor precisión que el reloj real porque el
         símbolo del sol puede moverse libremente a lo largo del círculo de la eclíptica según sea necesario. Con el
         reloj real el sol está obligado a alinearse con el puntero de la mano, produciendo un posible error de unos 15
-        minutos, más o menos, además de cualquier error producido por la diferencia entre la hora solar media local y
-        la zona horaria seleccionada. Sin embargo, se proporciona una opción para mostrar el sol de una manera menos
-        precisa, pero más auténtica.</li>
+        minutos más o menos, además de cualquier error producido por la diferencia entre la hora solar media local y
+        la zona horaria seleccionada. Al simular el tiempo mecánico, esta limitación del mundo real de la posición del
+        sol estará en efecto.</li>
+      <li>Las posiciones de los planetas visibles (Mercurio, Venus, Marte, Júpiter y Saturno) se pueden mostrar
+        opcionalmente, así como marcadores más precisos para las posiciones del sol y la luna.</li>
       <li>Antes de octubre de 2018, el reloj original mostraba un mapa del mundo en el centro de la esfera del reloj,
         realizado mediante una
         <a href="https://es.wikipedia.org/wiki/Proyecci%C3%B3n_estereogr%C3%A1fica" target="_blank">proyección estereográfica</a>,
@@ -85,7 +96,8 @@
         establecidas actualmente.</li>
       <li>Después de las renovaciones en octubre de 2018, se eliminó el mapa y se reemplazó con un simple globo
         terráqueo con estructura de alambre. Al usar el esquema de color posterior a 2018, este simulador conserva el
-        mapa, pero con colores y perspectiva en sintonía con la nueva apariencia del reloj.</li>
+        mapa, pero con colores y perspectiva en sintonía con la nueva apariencia del reloj. Este mapa se puede
+        desactivar opcionalmente.</li>
       <li>El simulador puede operar dentro de los círculos árticos y antárticos. Esto lleva a la posibilidad de
         oscuridad durante todo el día y luz durante todo el día. En estas latitudes extremas aparecerá una nueva región
         de la esfera del reloj, marcada como “SOL NOCTIS” (<em>sol de la noche</em> en latín). Las líneas de horas

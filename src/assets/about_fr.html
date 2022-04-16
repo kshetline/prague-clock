@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Pražský Orloj - À propos du simulateur d'horloge astronomique de Prague</title>
+  <base href="./">
+<style>
+  body {
+    align-items: center;
+    background: rgb(212,150,76);
+    background: linear-gradient(90deg,
+      rgba(212, 150, 76, 0.33) 0%, rgba(176, 186, 177, 0.33) 8%, rgba(140, 168, 167, 0.33) 17%, rgba(71, 153, 174, 0.33) 25%,
+      rgba(24, 146, 178, 0.33) 33%, rgba(11, 138, 176, 0.33) 42%, rgba(18, 133, 174, 0.33) 50%, rgba(11, 138, 176, 0.33) 58%,
+      rgba(24, 146, 178, 0.33) 67%, rgba(71, 153, 174, 0.33) 75%, rgba(140, 168, 167, 0.33) 83%, rgba(176, 186, 177, 0.33) 92%,
+      rgba(212, 150, 76, 0.33) 100%);
+    color: #444;
+    display: flex;
+    flex-direction: column;
+    font: 14px Arial, Helvetica, sans-serif;
+    margin: 1em;
+    width: calc(100vw - 2em);
+  }
+
+  .page {
+    background: none;
+    width: calc(min(800px, calc(100vw - 2em)));
+  }
+
+  #clock {
+    left: calc(50% - 217px);
+    position: relative;
+  }
+
+  h1 {
+    font: bold 18px Arial, Helvetica, sans-serif;
+    text-align: center;
+  }
+
+  h2 {
+    font: bold 16px Arial, Helvetica, sans-serif;
+  }
+
+  li {
+    padding-left: 0.6em;
+    padding-bottom: 0.6em;
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <h1>Simulateur d'horloge astronomique de Prague</h1>
+    <img id="clock" src="clock.jpg" width="435" height="435" alt="clock face">
+
+    <h2>Animation</h2>
+    <p>Les boutons de lecture et d'avance rapide (▶️ ⏩) sont disponibles pour regarder l'heure progresser rapidement,
+      à la minute ou à la journée. Cliquez sur Arrêter (⏹) pour terminer l'animation.</p>
+    <p>Vous pouvez également voir les changements rapides d'heure et de lieu en cliquant sur un chiffre dans les champs
+      d'heure, de longitude ou de latitude, puis cliquez et maintenez enfoncées les icônes de flèche haut/bas
+      associées, ou utilisez les touches fléchées haut/bas, et l'horloge progresser rapidement à travers une série de
+      moments ou de lieux.</p>
+
+    <h2>Conception graphique</h2>
+    <p>Les graphiques et la police d'horloge SVG originaux utilisés ici ont été initialement développés par Jan
+      Tošovský, comme on le trouve sur <a href="https://drifted.in/horologium-app/" target="_blank">ce site Web</a>.</p>
+    <p>Le schéma de couleurs ici a été modifié (avec deux schémas de couleurs différents disponibles), les graphiques
+      ont été modifiés pour couvrir une gamme complète de latitudes, et les graphiques peuvent maintenant être mis à
+      jour rapidement dans un navigateur Web, plutôt que de compter sur des mises à jour basées sur le serveur . Une
+      carte du monde centrale, similaire à celle présentée dans l'horloge originale de Prague (avant octobre 2018),
+      peut éventuellement être ajoutée à la palette de couleurs mise à jour.</p>
+    <p>Une option est fournie pour voir plus de détails mécaniques réels du cadran de l'horloge que ceux affichés
+      par défaut.</p>
+
+    <h2>Différences entre le simulateur et l'horloge originale de Prague</h2>
+    <ul>
+      <li>Le positionnement des aiguilles de l'horloge, du cadran extérieur, du soleil, de la lune et de la roue
+        écliptique du simulateur est effectué par défaut à l'aide de l'horloge de votre ordinateur et des calculs
+        astronomiques modernes, plutôt que de simuler l'engrenage interne de l'horloge mécanique. Des simulations
+        approximatives facultatives de la synchronisation mécanique sont également disponibles, où l'aiguille des
+        heures est traitée comme fonctionnant en temps parfait, avec le temps sidéral, la position de la lune et les
+        phases de lune dérivées sous forme de rapports fixes à partir du temps horaire. Des recalibrages virtuels
+        périodiques sont effectués (tout comme ils sont nécessaires dans la vie réelle) pour éviter que l'horloge ne
+        soit trop désynchronisée. L'heure de Bohême (l'anneau extérieur de l'horloge) est toujours maintenue à l'aide
+        de calculs astronomiques.</li>
+      <li>Normalement, ce simulateur montre la position du soleil avec plus de précision que la vraie horloge car le
+        symbole du soleil est libre de se déplacer le long du cercle écliptique selon les besoins. Avec l'horloge
+        réelle, le soleil est contraint de s'aligner avec le pointeur manuel, produisant une erreur possible d'environ
+        plus ou moins 15 minutes, en plus de toute erreur produite par la différence entre l'heure solaire moyenne
+        locale et le fuseau horaire sélectionné. Lors de la simulation de la synchronisation mécanique, cette
+        limitation réelle de la position du soleil sera en vigueur.</li>
+      <li>Les positions des planètes visibles (Mercure, Vénus, Mars, Jupiter et Saturne) peuvent éventuellement être
+        affichées, ainsi que des marqueurs plus précis pour les positions du soleil et de la lune.</li>
+      <li>Avant octobre 2018, l'horloge d'origine affichait une carte du monde au centre du cadran de l'horloge,
+        réalisée à l'aide d'une
+        <a href="https://fr.wikipedia.org/wiki/Projection_st%C3%A9r%C3%A9ographique" target="_blank">projection stéréographique</a>,
+        avec le pôle sud vers le haut, centrée sur Prague. Étant donné que cette simulation peut être définie sur
+        n'importe quel endroit sur Terre, pas seulement sur Prague, cette carte pivotera afin de se centrer sur la
+        latitude et la longitude actuellement définies.</li>
+      <li>Après des rénovations en octobre 2018, la carte a été supprimée, remplacée par un simple globe filaire. Lors
+        de l'utilisation du schéma de couleurs post-2018, ce simulateur conserve néanmoins la carte, mais avec des
+        couleurs et une perspective en phase avec le nouveau look de l'horloge. Cette carte peut être désactivée de
+        manière facultative.</li>
+      <li>Le simulateur peut fonctionner dans les cercles arctique et antarctique. Cela conduit à la possibilité
+        d'obscurité toute la journée et de lumière toute la journée. Une nouvelle région du cadran de l'horloge,
+        marquée "SOL NOCTIS" (latin pour <em>soleil du soir</em>) apparaîtra à ces latitudes extrêmes. Les lignes
+        d'heures inégales peuvent devenir très étroites et peuvent être complètement supprimées.</li>
+      <li>Le temps entre un coucher de soleil et le suivant est toujours divisé en vingt-quatre heures
+        <a href="https://translate.google.com/translate?js=n&sl=en&tl=fr&u=https%3A%2F%2Fwww.theflorentine.net%2F2016%2F03%2F03%2Fthe-duomo-clock%2F" target="_blank">d'heure bohémienne</a>
+        (alias heure italienne), y compris des périodes de temps où des jours ou même des mois peuvent s'écouler entre
+        les couchers de soleil.</li>
+      <li>Le simulateur peut fonctionner dans l'hémisphère sud. Lorsque la latitude est réglée au sud de l'équateur,
+        les marques de l'horloge et le mouvement des aiguilles de l'horloge sont inversés, devenant dans le sens
+        antihoraire.</li>
+    </ul>
+  </div>
+</body>
+</html>

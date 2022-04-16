@@ -1,13 +1,9 @@
-$controls-background: #121212;
-$controls-text: rgba(white, 0.87);
-$dark-background-2018: #132532;
-$gold-trim: #FFE696;
-$sky-color-2018: #2F9DE7;
+@import "../colors";
 
 :host {
   box-sizing: border-box;
   display: grid;
-  font-family: Horologium, sans-serif;
+  font-family: Horologium, NoEmojiAstronomy, sans-serif;
   gap: 12px;
   grid-template-columns: 1fr auto;
   min-height: var(--mfvh);
@@ -26,7 +22,7 @@ p-toast, p-confirmDialog {
   color: $controls-text;
   display: flex;
   flex-direction: column;
-  font: 14px sans-serif;
+  font: 14px Arial, sans-serif;
   gap: 4px;
   grid-area: 1 / 2;
   min-height: 400px;
@@ -102,7 +98,7 @@ p-toast, p-confirmDialog {
     padding: 0.125em;
   }
 
-  i.pi-bars {
+  i.pi-bars, i.pi-plus {
     cursor: pointer;
     padding: 0.5em;
     position: absolute;
@@ -113,6 +109,14 @@ p-toast, p-confirmDialog {
 
     &.collapsed {
       opacity: 0;
+    }
+  }
+
+  i.pi-plus {
+    left: 2em;
+
+    &.collapsed {
+      pointer-events: none;
     }
   }
 
@@ -129,6 +133,21 @@ p-toast, p-confirmDialog {
     }
   }
 
+  i.pi-info-circle {
+    bottom: 0;
+    cursor: pointer;
+    padding: 0.5em;
+    position: absolute;
+    right: 0;
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+
+    &.collapsed {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+
   ::ng-deep .p-checkbox-label {
     white-space: nowrap;
   }
@@ -141,8 +160,45 @@ p-toast, p-confirmDialog {
     font-size: 18px;
   }
 
+  .time-row {
+    fa-icon {
+      cursor: pointer;
+      margin-left: 0.75em;
+
+      &.disabled {
+        cursor: default;
+        opacity: 0.33;
+      }
+    }
+  }
+
   tze-zone-selector {
     margin: 0.5em 0;
+  }
+
+  .time-text {
+    background: inherit;
+    bottom: 0;
+    display: none;
+    font: 14px Verdana, sans-serif;
+    font-variant-numeric: tabular-nums;
+    padding: 0.5em 0 0.5em 0.5em;
+    position: absolute;
+    right: 2em;
+    top: 0;
+    white-space: nowrap;
+
+    &.collapsed {
+      display: block;
+    }
+
+    &.track-time {
+      color: #0A0;
+    }
+  }
+
+  #now {
+    margin: -4px 0;
   }
 
   &.collapsed {
@@ -151,7 +207,8 @@ p-toast, p-confirmDialog {
     min-height: 2.25em;
     min-width: 2em;
     width: 2em;
-    overflow: hidden;
+    overflow-x: visible;
+    overflow-y: clip;
 
     .button-row,
     .time-row,
@@ -193,6 +250,74 @@ svg {
   top: 0;
 }
 
+.info-panel {
+  background-color: $controls-background;
+  border: 1px solid #999;
+  box-sizing: border-box;
+  color: $controls-text;
+  font: 14px NoEmojiAstronomy, Arial, sans-serif;
+  max-width: 400px;
+  padding: 0.5em 2.5em 0.5em 0.5em;
+  position: relative;
+
+  .closer {
+    cursor: pointer;
+    padding: 0.5em;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  td {
+    white-space: nowrap;
+  }
+
+  .num {
+    color: #64B5F6;
+    font: 12.5px NoEmojiAstronomy, Verdana, sans-serif;
+    min-width: 52px;
+    white-space: nowrap;
+  }
+
+  .diff {
+    color: #F63;
+    font: 12.5px Verdana, sans-serif;
+    white-space: nowrap;
+  }
+
+  .wide {
+    min-width: 125px;
+  }
+
+  .recalibration {
+    padding: 0.5em 0;
+  }
+
+  .time-grid {
+    align-items: baseline;
+    display: grid;
+    gap: 0.33em;
+    grid-template-columns: auto auto;
+    justify-content: start;
+  }
+
+  table {
+    border-spacing: 1em 0;
+  }
+}
+
+.svg-info-overlay {
+  bottom: 8px;
+  position: fixed;
+  right: 8px;
+}
+
+.below-control-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+}
+
 #globe-host {
   border-radius: 50%;
   left: 36.333%;
@@ -215,6 +340,21 @@ svg {
       margin: -2px;
     }
   }
+
+  .info-panel {
+    margin: -20px 13px;
+    transform: scale(0.9);
+  }
+}
+
+@media screen and (max-height: 820px) {
+  .info-panel {
+    bottom: 8px;
+    left: unset;
+    position: fixed;
+    right: 8px;
+    top: unset;
+  }
 }
 
 @media screen and (orientation: portrait) and (max-height: 380px) {
@@ -225,6 +365,11 @@ svg {
     &.collapsed {
       margin: -4px -40px;
     }
+  }
+
+  .info-panel {
+    margin: -40px 26px;
+    transform: scale(0.8);
   }
 }
 
@@ -247,6 +392,13 @@ svg {
     i.pi-bars.collapsed {
       opacity: 1;
     }
+
+    .time-text {
+      left: 50%;
+      padding: 0.5em;
+      right: unset;
+      transform: translate(-50%, 0);
+    }
   }
 
   svg {
@@ -258,6 +410,16 @@ svg {
       height: calc(max(min(var(--mfvh) - 28px - 2.25em, 100vw - 16px), 320px));
       width: calc(max(min(var(--mfvh) - 28px - 2.25em, 100vw - 16px), 320px));
     }
+  }
+
+  .below-control-panel {
+    display: none;
+  }
+}
+
+@media screen and (orientation: landscape) {
+  .svg-info-overlay {
+    display: none;
   }
 }
 
@@ -368,8 +530,11 @@ svg {
 }
 
 .leverRafieSymbol {
-  stroke: none;
-  fill: #575652;
+  fill: $dark-metal;
+  opacity: 1;
+  stroke: $metal-edge;
+  stroke-width: 0.5;
+  transition: opacity 0.5s ease-in-out;
 }
 
 .leverRafieGolden {
@@ -379,7 +544,7 @@ svg {
 
 .leverSymbol {
   stroke: none;
-  fill: $gold-trim;
+  fill: $dark-metal;
 }
 
 .hourAngleStarSymbol {
@@ -409,12 +574,34 @@ svg {
 
 .pin {
   stroke: none;
-  fill: orange;
+  fill: $dark-metal;
 }
 
 .pinSphere {
   stroke: none;
-  fill: url("#gradientSunSphere");
+  fill: url("#gradientMoonSphereDark");
+}
+
+.sun-moon-arms {
+  fill: $dark-metal;
+}
+
+.sun-moon-guides {
+  fill: $dark-metal;
+  stroke: $metal-edge;
+  stroke-width: 0.66;
+}
+
+.moon-ring-edge {
+  fill: none;
+  stroke: $metal-edge;
+  stroke-width: 5;
+}
+
+.moon-ring {
+  fill: none;
+  stroke: $dark-metal;
+  stroke-width: 4;
 }
 
 .outerRingBackground {
@@ -535,5 +722,48 @@ svg {
 
   #globe-host {
     border: 2px $gold-trim solid;
+  }
+}
+
+#moon-true, #sun-true, #mercury, #venus, #mars, #jupiter, #saturn {
+  stroke-width: 0.5;
+  stroke: #4D4D4D;
+
+  text {
+    fill: black;
+    font: 9px Arial, sans-serif;
+    text-anchor: middle;
+  }
+}
+
+:lang(fr) ::ng-deep {
+  .now {
+    margin: 0 -10px;
+    transform: scale(0.85, 1);
+  }
+
+  #track-time label {
+    line-height: 0.9;
+    max-width: 90px;
+    white-space: normal !important;
+    width: 90px;
+  }
+}
+
+:lang(de) ::ng-deep {
+  #disable-dst label {
+    line-height: 0.9;
+    margin-bottom: -5px;
+    margin-top: -5px;
+    max-width: 140px;
+    white-space: normal !important;
+    width: 140px;
+  }
+
+  #track-time label {
+    line-height: 0.9;
+    max-width: 110px;
+    white-space: normal !important;
+    width: 110px;
   }
 }

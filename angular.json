@@ -22,8 +22,14 @@
           "cs": {
             "translation": "src/locales/messages.cs.xlf"
           },
+          "de": {
+            "translation": "src/locales/messages.de.xlf"
+          },
           "es": {
             "translation": "src/locales/messages.es.xlf"
+          },
+          "fr": {
+            "translation": "src/locales/messages.fr.xlf"
           }
         }
       },
@@ -61,8 +67,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "5kb",
-                  "maximumError": "8kb"
+                  "maximumWarning": "8kb",
+                  "maximumError": "10kb"
                 }
               ],
               "fileReplacements": [
@@ -79,18 +85,25 @@
               "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
-              "namedChunks": true
+              "namedChunks": true,
+              "localize": ["en-US"]
             },
             "cs": {
               "localize": ["cs"]
             },
+            "de": {
+              "localize": ["de"]
+            },
             "es": {
               "localize": ["es"]
+            },
+            "fr": {
+              "localize": ["fr"]
             },
             "en-US": {
               "localize": ["en-US"]
             }
-          },
+         },
           "defaultConfiguration": "production"
         },
         "serve": {
@@ -105,8 +118,14 @@
             "cs": {
               "browserTarget": "prague-clock:build:cs"
             },
+            "de": {
+              "browserTarget": "prague-clock:build:de"
+            },
             "es": {
               "browserTarget": "prague-clock:build:es"
+            },
+            "fr": {
+              "browserTarget": "prague-clock:build:fr"
             },
             "en-US": {
               "browserTarget": "prague-clock:build:en-US"

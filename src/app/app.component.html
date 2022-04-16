@@ -1,9 +1,73 @@
+<ng-template #infoErrorPanel>
+  <div class="info-panel">
+    <i class="pi pi-times closer" (click)="showInfoPanel = false"></i>
+    <div class="time-grid">
+      <span>{{ zoneOffset }}</span>
+      <span class="num">{{ localTime }}</span>
+      <span i18n>Local mean time:</span>
+      <span class="num">{{ localMeanTime }}</span>
+      <span i18n>Local solar time:</span>
+      <span class="num">{{ localSolarTime }}</span>
+      <span i18n>Sidereal time:</span>
+      <span class="num">{{ siderealTime }}</span>
+      <span i18n>Bohemian time:</span>
+      <span class="num">{{ bohemianTime }}</span>
+      <span i18n>Sun rise/set:</span>
+      <span class="num">{{ sunrise }} • {{ sunset }}</span>
+      <span i18n>Moon rise/set:</span>
+      <span class="num">{{ moonrise }} • {{ moonset }}</span>
+    </div>
+    <div *ngIf="showErrors" class="recalibration">
+      <span i18n>Last virtual recalibration:</span>&nbsp;<span class="num">{{ lastRecalibration }}</span>
+    </div>
+    <table [style.margin-top]="showErrors ? '0' : '1em'">
+      <ng-container *ngIf="showErrors">
+        <tr>
+          <th>&nbsp;</th>
+          <th i18n>Actual</th>
+          <th>Orloj</th>
+          <th>Δ</th>
+        </tr>
+      </ng-container>
+      <tr>
+        <td i18n>Sun λ</td>
+        <td class="num">{{ true_sunAngle.orig | number: '1.0-0' }}° {{ toZodiac(true_sunAngle.orig) }}</td>
+        <ng-container *ngIf="showErrors">
+          <td class="num">{{ sunAngle.orig | number: '1.0-0' }}°</td>
+          <td class="diff wide">{{ errorSun | number: '1.1-1' }}°, {{ errorSunMinutes | number: '1.1-1' }}
+            <span i18n>mins</span></td>
+        </ng-container>
+      </tr>
+      <tr>
+        <td i18n>Moon λ</td>
+        <td class="num">{{ true_moonAngle.orig | number: '1.0-0' }}° {{ toZodiac(true_moonAngle.orig) }}</td>
+        <ng-container *ngIf="showErrors">
+          <td class="num">{{ moonAngle.orig | number: '1.0-0' }}°</td>
+          <td class="diff wide">{{ errorMoon | number: '1.1-1' }}°, {{ errorMoonDays | number: '1.1-1' }}
+            <span i18n>days</span></td>
+        </ng-container>
+      </tr>
+      <tr>
+        <td i18n>Moon phase</td>
+        <td class="num">{{ true_moonPhase | number: '1.0-0' }}°</td>
+        <ng-container *ngIf="showErrors">
+          <td class="num">{{ moonPhase | number: '1.0-0' }}°</td>
+          <td class="diff wide">{{ errorPhase | number: '1.1-1' }}°, {{ errorPhaseDays | number: '1.1-1' }}
+            <span i18n>days</span></td>
+        </ng-container>
+      </tr>
+    </table>
+  </div>
+</ng-template>
+
 <div class="controls tbw-dark-mode"
     [class.short]="lastHeight <= 420 && lastHeight > 380"
     [class.extra-short]="lastHeight <= 380"
     [class.collapsed]="collapsed">
-  <p-menu #menu [popup]="true" [model]="menuItems" appendTo="body"></p-menu>
+  <p-tieredMenu #menu [popup]="true" [model]="menuItems" appendTo="body"></p-tieredMenu>
   <i class="pi pi-bars" (click)="menu.toggle($event)" [class.collapsed]="collapsed"></i>
+  <i class="pi pi-plus" (click)="advancedOptions.show()" [class.collapsed]="collapsed"></i>
+  <i class="pi pi-info-circle" (click)="showInfoPanel = !showInfoPanel" [class.collapsed]="collapsed"></i>
   <i class="pi pi-chevron-down" (click)="collapsed = !collapsed" [class.collapsed]="collapsed"></i>
   <div class="place-name-group" [class.collapsed]="collapsed">
     <span *ngIf="!canSaveName && placeName" class="place-name">{{placeName}}</span>
@@ -37,21 +101,31 @@
   <div class="button-row">
     <p-checkbox [(ngModel)]="isoFormat" [binary]="true"
         i18n-label label="ISO time format"></p-checkbox>
-    <p-checkbox [(ngModel)]="disableDst" [binary]="true" [disabled]="constrainedSun"
+    <p-checkbox [(ngModel)]="disableDst" [binary]="true" [disabled]="timing !== MODERN" id="disable-dst"
         i18n-label label="Disable DST on clock" (onChange)="updateTime(true)"></p-checkbox>
   </div>
   <tze-zone-selector [(ngModel)]="zone" [recents]="recentLocations" (clearItem)='clearItem($event)' (clearRecents)="clearRecents()"
       [autofocus]="false" [disabled]="canSaveName" (location)="changeLocation($event)"></tze-zone-selector>
   <div class="button-row time-row">
-    <p-checkbox [(ngModel)]="trackTime" [binary]="true"
+    <p-checkbox [(ngModel)]="trackTime" [binary]="true" [disabled]="playing" id="track-time"
         i18n-label label="Track current time"></p-checkbox><span>&nbsp;&nbsp;</span>
-    <button i18n type="button" pButton (click)="setNow()" [disabled]="trackTime">Now</button>
+    <button i18n type="button" pButton (click)="setNow()" class="now" [disabled]="trackTime" id="now">Now</button>
+    <fa-icon [icon]="faPlay" class="fa-xl" [class.disabled]="playing && playSpeed === NORMAL" (click)="play()"></fa-icon>
+    <fa-icon [icon]="faForward" class="fa-xl" [class.disabled]="playing && playSpeed === FAST" (click)="playFast()"></fa-icon>
+    <fa-icon [icon]="faStop" class="fa-xl" [class.disabled]="!playing" (click)="stop()"></fa-icon>
   </div>
   <div class="button-row">
     <tbw-angle-editor wideSpinner [(ngModel)]="latitude" [disableMobileKeyboard]="suppressOsKeyboard" [disabled]="canSaveName"
         [options]="{ angleStyle: DD, compass: SOUTH_NORTH, decimalPrecision: 1, locale: specificLocale }"></tbw-angle-editor>
     <tbw-angle-editor wideSpinner [(ngModel)]="longitude" [disableMobileKeyboard]="suppressOsKeyboard" [disabled]="canSaveName"
         [options]="{ angleStyle: DDD, compass: WEST_EAST, decimalPrecision: 1, locale: specificLocale }"></tbw-angle-editor>
+  </div>
+  <div class="time-text" [class.collapsed]="collapsed" [class.track-time]="trackTime">{{timeText}}</div>
+
+  <app-advanced-options #advancedOptions></app-advanced-options>
+
+  <div *ngIf="showInfoPanel && !collapsed" class="below-control-panel">
+    <ng-container *ngTemplateOutlet="infoErrorPanel"></ng-container>
   </div>
 </div>
 
@@ -207,7 +281,7 @@
           </text>
           <text *ngIf="midnightSunR">
             <textPath xlink:href="#solNoctis" startOffset="49%" class="eventText">
-              <tspan dy="-2" [style.font-size]="'12px'">ⓈⓄⓁ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ⓃⓄⒸⓉⒾⓈ</tspan><!-- CREPUSCULUM -->
+              <tspan dy="-2" [style.font-size]="'12px'">ⓈⓄⓁ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ⓃⓄⒸⓉⒾⓈ</tspan>
             </textPath>
           </text>
           <!-- cspell:enable -->
@@ -363,10 +437,22 @@
   <div id="globe-host"></div>
 
   <svg viewBox="0 0 600 600" xml:space="preserve" class="svg-overlay" [class.controls-collapsed]="collapsed">
+    <defs>
+      <radialGradient cx="25%" cy="25%" r="65%" id="sphere-effect">
+        <stop offset="0%" stop-color="rgba(255, 255, 255, 0.5)"/>
+        <stop offset="40%" stop-color="rgba(255, 255, 255, 0)"/>
+        <stop offset="100%" stop-color="rgba(0, 0, 0, 0.25)"/>
+      </radialGradient>
+    </defs>
     <g transform="translate(300, 300)" class="content">
       <g id="frontPart">
-        <g [attr.filter]="svgFilteringOn ? 'url(&quot;#filterHand&quot;)' : null">
+        <g [attr.filter]="filterHand">
           <g [attr.filter]="filterRelief">
+            <g *ngIf="detailedMechanism" id="moon-hand" [attr.transform]="rotate(moonHandAngle * rotateSign)"
+                [style.opacity]="translucentEcliptic ? '0.4' : '1'">
+              <use xlink:href="#leverRafieSymbol" class="leverRafieSymbol"/>
+              <path d="M0 0L0 -250.0" class="leverRafieSymbol"/>
+            </g>
             <g id="hand" [attr.transform]="rotate(handAngle * rotateSign)">
               <use xlink:href="#leverRafieSymbol" class="leverRafieSymbol"/>
               <path d="M0 0L0 -250.0" class="leverRafieGolden"/>
@@ -376,7 +462,7 @@
             </g>
           </g>
         </g>
-        <g [attr.filter]="svgFilteringOn ? 'url(&quot;#filterEcliptic&quot;)' : null" class="eclipticWheel"
+        <g [attr.filter]="filterEcliptic"
             [style.opacity]="translucentEcliptic ? '0.33' : '1'">
           <g [attr.filter]="filterRelief">
             <g id="ecliptic_positive_levers" [attr.transform]="rotate(siderealAngle * rotateSign)">
@@ -407,154 +493,162 @@
                     <path d="M0.0 -178.9C98.8 -178.9 178.9 -98.8 178.9 0.0C178.9 98.8 98.8 178.9 0.0 178.9C-98.8 178.9 -178.9 98.8 -178.9 0.0C-178.9 -98.8 -98.8 -178.9 0.0 -178.9M0.0 -116.3C-64.2 -116.3 -116.3 -64.2 -116.3 0.0C-116.3 64.2 -64.2 116.3 0.0 116.3C64.2 116.3 116.3 64.2 116.3 0.0C116.3 -64.2 64.2 -116.3 0.0 -116.3" class="maskWhite"/>
                   </mask>
                   <g mask="url('#maskSmall')">
-                    <path d="M0 71.1L40.7 426.5" class="eclipticDial"/>
-                    <path d="M0 71.1L80.7 419.6" class="eclipticDial"/>
-                    <path d="M0 71.1L119.4 408.3" class="eclipticDial"/>
-                    <path d="M0 71.1L156.2 393.0" class="eclipticDial"/>
-                    <path d="M0 71.1L222.1 351.6" class="eclipticDial"/>
-                    <path d="M0 71.1L250.6 326.5" class="eclipticDial"/>
-                    <path d="M0 71.1L275.8 299.0" class="eclipticDial"/>
-                    <path d="M0 71.1L297.7 269.6" class="eclipticDial"/>
-                    <path d="M0 71.1L331.2 206.4" class="eclipticDial"/>
-                    <path d="M0 71.1L342.8 173.3" class="eclipticDial"/>
-                    <path d="M0 71.1L351.1 139.6" class="eclipticDial"/>
-                    <path d="M0 71.1L356.1 105.5" class="eclipticDial"/>
-                    <path d="M0 71.1L356.1 36.8" class="eclipticDial"/>
-                    <path d="M0 71.1L351.1 2.7" class="eclipticDial"/>
-                    <path d="M0 71.1L342.8 -31.1" class="eclipticDial"/>
-                    <path d="M0 71.1L331.2 -64.1" class="eclipticDial"/>
-                    <path d="M0 71.1L297.7 -127.3" class="eclipticDial"/>
-                    <path d="M0 71.1L275.8 -156.7" class="eclipticDial"/>
-                    <path d="M0 71.1L250.6 -184.2" class="eclipticDial"/>
-                    <path d="M0 71.1L222.1 -209.3" class="eclipticDial"/>
-                    <path d="M0 71.1L156.2 -250.7" class="eclipticDial"/>
-                    <path d="M0 71.1L119.4 -266.1" class="eclipticDial"/>
-                    <path d="M0 71.1L80.7 -277.4" class="eclipticDial"/>
-                    <path d="M0 71.1L40.7 -284.3" class="eclipticDial"/>
-                    <path d="M0 71.1L-40.7 -284.3" class="eclipticDial"/>
-                    <path d="M0 71.1L-80.7 -277.4" class="eclipticDial"/>
-                    <path d="M0 71.1L-119.4 -266.1" class="eclipticDial"/>
-                    <path d="M0 71.1L-156.2 -250.7" class="eclipticDial"/>
-                    <path d="M0 71.1L-222.1 -209.3" class="eclipticDial"/>
-                    <path d="M0 71.1L-250.6 -184.2" class="eclipticDial"/>
-                    <path d="M0 71.1L-275.8 -156.7" class="eclipticDial"/>
-                    <path d="M0 71.1L-297.7 -127.3" class="eclipticDial"/>
-                    <path d="M0 71.1L-331.2 -64.1" class="eclipticDial"/>
-                    <path d="M0 71.1L-342.8 -31.1" class="eclipticDial"/>
-                    <path d="M0 71.1L-351.1 2.7" class="eclipticDial"/>
-                    <path d="M0 71.1L-356.1 36.8" class="eclipticDial"/>
-                    <path d="M0 71.1L-356.1 105.5" class="eclipticDial"/>
-                    <path d="M0 71.1L-351.1 139.6" class="eclipticDial"/>
-                    <path d="M0 71.1L-342.8 173.3" class="eclipticDial"/>
-                    <path d="M0 71.1L-331.2 206.4" class="eclipticDial"/>
-                    <path d="M0 71.1L-297.7 269.6" class="eclipticDial"/>
-                    <path d="M0 71.1L-275.8 299.0" class="eclipticDial"/>
-                    <path d="M0 71.1L-250.6 326.5" class="eclipticDial"/>
-                    <path d="M0 71.1L-222.1 351.6" class="eclipticDial"/>
-                    <path d="M0 71.1L-156.2 393.0" class="eclipticDial"/>
-                    <path d="M0 71.1L-119.4 408.3" class="eclipticDial"/>
-                    <path d="M0 71.1L-80.7 419.6" class="eclipticDial"/>
-                    <path d="M0 71.1L-40.7 426.5" class="eclipticDial"/>
+                    <path id="ref-01" d="M0 71.1L40.7 426.5" class="eclipticDial"/>
+                    <path id="ref-02" d="M0 71.1L80.7 419.6" class="eclipticDial"/>
+                    <path id="ref-03" d="M0 71.1L119.4 408.3" class="eclipticDial"/>
+                    <path id="ref-04" d="M0 71.1L156.2 393.0" class="eclipticDial"/>
+                    <path id="ref-06" d="M0 71.1L222.1 351.6" class="eclipticDial"/>
+                    <path id="ref-07" d="M0 71.1L250.6 326.5" class="eclipticDial"/>
+                    <path id="ref-08" d="M0 71.1L275.8 299.0" class="eclipticDial"/>
+                    <path id="ref-09" d="M0 71.1L297.7 269.6" class="eclipticDial"/>
+                    <path id="ref-11" d="M0 71.1L331.2 206.4" class="eclipticDial"/>
+                    <path id="ref-12" d="M0 71.1L342.8 173.3" class="eclipticDial"/>
+                    <path id="ref-13" d="M0 71.1L351.1 139.6" class="eclipticDial"/>
+                    <path id="ref-14" d="M0 71.1L356.1 105.5" class="eclipticDial"/>
+                    <path id="ref-16" d="M0 71.1L356.1 36.8" class="eclipticDial"/>
+                    <path id="ref-17" d="M0 71.1L351.1 2.7" class="eclipticDial"/>
+                    <path id="ref-18" d="M0 71.1L342.8 -31.1" class="eclipticDial"/>
+                    <path id="ref-19" d="M0 71.1L331.2 -64.1" class="eclipticDial"/>
+                    <path id="ref-21" d="M0 71.1L297.7 -127.3" class="eclipticDial"/>
+                    <path id="ref-22" d="M0 71.1L275.8 -156.7" class="eclipticDial"/>
+                    <path id="ref-23" d="M0 71.1L250.6 -184.2" class="eclipticDial"/>
+                    <path id="ref-24" d="M0 71.1L222.1 -209.3" class="eclipticDial"/>
+                    <path id="ref-26" d="M0 71.1L156.2 -250.7" class="eclipticDial"/>
+                    <path id="ref-27" d="M0 71.1L119.4 -266.1" class="eclipticDial"/>
+                    <path id="ref-28" d="M0 71.1L80.7 -277.4" class="eclipticDial"/>
+                    <path id="ref-29" d="M0 71.1L40.7 -284.3" class="eclipticDial"/>
+                    <path id="ref-31" d="M0 71.1L-40.7 -284.3" class="eclipticDial"/>
+                    <path id="ref-32" d="M0 71.1L-80.7 -277.4" class="eclipticDial"/>
+                    <path id="ref-33" d="M0 71.1L-119.4 -266.1" class="eclipticDial"/>
+                    <path id="ref-34" d="M0 71.1L-156.2 -250.7" class="eclipticDial"/>
+                    <path id="ref-36" d="M0 71.1L-222.1 -209.3" class="eclipticDial"/>
+                    <path id="ref-37" d="M0 71.1L-250.6 -184.2" class="eclipticDial"/>
+                    <path id="ref-38" d="M0 71.1L-275.8 -156.7" class="eclipticDial"/>
+                    <path id="ref-39" d="M0 71.1L-297.7 -127.3" class="eclipticDial"/>
+                    <path id="ref-41" d="M0 71.1L-331.2 -64.1" class="eclipticDial"/>
+                    <path id="ref-42" d="M0 71.1L-342.8 -31.1" class="eclipticDial"/>
+                    <path id="ref-43" d="M0 71.1L-351.1 2.7" class="eclipticDial"/>
+                    <path id="ref-44" d="M0 71.1L-356.1 36.8" class="eclipticDial"/>
+                    <path id="ref-46" d="M0 71.1L-356.1 105.5" class="eclipticDial"/>
+                    <path id="ref-47" d="M0 71.1L-351.1 139.6" class="eclipticDial"/>
+                    <path id="ref-48" d="M0 71.1L-342.8 173.3" class="eclipticDial"/>
+                    <path id="ref-49" d="M0 71.1L-331.2 206.4" class="eclipticDial"/>
+                    <path id="ref-51" d="M0 71.1L-297.7 269.6" class="eclipticDial"/>
+                    <path id="ref-52" d="M0 71.1L-275.8 299.0" class="eclipticDial"/>
+                    <path id="ref-53" d="M0 71.1L-250.6 326.5" class="eclipticDial"/>
+                    <path id="ref-54" d="M0 71.1L-222.1 351.6" class="eclipticDial"/>
+                    <path id="ref-56" d="M0 71.1L-156.2 393.0" class="eclipticDial"/>
+                    <path id="ref-57" d="M0 71.1L-119.4 408.3" class="eclipticDial"/>
+                    <path id="ref-58" d="M0 71.1L-80.7 419.6" class="eclipticDial"/>
+                    <path id="ref-59" d="M0 71.1L-40.7 426.5" class="eclipticDial"/>
                   </g>
                   <g mask="url('#maskLarge')">
-                    <path d="M0 71.1L0.0 428.9" class="eclipticCircle"/>
-                    <path d="M0 71.1L190.5 373.9" class="eclipticCircle"/>
-                    <path d="M0 71.1L316.1 238.6" class="eclipticCircle"/>
-                    <path d="M0 71.1L357.7 71.1" class="eclipticCircle"/>
-                    <path d="M0 71.1L316.1 -96.3" class="eclipticCircle"/>
-                    <path d="M0 71.1L190.5 -231.6" class="eclipticCircle"/>
-                    <path d="M0 71.1L0.0 -286.6" class="eclipticCircle"/>
-                    <path d="M0 71.1L-190.5 -231.6" class="eclipticCircle"/>
-                    <path d="M0 71.1L-316.1 -96.3" class="eclipticCircle"/>
-                    <path d="M0 71.1L-357.7 71.1" class="eclipticCircle"/>
-                    <path d="M0 71.1L-316.1 238.6" class="eclipticCircle"/>
-                    <path d="M0 71.1L-190.5 373.9" class="eclipticCircle"/>
+                    <path id="ref-00" d="M0 71.1L0.0 428.9" class="eclipticCircle"/>
+                    <path id="ref-05" d="M0 71.1L190.5 373.9" class="eclipticCircle"/>
+                    <path id="ref-10" d="M0 71.1L316.1 238.6" class="eclipticCircle"/>
+                    <path id="ref-15" d="M0 71.1L357.7 71.1" class="eclipticCircle"/>
+                    <path id="ref-20" d="M0 71.1L316.1 -96.3" class="eclipticCircle"/>
+                    <path id="ref-25" d="M0 71.1L190.5 -231.6" class="eclipticCircle"/>
+                    <path id="ref-30" d="M0 71.1L0.0 -286.6" class="eclipticCircle"/>
+                    <path id="ref-35" d="M0 71.1L-190.5 -231.6" class="eclipticCircle"/>
+                    <path id="ref-40" d="M0 71.1L-316.1 -96.3" class="eclipticCircle"/>
+                    <path id="ref-45" d="M0 71.1L-357.7 71.1" class="eclipticCircle"/>
+                    <path id="ref-50" d="M0 71.1L-316.1 238.6" class="eclipticCircle"/>
+                    <path id="ref-55" d="M0 71.1L-190.5 373.9" class="eclipticCircle"/>
                   </g>
                 </g>
                 <g *ngIf="!southern" id="symbols" transform="translate(0, 71.1)">
                   <g transform="rotate(76.2) translate(0,-110.5)">
-                    <text class="eclipticSymbol">♈</text>
+                    <text class="eclipticSymbol">♈&#xFE0E;</text>
                   </g>
                   <g transform="rotate(47.5) translate(0,-151.9)">
-                    <text class="eclipticSymbol">♉</text>
+                    <text class="eclipticSymbol">♉&#xFE0E;</text>
                   </g>
                   <g transform="rotate(16.3) translate(0,-182.8)">
-                    <text class="eclipticSymbol">♊</text>
+                    <text class="eclipticSymbol">♊&#xFE0E;</text>
                   </g>
                   <g transform="rotate(-16.3) translate(0,-182.8)">
-                    <text class="eclipticSymbol">♋</text>
+                    <text class="eclipticSymbol">♋&#xFE0E;</text>
                   </g>
                   <g transform="rotate(-47.5) translate(0,-151.9)">
-                    <text class="eclipticSymbol">♌</text>
+                    <text class="eclipticSymbol">♌&#xFE0E;</text>
                   </g>
                   <g transform="rotate(-76.2) translate(0,-110.5)">
-                    <text class="eclipticSymbol">♍</text>
+                    <text class="eclipticSymbol">♍&#xFE0E;</text>
                   </g>
                   <g transform="rotate(256.2) translate(0,-76.5)">
-                    <text class="eclipticSymbol">♎</text>
+                    <text class="eclipticSymbol">♎&#xFE0E;</text>
                   </g>
                   <g transform="rotate(227.5) translate(0,-55.7)">
-                    <text class="eclipticSymbol">♏</text>
+                    <text class="eclipticSymbol">♏&#xFE0E;</text>
                   </g>
                   <g transform="rotate(196.3) translate(0,-46.3)">
-                    <text class="eclipticSymbol">♐</text>
+                    <text class="eclipticSymbol">♐&#xFE0E;</text>
                   </g>
                   <g transform="rotate(163.7) translate(0,-46.3)">
-                    <text class="eclipticSymbol">♑</text>
+                    <text class="eclipticSymbol">♑&#xFE0E;</text>
                   </g>
                   <g transform="rotate(132.5) translate(0,-55.7)">
-                    <text class="eclipticSymbol">♒</text>
+                    <text class="eclipticSymbol">♒&#xFE0E;</text>
                   </g>
                   <g transform="rotate(103.8) translate(0,-76.5)">
-                    <text class="eclipticSymbol">♓</text>
+                    <text class="eclipticSymbol">♓&#xFE0E;</text>
                   </g>
                 </g>
                 <g *ngIf="southern" id="symbols" transform="translate(0, 71.1)">
                   <g transform="rotate(-76.2) translate(0,-110.5) scale(-1, 1)">
-                    <text class="eclipticSymbol">♈</text>
+                    <text class="eclipticSymbol">♈&#xFE0E;</text>
                   </g>
                   <g transform="rotate(-47.5) translate(0,-151.9) scale(-1, 1)">
-                    <text class="eclipticSymbol">♉</text>
+                    <text class="eclipticSymbol">♉&#xFE0E;</text>
                   </g>
                   <g transform="rotate(-16.3) translate(0,-182.8) scale(-1, 1)">
-                    <text class="eclipticSymbol">♊</text>
+                    <text class="eclipticSymbol">♊&#xFE0E;</text>
                   </g>
                   <g transform="rotate(16.3) translate(0,-182.8) scale(-1, 1)">
-                    <text class="eclipticSymbol">♋</text>
+                    <text class="eclipticSymbol">♋&#xFE0E;</text>
                   </g>
                   <g transform="rotate(47.5) translate(0,-151.9) scale(-1, 1)">
-                    <text class="eclipticSymbol">♌</text>
+                    <text class="eclipticSymbol">♌&#xFE0E;</text>
                   </g>
                   <g transform="rotate(76.2) translate(0,-110.5) scale(-1, 1)">
-                    <text class="eclipticSymbol">♍</text>
+                    <text class="eclipticSymbol">♍&#xFE0E;</text>
                   </g>
                   <g transform="rotate(-256.2) translate(0,-76.5) scale(-1, 1)">
-                    <text class="eclipticSymbol">♎</text>
+                    <text class="eclipticSymbol">♎&#xFE0E;</text>
                   </g>
                   <g transform="rotate(-227.5) translate(0,-55.7) scale(-1, 1)">
-                    <text class="eclipticSymbol">♏</text>
+                    <text class="eclipticSymbol">♏&#xFE0E;</text>
                   </g>
                   <g transform="rotate(-196.3) translate(0,-46.3) scale(-1, 1)">
-                    <text class="eclipticSymbol">♐</text>
+                    <text class="eclipticSymbol">♐&#xFE0E;</text>
                   </g>
                   <g transform="rotate(-163.7) translate(0,-46.3) scale(-1, 1)">
-                    <text class="eclipticSymbol">♑</text>
+                    <text class="eclipticSymbol">♑&#xFE0E;</text>
                   </g>
                   <g transform="rotate(-132.5) translate(0,-55.7) scale(-1, 1)">
-                    <text class="eclipticSymbol">♒</text>
+                    <text class="eclipticSymbol">♒&#xFE0E;</text>
                   </g>
                   <g transform="rotate(-103.8) translate(0,-76.5) scale(-1, 1)">
-                    <text class="eclipticSymbol">♓</text>
+                    <text class="eclipticSymbol">♓&#xFE0E;</text>
                   </g>
                 </g>
               </g>
             </g>
           </g>
           <g id="sunGroup">
+            <g *ngIf="detailedMechanism" [attr.filter]="filterHand">
+              <g [attr.filter]="filterRelief">
+                <g id="sun-guide" [attr.transform]="rotate(handAngle * rotateSign)">
+                  <rect x="-2.5" y="-250" width="5" height="20" class="sun-moon-guides"/>
+                  <rect x="-1.5" y="-230" width="3" height="150" class="sun-moon-guides"/>
+                </g>
+              </g>
+            </g>
             <g [attr.filter]="filterRelief">
               <g id="ecliptic_positive_sunBeamLargeSymbol_A" [attr.transform]="rotate(siderealAngle * rotateSign)">
                 <g transform="translate(0, -71.1)">
-                  <g id="sun_positive_sunBeamLargeSymbol_A" [attr.transform]="rotate(sunAngle * rotateSign)">
+                  <g id="sun_positive_sunBeamLargeSymbol_A" [attr.transform]="rotate(sunAngle.ie * rotateSign)">
                     <g id="sun_translate_sunBeamLargeSymbol_A" transform="translate(0,-161.0)">
                       <use xlink:href="#sunBeamLargeSymbol"/>
                     </g>
@@ -564,21 +658,25 @@
             </g>
             <g id="ecliptic_positive_sunBeamLargeSymbol_B0" [attr.transform]="rotate(siderealAngle * rotateSign)">
               <g transform="translate(0, -71.1)">
-                <g id="sun_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(sunAngle * rotateSign)">
+                <g id="sun_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(sunAngle.ie * rotateSign)">
                   <g id="sun_translate_sunBeamLargeSymbol_B" transform="translate(0,-161.0)">
-                    <g id="sun_negative_sunBeamLargeSymbol_B" [attr.transform]="rotate(-sunAngle * rotateSign)">
+                    <rect *ngIf="detailedMechanism" x="-1" y="0" width="2" height="161"
+                        class="sun-moon-arms" [attr.filter]="filterRelief"/>
+                    <g id="sun_negative_sunBeamLargeSymbol_B" [attr.transform]="rotate(-sunAngle.ie * rotateSign)">
                       <g id="ecliptic_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(-siderealAngle * rotateSign)">
                         <path d="M0.0 -9.6C5.3 -9.6 9.6 -5.3 9.6 0.0C9.6 5.3 5.3 9.6 0.0 9.6C-5.3 9.6 -9.6 5.3 -9.6 0.0C-9.6 -5.3 -5.3 -9.6 0.0 -9.6" class="sunSphere"/>
                       </g>
                     </g>
                   </g>
+                  <circle *ngIf="detailedMechanism" cx="0" cy="0" r="3.5" class="pin"/>
+                  <circle *ngIf="detailedMechanism" cx="0" cy="0" r="3.5" class="pinSphere"/>
                 </g>
               </g>
             </g>
             <g [attr.filter]="filterRelief">
               <g id="ecliptic_positive_sunBeamSmallSymbol_A" [attr.transform]="rotate(siderealAngle * rotateSign)">
                 <g transform="translate(0, -71.1)">
-                  <g id="sun_positive_sunBeamSmallSymbol_A" [attr.transform]="rotate(sunAngle * rotateSign)">
+                  <g id="sun_positive_sunBeamSmallSymbol_A" [attr.transform]="rotate(sunAngle.ie * rotateSign)">
                     <g id="sun_translate_sunBeamSmallSymbol_A" transform="translate(0,-161.0)">
                       <use xlink:href="#sunBeamSmallSymbol"/>
                     </g>
@@ -588,44 +686,107 @@
             </g>
             <g id="ecliptic_positive_sunBeamSmallSymbol_B0" [attr.transform]="rotate(siderealAngle * rotateSign)">
               <g transform="translate(0, -71.1)">
-                <g id="sun_positive_sunBeamSmallSymbol_B" [attr.transform]="rotate(sunAngle * rotateSign)">
+                <g id="sun_positive_sunBeamSmallSymbol_B" [attr.transform]="rotate(sunAngle.ie * rotateSign)">
                   <g id="sun_translate_sunBeamSmallSymbol_B" transform="translate(0,-161.0)">
-                    <g id="sun_negative_sunBeamSmallSymbol_B" [attr.transform]="rotate(sunAngle * rotateSign)">
-                      <g id="ecliptic_positive_sunBeamSmallSymbol_B" [attr.transform]="rotate(-sunAngle * rotateSign)">
-                        <path d="M0.0 -9.6C5.3 -9.6 9.6 -5.3 9.6 0.0C9.6 5.3 5.3 9.6 0.0 9.6C-5.3 9.6 -9.6 5.3 -9.6 0.0C-9.6 -5.3 -5.3 -9.6 0.0 -9.6" class="sunSphere"/>
+                    <g id="sun_negative_sunBeamSmallSymbol_B" [attr.transform]="rotate(sunAngle.ie * rotateSign)">
+                      <g id="ecliptic_positive_sunBeamSmallSymbol_B" [attr.transform]="rotate(-sunAngle.ie * rotateSign)">
+                        <path d="M0.0 -9.6C5.3 -9.6 9.6 -5.3 9.6 0.0C9.6 5.3 5.3 9.6 0.0 9.6C-5.3 9.6 -9.6 5.3 -9.6 0.0C-9.6 -5.3 -5.3 -9.6 0.0 -9.6" class="sunSphere">
+                          <title>{{ true_sunAngle.orig | number: '1.1-1' }}°</title>
+                        </path>
                       </g>
                     </g>
                   </g>
                 </g>
+             </g>
+            </g>
+          </g>
+          <g *ngIf="detailedMechanism" [attr.filter]="filterHand">
+            <g [attr.filter]="filterRelief">
+              <g id="moon-guide" [attr.transform]="rotate(moonHandAngle * rotateSign)">
+                <rect x="-2.5" y="-270" width="5" height="20" class="sun-moon-guides"/>
+                <rect x="-1.5" y="-250" width="3" height="170" class="sun-moon-guides"/>
               </g>
             </g>
           </g>
           <g [attr.filter]="filterRelief">
             <g id="ecliptic_positive_moonGroup" [attr.transform]="rotate(siderealAngle * rotateSign)">
               <g transform="translate(0, -71.1)">
-                <g id="moon_positive" [attr.transform]="rotate(moonAngle * rotateSign)">
+                <g id="moon_positive" [attr.transform]="rotate(moonAngle.ie * rotateSign)">
                   <g transform="translate(0,-161.0)">
+                    <ng-container *ngIf="detailedMechanism">
+                      <rect x="-1" y="0" width="2" height="161" class="sun-moon-arms"/>
+                      <circle cx="0" cy="0" r="16" class="moon-ring-edge"/>
+                      <circle cx="0" cy="0" r="15" class="moon-ring"/>
+                    </ng-container>
                     <circle cx="0" cy="0" r="12" fill="black"/>
                     <circle cx="0" cy="0" r="12" class="moonDark"/>
                     <path id="moonSunlit" [attr.d]="sunlitMoonPath()" class="moonSunlit"/>
                   </g>
                   <g transform="translate(0,-161.0)">
-                    <g id="moon_negative" [attr.transform]="rotate(moonAngle * rotateSign)">
-                      <g id="ecliptic_negative_moon" [attr.transform]="rotate(-moonAngle * rotateSign)">
-                        <circle cx="0" cy="0" r="12" class="moonSphere"/>
+                    <g id="moon_negative" [attr.transform]="rotate(moonAngle.ie * rotateSign)">
+                      <g id="ecliptic_negative_moon" [attr.transform]="rotate(-moonAngle.ie * rotateSign)">
+                        <circle cx="0" cy="0" r="12" class="moonSphere">
+                          <title>{{ true_moonAngle.orig | number: '1.1-1' }}°</title>
+                        </circle>
                       </g>
                     </g>
                   </g>
+                </g>
+                <g *ngIf="additionalPlanets" id="mercury" [attr.transform]="rotate(mercuryAngle.oe * rotateSign)">
+                  <title>{{ mercuryAngle.orig | number: '1.1-1' }}°</title>
+                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[0]" r="7" fill="#C0C0C0"/>
+                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[0]" r="7" fill="url('#sphere-effect')"/>
+                  <text x="0" y="-176.5" [attr.dy]="overlapShift[0]" width="7" height="7">☿</text>
+                </g>
+                <g *ngIf="additionalPlanets" id="venus" [attr.transform]="rotate(venusAngle.oe * rotateSign)">
+                  <title>{{ venusAngle.orig | number: '1.1-1' }}°</title>
+                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[1]" r="7" fill="#CCCCFF"/>
+                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[1]" r="7" fill="url('#sphere-effect')"/>
+                  <text x="0" y="-176.5" [attr.dy]="overlapShift[1]" width="7" height="7">♀</text>
+                </g>
+                <g *ngIf="additionalPlanets" id="mars" [attr.transform]="rotate(marsAngle.oe * rotateSign)">
+                  <title>{{ marsAngle.orig | number: '1.1-1' }}°</title>
+                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[2]" r="7" fill="red"/>
+                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[2]" r="7" fill="url('#sphere-effect')"/>
+                  <text x="0" y="-176.5" [attr.dy]="overlapShift[2]" width="7" height="7">♂</text>
+                </g>
+                <g *ngIf="additionalPlanets" id="jupiter" [attr.transform]="rotate(jupiterAngle.oe * rotateSign)">
+                  <title>{{ jupiterAngle.orig | number: '1.1-1' }}°</title>
+                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[3]" r="7" fill="orange"/>
+                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[3]" r="7" fill="url('#sphere-effect')"/>
+                  <text x="0" y="-176.5" [attr.dy]="overlapShift[3]" width="7" height="7">♃</text>
+                </g>
+                <g *ngIf="additionalPlanets" id="saturn" [attr.transform]="rotate(saturnAngle.oe * rotateSign)">
+                  <title>{{ saturnAngle.orig | number: '1.1-1' }}°</title>
+                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[4]" r="7" fill="#FFFF99"/>
+                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[4]" r="7" fill="url('#sphere-effect')"/>
+                  <text x="0" y="-176.5" [attr.dy]="overlapShift[4]" width="7" height="7">♄</text>
+                </g>
+                <g *ngIf="realPositionMarkers" id="sun-true" [attr.transform]="rotate(true_sunAngle.oe * rotateSign)">
+                  <title>{{ true_sunAngle.orig | number: '1.1-1' }}°</title>
+                  <circle cx="0" cy="-178.9" r="7" fill="yellow"/>
+                  <circle cx="0" cy="-178.9" r="7" fill="url('#sphere-effect')"/>
+                  <text x="0" y="-176.5" width="7" height="7">☉</text>
+                </g>
+                <g *ngIf="realPositionMarkers" id="moon-true" [attr.transform]="rotate(true_moonAngle.oe * rotateSign)">
+                  <title>{{ true_moonAngle.orig | number: '1.1-1' }}°</title>
+                  <circle cx="0" cy="-178.9" r="7" fill="white"/>
+                  <circle cx="0" cy="-178.9" r="7" fill="url('#sphere-effect')"/>
+                  <text x="0" y="-176.5" width="7" height="7">☽</text>
                 </g>
               </g>
             </g>
           </g>
         </g>
-        <path d="M0.0 -4.5C2.5 -4.5 4.5 -2.5 4.5 0.0C4.5 2.5 2.5 4.5 0.0 4.5C-2.5 4.5 -4.5 2.5 -4.5 0.0C-4.5 -2.5 -2.5 -4.5 0.0 -4.5" class="pin"/>
-        <path d="M0.0 -4.5C2.5 -4.5 4.5 -2.5 4.5 0.0C4.5 2.5 2.5 4.5 0.0 4.5C-2.5 4.5 -4.5 2.5 -4.5 0.0C-4.5 -2.5 -2.5 -4.5 0.0 -4.5" class="pinSphere"/>
+        <circle cx="0" cy="0" r="4.5" class="pin"/>
+        <circle cx="0" cy="0" r="4.5" class="pinSphere"/>
       </g>
     </g>
   </svg>
+
+  <div *ngIf="showInfoPanel" class="svg-info-overlay" [style.display]="showInfoPanel && collapsed ? 'block' : null">
+    <ng-container *ngTemplateOutlet="infoErrorPanel"></ng-container>
+  </div>
 </div>
 
 <div i18n id="graphics-credit">Original SVG clock graphics by Jan Tošovský</div>

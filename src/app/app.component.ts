@@ -1,17 +1,26 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService, PrimeNGConfig } from 'primeng/api';
-import { abs, atan2_deg, atan_deg, cos_deg, floor, max, min, mod, PI, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
-import { clone, getCssValue, isChromeOS, isEqual, isLikelyMobile, isSafari, processMillis } from '@tubular/util';
+import {
+  abs, atan2_deg, atan_deg, cos_deg, floor, interpolateModular, max, min, mod, mod2, PI, Point, sign,
+  sin_deg, sqrt, tan_deg
+} from '@tubular/math';
+import {
+  clone, extendDelimited, forEach, getCssValue, isEqual, isLikelyMobile, isObject, isSafari, processMillis, toNumber
+} from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import {
-  AstroEvent, EventFinder, FALL_EQUINOX, FIRST_QUARTER, FULL_MOON, LAST_QUARTER, MOON, NEW_MOON, RISE_EVENT, SET_EVENT,
-  SkyObserver, SolarSystem, SPRING_EQUINOX, SUMMER_SOLSTICE, SUN, TRANSIT_EVENT, WINTER_SOLSTICE
+  AstroEvent, EventFinder, FALL_EQUINOX, FIRST_QUARTER, FULL_MOON, JUPITER, LAST_QUARTER, MARS, MERCURY, MOON,
+  NEW_MOON, RISE_EVENT, SATURN, SET_EVENT, SkyObserver, SolarSystem, SPRING_EQUINOX, SUMMER_SOLSTICE, SUN,
+  TRANSIT_EVENT, VENUS, WINTER_SOLSTICE
 } from '@tubular/astronomy';
-import ttime, { DateTime, utToTdt } from '@tubular/time';
-import julianDay = ttime.julianDay;
+import ttime, { DateAndTime, DateTime, Timezone, utToTdt } from '@tubular/time';
 import { TzsLocation } from '../timezone-selector/timezone-selector.component';
 import { Globe } from '../globe/globe';
-import { localeSuffix, SOUTH_NORTH, specificLocale, WEST_EAST } from '../locales/locale-info';
+import { basePath, languageList, localeSuffix, SOUTH_NORTH, specificLocale, WEST_EAST } from '../locales/locale-info';
+import { faForward, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
+import { AdvancedOptionsComponent, SettingsHolder, Timing } from '../advanced-options/advanced-options.component';
+
+const { DATE, DATETIME_LOCAL, julianDay, TIME } = ttime;
 
 const CLOCK_RADIUS = 250;
 const INCLINATION = 23.5;
@@ -21,10 +30,14 @@ const EQUATOR_RADIUS = 164.1;
 const HORIZON_RADIUS = CLOCK_RADIUS * tan_deg((90 - INCLINATION) / 2);
 const TROPIC_RADIUS = HORIZON_RADIUS * tan_deg((90 - INCLINATION) / 2);
 const ECLIPTIC_INNER_RADIUS = 161;
+const ECLIPTIC_OUTER_RADIUS = 178.9;
 const ECLIPTIC_CENTER_OFFSET = 71.1;
 const MAX_UNEVEN_HOUR_LATITUDE = 86;
 const RESUME_FILTERING_DELAY = 1000;
+const START_FILTERING_DELAY = 500;
 const STOP_FILTERING_DELAY = isSafari() ? 1000 : 3000;
+const MILLIS_PER_DAY = 86_400_000;
+const RECOMPUTED_WHEN_NEEDED: null = null;
 
 interface CircleAttributes {
   cy: number;
@@ -33,28 +46,39 @@ interface CircleAttributes {
 }
 
 enum EventType { EQUISOLSTICE, MOON_PHASE, RISE_SET }
+enum PlaySpeed { NORMAL, FAST }
 
 const MAX_SAVED_LOCATIONS = 10;
 
 const prague = $localize`Prague, CZE`;
+const pragueLat = 50.0870;
+const pragueLon = 14.4185;
+
 const defaultSettings = {
+  additionalPlanets: false,
+  background: '#4D4D4D',
   collapsed: false,
-  constrainedSun: false,
+  detailedMechanism: false,
   disableDst: true,
   eventType: EventType.EQUISOLSTICE,
+  fasterGraphics: true,
+  hideMap: false,
   isoFormat: false,
-  latitude: 50.0870,
-  longitude: 14.4185,
+  latitude: pragueLat,
+  longitude: pragueLon,
   placeName: prague,
   post2018: true,
+  realPositionMarkers: false,
   recentLocations: [{
     lastTimeUsed: 0,
-    latitude: 50.0870,
-    longitude: 14.4185,
+    latitude: pragueLat,
+    longitude: pragueLon,
     name: prague,
     zone: 'Europe/Prague'
   }] as TzsLocation[],
+  showInfoPanel: false,
   suppressOsKeyboard: false,
+  timing: Timing.MODERN,
   trackTime: true,
   translucentEcliptic: false,
   zone: 'Europe/Prague'
@@ -148,19 +172,117 @@ function findCircleRadius(x1: number, y1: number, x2: number, y2: number, x3: nu
   return sqrt(sqr_of_r);
 }
 
+function interpolateAngle(xx: number[], yy: number[], angle: number): number {
+  angle = mod(angle, 360);
+
+  const angle2 = angle - 360;
+
+  for (let i = 0; i < xx.length; ++i) {
+    let match: number;
+
+    if (xx[i] === angle || xx[i] === angle2)
+      return mod(yy[i], 360);
+    else if ((xx[i] < angle && angle < xx[i + 1]) || ((xx[i] > angle && angle > xx[i + 1])))
+      match = angle;
+    else if ((xx[i] < angle2 && angle2 < xx[i + 1]) || (xx[i] > angle2 && angle2 > xx[i + 1]))
+      match = angle2;
+    else
+      continue;
+
+    return interpolateModular(xx[i], match, xx[i + 1], yy[i], yy[i + 1], 360);
+  }
+
+  return NaN;
+}
+
+interface AngleTriplet {
+  ie: number; // inner ecliptic
+  oe: number; // outer ecliptic
+  orig: number;
+}
+
+const ZeroAngles: AngleTriplet = { ie: 0, oe: 0, orig: 0 };
+
+function eclipticIntercept(x1: number, y1: number, r: number): Point {
+  if (y1 === ECLIPTIC_CENTER_OFFSET)
+    y1 -= 0.001 * sign(x1); // Calculation fails of y1 is exactly equal to ECLIPTIC_CENTER_OFFSET
+
+  const sgn = (y1 < ECLIPTIC_CENTER_OFFSET ? -1 : 1);
+  const y2 = ECLIPTIC_CENTER_OFFSET;
+  const dx = -x1;
+  const dy = y2 - y1;
+  const dr = sqrt(dx ** 2 + dy ** 2);
+  const D = x1 * y2;
+  const dr2 = dr ** 2;
+  const root = sqrt(r ** 2 * dr2 - D ** 2);
+  const x = (D * dy + sgn * sign(dy) * dx * root) / dr2;
+  const y = (-D * dx + sgn * abs(dy) * root) / dr2;
+
+  return { x, y };
+}
+
+function bpKey(key: string): boolean { return !key.startsWith('_'); }
+
+interface BasicPositions {
+  _date?: DateTime;
+  _endTime?: number;
+  _hourOfDay?: number;
+  _jde?: number;
+  _jdu?: number;
+  _referenceTime?: number;
+  handAngle: number;
+  moonAngle: AngleTriplet;
+  moonHandAngle: number;
+  moonPhase: number;
+  siderealAngle: number;
+  sunAngle: AngleTriplet;
+}
+
+function formatTimeOfDay(hours: number | DateTime | DateAndTime, force24 = false, zeroIs24 = false): string {
+  if (hours instanceof DateTime)
+    hours = hours.wallTime;
+
+  if (isObject(hours))
+    hours = hours.hour + hours.minute / 60;
+
+  const minutes = min(floor(hours * 60 + 0.001), 1439);
+  const hour = floor(minutes / 60);
+  const minute = minutes % 60;
+  const format = force24 ? TIME : 'IxS{hour:2-digit}';
+  let time = new DateTime([1970, 1, 1, hour, minute], 'UTC', specificLocale).format(format);
+
+  if (zeroIs24)
+    time = time.replace(/^00/, '24');
+
+  return time;
+}
+
+const menuLanguageList: MenuItem[] = [];
+
+menuLanguageList.push({ label: $localize`Default`, url: basePath, target: '_self' });
+menuLanguageList.push({ separator: true });
+languageList.forEach(language => menuLanguageList.push({ label: language.name, url: basePath + language.directory, target: '_self' }));
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
-  buggyForeignObject = isChromeOS() || isSafari();
+export class AppComponent implements OnInit, SettingsHolder {
+  faForward = faForward;
+  faPlay = faPlay;
+  faStop = faStop;
+
   DD = AngleStyle.DD;
   DDD = AngleStyle.DDD;
+  FAST = PlaySpeed.FAST;
+  MODERN = Timing.MODERN;
   MAX_YEAR = 2399;
   MIN_YEAR = 1400;
+  NORMAL = PlaySpeed.NORMAL;
   SOUTH_NORTH = SOUTH_NORTH;
   specificLocale = specificLocale;
+  toZodiac = (angle: number): string => '♈♉♊♋♌♍♎♏♐♑♒♓'.charAt(floor(mod(angle, 360) / 30)) + '\uFE0E';
   WEST_EAST = WEST_EAST;
 
   LOCAL_OPTS: TimeEditorOptions = {
@@ -173,31 +295,43 @@ export class AppComponent implements OnInit {
 
   ISO_OPTS = ['ISO', this.LOCAL_OPTS, { showUtcOffset: true }];
 
-  private baseMoonAngle: number;
-  private baseSunAngle: number;
+  private _additionalPlanets = false;
+  private _background = '#4D4D4D';
   private _collapsed = false;
-  private _constrainedSun = false;
   private delayedCollapse = false;
+  private eclipticInnerAngle: number[] = [];
+  private eclipticOuterAngle: number[] = [];
   private eventFinder = new EventFinder();
   private eventType = EventType.EQUISOLSTICE;
   private globe: Globe
   private graphicsChangeLastTime = -1;
   private graphicsChangeStartTime = -1;
   private graphicsChangeStopTimer: any;
+  private _hideMap = false;
   private initDone = false;
+  private _isoFormat = false;
   private lastSavedSettings: any = null;
-  private _latitude = 50.0870;
-  private _longitude = 14.4185;
+  private lastWallTime: DateAndTime;
+  private _latitude = pragueLat;
+  private _longitude = pragueLon;
+  private localTimezone = Timezone.getTimezone('LMT', this._longitude);
   private observer: SkyObserver;
+  private _playing = false;
+  private playTimeBase: number;
+  private playTimeProcessBase: number;
   private _post2018 = false;
+  private _realPositionMarkers = false;
+  private slightlyOffEclipticAngle: number[] = [];
   private solarSystem = new SolarSystem();
   private sunsetA: AstroEvent = null;
   private sunsetB: AstroEvent = null;
   private _suppressOsKeyboard = false;
   private _time = 0;
   private timeCheck: any;
+  private _timing = Timing.MODERN;
+  private timingReference: BasicPositions| null | undefined;
   private _trackTime = false;
-  private _translucentEcliptic = false;
+  private trueEclipticAngle: number[] = [];
   private _zone = 'Europe/Prague';
   private zoneFixTimeout: any;
 
@@ -209,20 +343,23 @@ export class AppComponent implements OnInit {
     { label: $localize`↔ Sunrise/transit/sunset`, icon: 'pi pi-circle',
       command: (): void => this.setEventType(EventType.RISE_SET) },
     { separator : true },
-    { label: $localize`Post-2018 colors`, icon: 'pi pi-circle', id: 'p18',
-      command: (): boolean => this.post2018 = !this.post2018 },
-    { label: $localize`Align sun to hand pointer`, icon: 'pi pi-circle', id: 'cns',
-      command: (): boolean => this.constrainedSun = !this.constrainedSun },
-    { label: $localize`Translucent ecliptic`, icon: 'pi pi-circle', id: 'tec',
-      command: (): boolean => this.translucentEcliptic = !this.translucentEcliptic },
+    { label: $localize`Advanced options...`, icon: 'pi pi-circle', command: (): void => {
+      this.collapsed = false;
+      this.advancedOptions?.show();
+    } },
+    { label: $localize`Language`, icon: 'pi pi-circle', items: menuLanguageList },
     { separator : true },
-    { label: $localize`Code on GitHub`, icon: 'pi pi-github', url: 'https://github.com/kshetline/prague-clock' },
+    { label: $localize`Code on GitHub`, icon: 'pi pi-github', url: 'https://github.com/kshetline/prague-clock',
+      target: '_blank' },
+    { label: $localize`Official web site`, icon: 'pi pi-home', url: 'https://www.orloj.eu/', target: '_blank' },
     { label: $localize`About the real clock`, icon: 'pi pi-info-circle',
-      url: $localize`:Language-specific Wikipedia URL:https://en.wikipedia.org/wiki/Prague_astronomical_clock` },
-    { label: $localize`About this simulator`, icon: 'pi pi-info-circle',
-      url: `assets/about${localeSuffix}.html` }
+      url: $localize`:Language-specific Wikipedia URL:https://en.wikipedia.org/wiki/Prague_astronomical_clock`,
+      target: '_blank' },
+    { label: $localize`About this simulator`, icon: 'pi pi-info-circle', url: `assets/about${localeSuffix}.html`,
+      target: '_blank' }
   ];
 
+  bohemianTime = '';
   canEditName = false;
   canSaveName = false;
   darkCy: number;
@@ -231,11 +368,19 @@ export class AppComponent implements OnInit {
   dawnDuskFontSize = '15px';
   dawnLabelPath: string;
   dawnTextOffset: number;
+  detailedMechanism = false;
   disableDst = true;
   duskGradientAdjustment = 80;
   duskLabelPath: string;
   duskTextOffset: number;
   equatorSunriseAngle: number = null;
+  errorMoon = 0;
+  errorMoonDays = 0;
+  errorPhase = 0;
+  errorPhaseDays = 0;
+  errorSun = 0;
+  errorSunMinutes = 0;
+  fasterGraphics = true;
   handAngle = 0;
   hourStroke = 2;
   horizonCy: number;
@@ -246,25 +391,66 @@ export class AppComponent implements OnInit {
   innerSunriseAngle: number = null;
   inputLength = 0;
   inputName: string;
-  isoFormat = false;
+  jupiterAngle = ZeroAngles;
   lastHeight = -1;
+  lastRecalibration = '';
+  localMeanTime = '';
+  localSolarTime = '';
+  localTime = '';
+  marsAngle = ZeroAngles;
   midnightSunR = 0;
-  moonAngle = 0;
+  mercuryAngle = ZeroAngles;
+  moonAngle = ZeroAngles;
+  moonHandAngle = 0;
+  moonPhase = 0;
+  moonrise = '';
+  moonset = '';
   outerRingAngle = 0;
   outerSunriseAngle: number = null;
+  overlapShift = [0, 0, 0, 0, 0];
   placeName = 'Prague, CZE';
+  playSpeed = PlaySpeed.NORMAL;
   recentLocations: TzsLocation[] = [];
   riseSetFontSize = '15px';
   rotateSign = 1;
+  saturnAngle = ZeroAngles;
+  showErrors = false;
+  showInfoPanel = false;
   siderealAngle = 0;
+  siderealTime = '';
+  siderealTimeOrloj = '';
   solNoctisPath = '';
   southern = false;
-  sunAngle = 0;
+  sunAngle = ZeroAngles;
+  sunrise: string;
   sunriseLabelPath: string;
+  sunset: string;
   sunsetLabelPath: string;
   svgFilteringOn = true;
+  timeText = '';
+  translucentEcliptic = false;
+  true_handAngle = 0;
+  true_moonAngle = ZeroAngles;
+  true_moonHandleAngle = 0;
+  true_moonPhase = 0;
+  true_siderealAngle = 0;
+  true_sunAngle = ZeroAngles;
+  venusAngle = ZeroAngles;
+  zoneOffset = '';
 
-  get filterRelief(): string { return this.svgFilteringOn ? 'url("#filterRelief")' : null; }
+  @ViewChild('advancedOptions', { static: true }) advancedOptions: AdvancedOptionsComponent;
+
+  get filterEcliptic(): string {
+    return this.fasterGraphics && (!this.svgFilteringOn || this.playing) ? null : 'url("#filterEcliptic")';
+  }
+
+  get filterHand(): string {
+    return this.fasterGraphics && (!this.svgFilteringOn || this.playing) ? null : 'url("#filterHand")';
+  }
+
+  get filterRelief(): string {
+    return this.fasterGraphics &&  (!this.svgFilteringOn || this.playing) ? null : 'url("#filterRelief")';
+  }
 
   constructor(
     private confirmService: ConfirmationService,
@@ -283,6 +469,7 @@ export class AppComponent implements OnInit {
       settings = JSON.parse(localStorage.getItem('pac-settings') ?? 'null');
 
       if (settings?.recentLocations && settings.recentLocations.length > 0) {
+        delete settings.constrainedSun;
         settings.recentLocations.forEach((loc: any) => { loc.name = loc.name || loc.placeName; delete loc.placeName; });
         settings.recentLocations[0].name = prague;
       }
@@ -300,7 +487,51 @@ export class AppComponent implements OnInit {
     setInterval(() => this.saveSettings(), 5000);
   }
 
+  private eclipticToOffCenter(angle: number, inner = true): number {
+    if (this.eclipticInnerAngle.length === 0)
+      return 0;
+
+    return interpolateAngle(this.trueEclipticAngle, inner ? this.eclipticInnerAngle : this.eclipticOuterAngle, angle);
+  }
+
+  // The markings on the SVG graphics for the ecliptic wheel are slightly off in some places, by a degree or two
+  // (for instance, the line between Aries and Taurus is at about 28° instead of 30°), so this method corrects
+  // for those small errors. This is needed when the clock is operating in mechanical simulation mode, in order for
+  // the sun and the moon to be correctly aligned on the ecliptic wheel as if they had been guided into place by the
+  // sun and the moon hands of the clock.
+  private correctOffAngle(angle: number): number {
+    if (this.eclipticInnerAngle.length === 0)
+      return 0;
+
+    return interpolateAngle(this.slightlyOffEclipticAngle, this.trueEclipticAngle, angle);
+  }
+
+  private adjustForEclipticWheel(angle: number): AngleTriplet {
+    return {
+      orig: angle,
+      ie: 90 + this.eclipticToOffCenter(angle),
+      oe: 90 + this.eclipticToOffCenter(angle, false)
+    };
+  }
+
   ngOnInit(): void {
+    // Go backwards from coordinates already pre-defined in the SVG graphics to generate angle
+    // conversions guaranteed to align precisely with the graphics.
+    for (let i = -2; i <= 62; ++i) { // -2, 62
+      const elem = document.getElementById('ref-' + mod(i + 15, 60).toString().padStart(2, '0'));
+      const coords = /([-0-9.]+)\s+([-0-9.]+)$/.exec(elem.getAttribute('d'));
+      const x = toNumber(coords[1]);
+      const y = toNumber(coords[2]);
+      const inner = eclipticIntercept(x, y, ECLIPTIC_INNER_RADIUS);
+      const outer = eclipticIntercept(x, y, ECLIPTIC_OUTER_RADIUS);
+
+      this.trueEclipticAngle[i + 2] = i * 6;
+      this.slightlyOffEclipticAngle[i + 2] = mod(atan2_deg(ECLIPTIC_CENTER_OFFSET - inner.y, inner.x), 360)
+        - (i < 0 ? 360 : 0) + (i > 59 ? 360 : 0);
+      this.eclipticInnerAngle[i + 2] = mod(atan2_deg(inner.y, inner.x), 360) + (i < 5 ? 360 : 0);
+      this.eclipticOuterAngle[i + 2] = mod(atan2_deg(outer.y, outer.x), 360) + (i < 4 ? 360 : 0);
+    }
+
     this.primeNgConfig.setTranslation({
       accept: $localize`:for dialog button:Yes`,
       reject: $localize`:for dialog button:No`
@@ -310,9 +541,13 @@ export class AppComponent implements OnInit {
 
     this.initDone = true;
     this.globe = new Globe('globe-host');
+    this.globe.setColorScheme(this.post2018);
+    this.globe.setHideMap(this.hideMap);
     this.adjustLatitude();
+
     this.setNow();
     this.placeName = placeName;
+    this.advancedOptions.settingsHolder = this;
 
     if (this.delayedCollapse)
       setTimeout(() => this.collapsed = true);
@@ -359,7 +594,7 @@ export class AppComponent implements OnInit {
     poll();
     doResize();
 
-    setTimeout(() => document.getElementById('graphics-credit').style.opacity = '0', 30000);
+    setTimeout(() => document.getElementById('graphics-credit').style.opacity = '0', 15000);
     this.graphicsChangeStartTime = -1;
   }
 
@@ -392,6 +627,23 @@ export class AppComponent implements OnInit {
     });
   }
 
+  get background(): string { return this._background; }
+  set background(value: string) {
+    if (this._background !== value) {
+      this._background = value;
+      document.documentElement.style.setProperty('--background', value);
+    }
+  }
+
+  get isoFormat(): boolean { return this._isoFormat; }
+  set isoFormat(value: boolean) {
+    if (this._isoFormat !== value) {
+      this._isoFormat = value;
+      this.clearTimingReferenceIfNeeded();
+      this.updateTime();
+    }
+  }
+
   get collapsed(): boolean { return this._collapsed; }
   set collapsed(value: boolean) {
     if (this._collapsed !== value) {
@@ -415,11 +667,135 @@ export class AppComponent implements OnInit {
   set post2018(value: boolean) {
     if (this._post2018 !== value) {
       this._post2018 = value;
-      this.updateMenu();
-
-      if (this.initDone)
-        this.updateGlobe();
+      this.globe?.setColorScheme(value);
     }
+  }
+
+  get hideMap(): boolean { return this._hideMap; }
+  set hideMap(value: boolean) {
+    if (this._hideMap !== value) {
+      this._hideMap = value;
+      this.globe?.setHideMap(value);
+    }
+  }
+
+  get timing(): Timing { return this._timing; }
+  set timing(value: Timing) {
+    if (this._timing !== value) {
+      this._timing = value;
+
+      if (value !== Timing.MODERN) {
+        this.showErrors = true;
+        this.timingReference = RECOMPUTED_WHEN_NEEDED;
+      }
+      else {
+        this.showErrors = false;
+        this.timingReference = undefined;
+      }
+
+      this.updateTime(true);
+    }
+  }
+
+  private clearTimingReferenceIfNeeded(): void {
+    if (this.timing !== Timing.MODERN)
+      this.timingReference = RECOMPUTED_WHEN_NEEDED;
+  }
+
+  private adjustMechanicalTimingReference(): void {
+    if (this.timing === Timing.MODERN) {
+      this.timingReference = undefined;
+      return;
+    }
+
+    const date = new DateTime(this.time, this.zone);
+    const wt = date.wallTime;
+    let refTime: DateTime;
+    let endTime: DateTime;
+
+    if (this.timing === Timing.MECHANICAL_UPDATED) {
+      refTime = new DateTime([wt.y, 1, 1], this.zone);
+      endTime = new DateTime([wt.y + 1, 1, 1], this.zone);
+    }
+    else {
+      refTime = new DateTime([wt.y, wt.m - (wt.m % 3), 1], this.zone);
+      endTime = new DateTime([wt.y, wt.m - (wt.m % 3), 1], this.zone).add('months', 3);
+    }
+
+    this.timingReference = this.calculateBasicPositions(refTime.utcMillis);
+    this.timingReference._referenceTime = refTime.utcMillis;
+    this.timingReference._endTime = endTime.utcMillis;
+    this.lastRecalibration = refTime.format(this.isoFormat ? DATE :
+      'IS{year:numeric,month:2-digit,day:2-digit}', specificLocale);
+  }
+
+  get additionalPlanets(): boolean { return this._additionalPlanets; }
+  set additionalPlanets(value: boolean) {
+    if (this._additionalPlanets !== value) {
+      this._additionalPlanets = value;
+      this.checkPlanetOverlaps();
+    }
+  }
+
+  get realPositionMarkers(): boolean { return this._realPositionMarkers; }
+  set realPositionMarkers(value: boolean) {
+    if (this._realPositionMarkers !== value) {
+      this._realPositionMarkers = value;
+      this.checkPlanetOverlaps();
+    }
+  }
+
+  get playing(): boolean { return this._playing; }
+  set playing(value: boolean) {
+    if (this._playing !== value) {
+      this._playing = value;
+
+      if (value) {
+        this.trackTime = false;
+        this.playTimeBase = this._time;
+        this.playTimeProcessBase = processMillis();
+        requestAnimationFrame(this.playStep);
+      }
+    }
+  }
+
+  play(): void {
+    if (this.playSpeed !== PlaySpeed.NORMAL) {
+      this.playing = false;
+      this.playSpeed = PlaySpeed.NORMAL;
+    }
+
+    this.playing = true;
+  }
+
+  playFast(): void {
+    if (this.playSpeed !== PlaySpeed.FAST) {
+      this.playing = false;
+      this.playSpeed = PlaySpeed.FAST;
+    }
+
+    this.playing = true;
+  }
+
+  stop(): void {
+    this.playing = false;
+  }
+
+  private playStep = (): void => {
+    if (!this.playing)
+      return;
+
+    const elapsed = processMillis() - this.playTimeProcessBase;
+
+    if (this.playSpeed === PlaySpeed.NORMAL)
+      this.time = this.playTimeBase + floor(elapsed / 25) * 60_000;
+    else
+      this.time = this.playTimeBase + floor(elapsed / 100) * MILLIS_PER_DAY;
+
+    if (this.lastWallTime && this.lastWallTime.y === this.MAX_YEAR && this.lastWallTime.m === 12 && this.lastWallTime.d === 31)
+      this.stop();
+    else
+      requestAnimationFrame(this.playStep);
   }
 
   clearItem(index: number): void {
@@ -454,27 +830,6 @@ export class AppComponent implements OnInit {
     return this.menuItems.find(item => item.id === id);
   }
 
-  get translucentEcliptic(): boolean { return this._translucentEcliptic; }
-  set translucentEcliptic(value: boolean) {
-    if (this._translucentEcliptic !== value) {
-      this._translucentEcliptic = value;
-      this.updateMenu();
-    }
-  }
-
-  get constrainedSun(): boolean { return this._constrainedSun; }
-  set constrainedSun(value: boolean) {
-    if (this._constrainedSun !== value) {
-      this._constrainedSun = value;
-
-      if (value)
-        this.disableDst = true;
-
-      this.updateTime(true);
-      this.updateMenu();
-    }
-  }
-
   get suppressOsKeyboard(): boolean { return this._suppressOsKeyboard; }
   set suppressOsKeyboard(value: boolean) {
     if (this._suppressOsKeyboard !== value) {
@@ -497,10 +852,12 @@ export class AppComponent implements OnInit {
   set longitude(newValue: number) {
     if (this._longitude !== newValue) {
       this._longitude = newValue;
+      this.localTimezone = Timezone.getTimezone('LMT', this.longitude);
 
       if (this.initDone) {
         this.placeName = '';
         this.updateObserver();
+        this.clearTimingReferenceIfNeeded();
         this.updateTime(true);
         this.updateGlobe();
       }
@@ -515,6 +872,7 @@ export class AppComponent implements OnInit {
       if (this.initDone) {
         this.placeName = '';
         this.updateObserver();
+        this.clearTimingReferenceIfNeeded();
         this.updateTime(true);
       }
     }
@@ -595,8 +953,14 @@ export class AppComponent implements OnInit {
   setNow(): void {
     const newTime = floor(Date.now() / 60000) * 60000;
 
-    if (this.time !== newTime)
+    if (this.time !== newTime) {
       this.time = newTime;
+
+      if (this.playing) {
+        this.playTimeBase = newTime;
+        this.playTimeProcessBase = processMillis();
+      }
+    }
   }
 
   private clearZoneFixTimeout(): void {
@@ -612,6 +976,7 @@ export class AppComponent implements OnInit {
 
     this.southern = (this._latitude < 0);
     this.rotateSign = (this.southern ? -1 : 1);
+    this.clearTimingReferenceIfNeeded();
     this.updateObserver();
     this.placeName = '';
     ({ cy: this.horizonCy, d: this.horizonPath, r: this.horizonR } = this.getAltitudeCircle(0, true));
@@ -757,24 +1122,31 @@ export class AppComponent implements OnInit {
 
     if (this.svgFilteringOn) {
       if (!suppressFilteringImmediately &&
-          (this.graphicsChangeStartTime < 0 || now > this.graphicsChangeLastTime  + STOP_FILTERING_DELAY))
+          (this.graphicsChangeStartTime < 0 ||
+           (this.graphicsChangeStartTime > 0 && now > this.graphicsChangeLastTime + START_FILTERING_DELAY) ||
+           now > this.graphicsChangeLastTime + STOP_FILTERING_DELAY))
         this.graphicsChangeStartTime = now;
       else if (now > this.graphicsChangeStartTime + STOP_FILTERING_DELAY || suppressFilteringImmediately) {
         this.graphicsChangeStartTime = -1;
-        this.svgFilteringOn = false;
-        this.graphicsChangeStopTimer = setTimeout(resumeFiltering, RESUME_FILTERING_DELAY);
+
+        if (!this.playing) {
+          this.svgFilteringOn = false;
+          this.graphicsChangeStopTimer = setTimeout(resumeFiltering, RESUME_FILTERING_DELAY);
+        }
       }
     }
     else if (this.graphicsChangeStopTimer) {
       clearTimeout(this.graphicsChangeStopTimer);
-      this.graphicsChangeStopTimer = setTimeout(resumeFiltering, RESUME_FILTERING_DELAY);
+
+      if (!this.playing)
+        this.graphicsChangeStopTimer = setTimeout(resumeFiltering, RESUME_FILTERING_DELAY);
     }
 
     this.graphicsChangeLastTime = now;
   }
 
   private updateGlobe(): void {
-    this.globe.orient(this._longitude, this.latitude, this.post2018).finally();
+    this.globe.orient(this._longitude, this.latitude).finally();
   }
 
   private createDayAreaMask(outerR: number): void {
@@ -834,42 +1206,169 @@ export class AppComponent implements OnInit {
     this.graphicsRateChangeCheck();
 
     const jdu = julianDay(this.time);
-    const jde = utToTdt(jdu);
 
     // Finding sunset events can be slow at high latitudes, so use cached values when possible.
-    if (forceUpdate || !this.sunsetA || !this.sunsetB || jdu < this.sunsetA.ut || jdu > this.sunsetB.ut) {
+    if (forceUpdate || !this.sunsetA || !this.sunsetB || jdu <= this.sunsetA.ut || jdu > this.sunsetB.ut) {
       this.sunsetA = this.eventFinder.findEvent(SUN, SET_EVENT, jdu, this.observer, undefined, undefined, true);
       this.sunsetB = this.eventFinder.findEvent(SUN, SET_EVENT, this.sunsetA.ut, this.observer, undefined, undefined, false);
     }
 
     const dayLength = this.sunsetB.ut - this.sunsetA.ut;
     const bohemianHour = (jdu - this.sunsetA.ut) / dayLength * 24;
-    const date = new DateTime(this.time, this.zone);
+    const basicPositions = this.calculateBasicPositions(this.time);
+    const date = basicPositions._date;
     const wt = date.wallTime;
-    const hourOfDay = wt.hour + wt.minute / 60 - (this.disableDst || this.constrainedSun ? wt.dstOffset / 3600 : 0);
+    const dateLocal = new DateTime(this.time, this.localTimezone);
+    const jde = basicPositions._jde;
 
-    this.baseSunAngle = this.solarSystem.getEclipticPosition(SUN, jde).longitude.degrees;
-    this.baseMoonAngle = this.solarSystem.getEclipticPosition(MOON, jde).longitude.degrees;
-    this.handAngle = hourOfDay * 15 - 180;
-    this.sunAngle = 90 - this.baseSunAngle + cos_deg(this.baseSunAngle) * 26.6;
-    this.moonAngle = 90 - this.baseMoonAngle + cos_deg(this.baseMoonAngle) * 26.6;
-    this.siderealAngle = this.observer.getLocalHourAngle(jdu, true).degrees - 90;
-    this.outerRingAngle = 180 - (bohemianHour - hourOfDay) * 15;
+    forEach(basicPositions as any, (key, value) => bpKey(key) && ((this as any)['true_' + key] = value));
 
-    if (this.constrainedSun) {
-      const eclipticHandAngle = this.handAngle - this.siderealAngle;
-      const x2 = sin_deg(eclipticHandAngle) * CLOCK_RADIUS;
-      const y2 = -cos_deg(eclipticHandAngle) * CLOCK_RADIUS + ECLIPTIC_CENTER_OFFSET;
-      const y1 = ECLIPTIC_CENTER_OFFSET;
-      const dy = y2 - y1;
-      const dr = sqrt(x2 ** 2 + dy ** 2);
-      const D = -x2 * y1;
-      const r2 = ECLIPTIC_INNER_RADIUS ** 2;
-      const x = (D * dy + x2 * sqrt(r2 * dr ** 2 - D ** 2)) / dr ** 2;
-      const y = (-D * x2 + dy * sqrt(r2 * dr ** 2 - D ** 2)) / dr ** 2;
+    this.mercuryAngle = this.adjustForEclipticWheel(this.solarSystem.getEclipticPosition(MERCURY, jde).longitude.degrees);
+    this.venusAngle = this.adjustForEclipticWheel(this.solarSystem.getEclipticPosition(VENUS, jde).longitude.degrees);
+    this.marsAngle = this.adjustForEclipticWheel(this.solarSystem.getEclipticPosition(MARS, jde).longitude.degrees);
+    this.jupiterAngle = this.adjustForEclipticWheel(this.solarSystem.getEclipticPosition(JUPITER, jde).longitude.degrees);
+    this.saturnAngle = this.adjustForEclipticWheel(this.solarSystem.getEclipticPosition(SATURN, jde).longitude.degrees);
 
-      this.sunAngle = 90 + atan2_deg(y, x);
+    if (this.timing !== Timing.MODERN) {
+      if (!this.timingReference || this.time < this.timingReference._referenceTime ||
+          this.time >= this.timingReference._endTime)
+        this.adjustMechanicalTimingReference();
+
+      forEach(this.calculateMechanicalPositions(this.time, this.timingReference) as any,
+        (key, value) => bpKey(key) && ((this as any)[key] = value));
     }
+    else
+      forEach(basicPositions as any, (key, value) => bpKey(key) && ((this as any)[key] = value));
+
+    const format = this.isoFormat ? DATETIME_LOCAL : 'ISS{year:numeric,month:2-digit,day:2-digit,hour:2-digit}';
+
+    this.timeText = date.format(format, specificLocale);
+    this.timeText = this.isoFormat ? this.timeText.replace('T', '\xA0') : this.timeText;
+    this.outerRingAngle = 180 - (bohemianHour - basicPositions._hourOfDay) * 15;
+    this.zoneOffset = 'UTC' + Timezone.formatUtcOffset(date.utcOffsetSeconds);
+    this.localTime = formatTimeOfDay(date, this.isoFormat);
+    this.localMeanTime = formatTimeOfDay(dateLocal, this.isoFormat);
+    this.localSolarTime = formatTimeOfDay(this.observer.getApparentSolarTime(jdu).hours, this.isoFormat);
+    this.siderealTime = formatTimeOfDay(mod(this.true_siderealAngle + 90, 360) / 15, true);
+    this.siderealTimeOrloj = formatTimeOfDay(mod(this.siderealAngle + 90, 360) / 15, true);
+    this.bohemianTime = formatTimeOfDay(bohemianHour, true, true); // Round to match rounded sunrise/sunset times
+
+    this.errorMoon = mod2(this.moonAngle.orig - this.true_moonAngle.orig, 360);
+    this.errorMoonDays = this.errorMoon / 360 * 27.321;
+    this.errorPhase = mod2(this.moonPhase - this.true_moonPhase, 360) * this.rotateSign;
+    this.errorPhaseDays = this.errorPhase / 360 * 29.53059;
+    this.errorSun = mod2(this.sunAngle.orig - this.true_sunAngle.orig, 360);
+    this.errorSunMinutes = this.errorSun / 360 * 1440;
+
+    [this.sunrise, this.sunset] =
+      this.extractRiseAndSetTimes(
+        this.eventFinder.getRiseAndSetTimes(SUN, wt.year, wt.month, wt.day, this.observer, date.timezone));
+
+    [this.moonrise, this.moonset] =
+      this.extractRiseAndSetTimes(
+        this.eventFinder.getRiseAndSetTimes(MOON, wt.year, wt.month, wt.day, this.observer, date.timezone));
+
+    this.checkPlanetOverlaps();
+  }
+
+  private extractRiseAndSetTimes(events: AstroEvent[]): string[] {
+    let rise = '';
+    let set = '';
+
+    if (events) {
+      for (const evt of events) {
+        const time = formatTimeOfDay(evt.eventTime, this.isoFormat);
+
+        if (evt.eventType === RISE_EVENT)
+          rise = extendDelimited(rise, time, ', ');
+        else if (evt.eventType === SET_EVENT)
+          set = extendDelimited(set, time, ', ');
+      }
+    }
+
+    return [rise || '---', set || '---'];
+  }
+
+  private checkPlanetOverlaps(): void {
+    const angles =
+      [this.mercuryAngle.oe, this.venusAngle.oe, this.marsAngle.oe, this.jupiterAngle.oe, this.saturnAngle.oe, -999, -999];
+
+    if (this.realPositionMarkers) {
+      angles[5] = this.true_sunAngle.oe;
+      angles[6] = this.true_moonAngle.oe;
+    }
+
+    this.overlapShift.fill(0);
+
+    for (let i = 0; i <= 4; ++i) {
+      let maxShift = 0;
+      const angle = angles[i];
+
+      for (let j = i + 1; j <= 6; ++j) {
+        if (abs(mod2(angle - angles[j], 360)) < 2.5)
+          maxShift = max((this.overlapShift[j] || 0) + 3, maxShift);
+      }
+
+      this.overlapShift[i] = maxShift;
+    }
+  }
+
+  private calculateBasicPositions(time: number): BasicPositions {
+    const _jdu = julianDay(time);
+    const _jde = utToTdt(_jdu);
+    const _date = new DateTime(time, this.zone);
+    const wt = this.lastWallTime = _date.wallTime;
+    const _hourOfDay = wt.hour + wt.minute / 60 -
+      (this.disableDst || this.timing !== Timing.MODERN ? wt.dstOffset / 3600 : 0);
+    const handAngle = _hourOfDay * 15 - 180;
+    const baseSunAngle = this.solarSystem.getEclipticPosition(SUN, _jde).longitude.degrees;
+    const baseMoonAngle = this.solarSystem.getEclipticPosition(MOON, _jde).longitude.degrees;
+    const sunAngle = this.adjustForEclipticWheel(baseSunAngle);
+    const moonAngle = this.adjustForEclipticWheel(baseMoonAngle);
+    const siderealAngle = this.observer.getLocalHourAngle(_jdu, true).degrees - 90;
+    const moonPhase = mod((baseMoonAngle - baseSunAngle) * this.rotateSign, 360);
+    const moonHandAngle = AppComponent.calculateMoonHandAngle(moonAngle.ie, siderealAngle);
+
+    return { _jde, _jdu, _hourOfDay, _date, handAngle, moonAngle, moonHandAngle, moonPhase, siderealAngle, sunAngle };
+  }
+
+  private calculateMechanicalPositions(time: number, ref: BasicPositions): BasicPositions {
+    const deltaDays = (time - ref._referenceTime) / MILLIS_PER_DAY;
+    const deltaSiderealDays = deltaDays * 366 / 365;
+    // The moon is off by about one day every three months with the original 366 / 379 gear ratio.
+    const deltaMoonDays = deltaDays * (this.timing === Timing.MECHANICAL_ORIGINAL ? 366 / 379 : 0.966139); // 0.966137 is closer to the true mean synodic lunar month
+    const phaseCycles = deltaMoonDays * 2 / 57;
+    const handAngle = mod(ref.handAngle + deltaDays * 360, 360);
+    const moonHandAngle = mod(ref.moonHandAngle + deltaMoonDays * 360, 360);
+    const siderealAngle = mod(ref.siderealAngle + deltaSiderealDays * 360, 360);
+
+    return {
+      handAngle,
+      moonAngle: this.calculateEclipticAnglesFromHandAngle(moonHandAngle, siderealAngle),
+      moonHandAngle,
+      moonPhase: mod(ref.moonPhase + phaseCycles * 360, 360),
+      siderealAngle,
+      sunAngle: this.calculateEclipticAnglesFromHandAngle(handAngle, siderealAngle)
+    };
+  }
+
+  private static calculateMoonHandAngle(moonAngle: number, siderealAngle: number): number {
+    // Note: SVG angles start at "noon" and go clockwise, rather than at 3:00 going counterclockwise,
+    // so the roles of sin and cos are swapped, and signs are changed.
+    const x = sin_deg(moonAngle) * ECLIPTIC_INNER_RADIUS;
+    const y = -cos_deg(moonAngle) * ECLIPTIC_INNER_RADIUS - ECLIPTIC_CENTER_OFFSET;
+
+    return 90 + atan2_deg(y, x) + siderealAngle;
+  }
+
+  private calculateEclipticAnglesFromHandAngle(handAngle: number, siderealAngle: number): AngleTriplet {
+    const eclipticAngle = this.correctOffAngle(mod(90 - handAngle + siderealAngle, 360));
+
+    return {
+      orig: eclipticAngle,
+      ie: mod(90 + this.eclipticToOffCenter(eclipticAngle), 360),
+      oe: mod(90 + this.eclipticToOffCenter(eclipticAngle, false), 360)
+    };
   }
 
   rotate(angle: number): string {
@@ -877,10 +1376,9 @@ export class AppComponent implements OnInit {
   }
 
   sunlitMoonPath(): string {
-    const phaseAngle = mod((this.baseMoonAngle - this.baseSunAngle) * this.rotateSign, 360);
-    const largeArcFlag = phaseAngle < 180 ? 1 : 0;
-    const sweepFlag = floor(phaseAngle / 90) % 2;
-    const x = (abs(cos_deg(phaseAngle)) * 12).toFixed(1);
+    const largeArcFlag = this.moonPhase < 180 ? 1 : 0;
+    const sweepFlag = floor(this.moonPhase / 90) % 2;
+    const x = (abs(cos_deg(this.moonPhase)) * 12).toFixed(1);
 
     return `M0 -12.0A12.0 12.0 0 0 ${largeArcFlag} 0 12.0A${x} 12.0 0 0 ${sweepFlag} 0 -12.0`;
   }
@@ -972,15 +1470,6 @@ export class AppComponent implements OnInit {
         item.icon = (index === this.eventType ? 'pi pi-check' : 'pi pi-circle');
     });
 
-    if (this.menuItemById('p18'))
-      this.menuItemById('p18').icon = (this.post2018 ? 'pi pi-check' : 'pi pi-circle');
-
-    if (this.menuItemById('cns'))
-      this.menuItemById('cns').icon = (this.constrainedSun ? 'pi pi-check' : 'pi pi-circle');
-
-    if (this.menuItemById('tec'))
-      this.menuItemById('tec').icon = (this.translucentEcliptic ? 'pi pi-check' : 'pi pi-circle');
-
     if (this.menuItemById('sok'))
       this.menuItemById('sok').icon = (this.suppressOsKeyboard ? 'pi pi-check' : 'pi pi-circle');
   }
@@ -1050,7 +1539,6 @@ export class AppComponent implements OnInit {
     const jdu = julianDay(this.time);
     let eventsToCheck: number[] = [];
     const eventsFound: AstroEvent[] = [];
-    let altitude: number;
 
     switch (this.eventType) {
       case EventType.EQUISOLSTICE:
@@ -1061,12 +1549,11 @@ export class AppComponent implements OnInit {
         break;
       case EventType.RISE_SET:
         eventsToCheck = [RISE_EVENT, TRANSIT_EVENT, SET_EVENT];
-        altitude = 0;
         break;
     }
 
     for (const eventType of eventsToCheck) {
-      const evt = this.eventFinder.findEvent(SUN, eventType, jdu, this.observer, undefined, undefined, previous, altitude);
+      const evt = this.eventFinder.findEvent(SUN, eventType, jdu, this.observer, undefined, undefined, previous);
 
       if (evt)
         eventsFound.push(evt);

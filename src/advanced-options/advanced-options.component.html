@@ -1,0 +1,41 @@
+<i class="pi pi-times closer" (click)="hide()"></i>
+<div i18n class="header">Advanced Options</div>
+
+<div class="colors">
+  <p-radioButton [value]="true" [(ngModel)]="settingsHolder.post2018"
+      i18n-label label="Post-2018 colors"></p-radioButton>
+  <p-radioButton [value]="true" [(ngModel)]="pre2018"
+      i18n-label label="Pre-2018 colors"></p-radioButton>
+</div>
+
+<div class="map-and-colors">
+  <p-checkbox [(ngModel)]="settingsHolder.hideMap" [binary]="true" [disabled]="!settingsHolder.post2018"
+      i18n-label label="Hide globe map"></p-checkbox>
+  <label i18n for="app-background">Background</label>
+  <input id="app-background" name="clock-background" type="color" [(ngModel)]="settingsHolder.background">
+</div>
+
+<p-checkbox [(ngModel)]="settingsHolder.translucentEcliptic" [binary]="true"
+    i18n-label label="Translucent ecliptic"></p-checkbox>
+
+<p-checkbox [(ngModel)]="settingsHolder.detailedMechanism" [binary]="true"
+    i18n-label label="Mechanically detailed clock face"></p-checkbox>
+
+<p-checkbox [(ngModel)]="settingsHolder.fasterGraphics" [binary]="true"
+    i18n-label label="Faster graphics / less shading"></p-checkbox>
+
+<p-checkbox [(ngModel)]="settingsHolder.realPositionMarkers" [binary]="true"
+    i18n-label label="Sun/moon real position markers"></p-checkbox>
+
+<p-checkbox [(ngModel)]="settingsHolder.additionalPlanets" [binary]="true"
+    i18n-label label="Additional planet markers"></p-checkbox>
+<p-checkbox [(ngModel)]="settingsHolder.showInfoPanel" [binary]="true"
+    i18n-label label="Show info panel"></p-checkbox>
+
+<div class="spacer">&nbsp;</div>
+<p-radioButton [value]="MODERN" [(ngModel)]="settingsHolder.timing"
+    i18n-label label="Astronomically-accurate, non-mechanical timing"></p-radioButton>
+<p-radioButton [value]="MECHANICAL_ORIGINAL" [(ngModel)]="settingsHolder.timing"
+    i18n-label label="Pre-1866 mechanical timing, recalibrated quarterly"></p-radioButton>
+<p-radioButton [value]="MECHANICAL_UPDATED" [(ngModel)]="settingsHolder.timing"
+    i18n-label label="Updated mechanical timing, recalibrated yearly"></p-radioButton>
