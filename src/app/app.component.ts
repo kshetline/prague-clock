@@ -172,11 +172,32 @@ function findCircleRadius(x1: number, y1: number, x2: number, y2: number, x3: nu
   return sqrt(sqr_of_r);
 }
 
+function interpolateAngle(xx: number[], yy: number[], angle: number): number {
+  angle = mod(angle, 360);
+
+  const angle2 = angle - 360;
+
+  for (let i = 0; i < xx.length; ++i) {
+    let match: number;
+
+    if (xx[i] === angle || xx[i] === angle2)
+      return mod(yy[i], 360);
+    else if ((xx[i] < angle && angle < xx[i + 1]) || ((xx[i] > angle && angle > xx[i + 1])))
+      match = angle;
+    else if ((xx[i] < angle2 && angle2 < xx[i + 1]) || (xx[i] > angle2 && angle2 > xx[i + 1]))
+      match = angle2;
+    else
+      continue;
+
+    return interpolateModular(xx[i], match, xx[i + 1], yy[i], yy[i + 1], 360);
+  }
+
+  return NaN;
+}
+
 interface AngleTriplet {
-  ie: number; // outer ecliptic
-  ie2?: number;
+  ie: number; // inner ecliptic
   oe?: number; // outer ecliptic
-  oe2?: number;
   orig: number;
 }
 
@@ -197,7 +218,7 @@ function eclipticIntercept(x1: number, y1: number, r: number): Point {
   const x = (D * dy + sgn * sign(dy) * dx * root) / dr2;
   const y = (-D * dx + sgn * abs(dy) * root) / dr2;
 
-  return { x, y: y + ECLIPTIC_CENTER_OFFSET };
+  return { x, y };
 }
 
 function bpKey(key: string): boolean { return !key.startsWith('_'); }
@@ -300,6 +321,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   private playTimeProcessBase: number;
   private _post2018 = false;
   private _realPositionMarkers = false;
+  private slightlyOffEclipticAngle: number[] = [];
   private solarSystem = new SolarSystem();
   private sunsetA: AstroEvent = null;
   private sunsetB: AstroEvent = null;
@@ -465,28 +487,14 @@ export class AppComponent implements OnInit, SettingsHolder {
     if (this.eclipticInnerAngle.length === 0)
       return 0;
 
-    angle = mod(angle, 360);
+    return interpolateAngle(this.trueEclipticAngle, inner ? this.eclipticInnerAngle : this.eclipticOuterAngle, angle);
+  }
 
-    const angle2 = angle - 360;
-    const xs = this.trueEclipticAngle;
-    const ys = inner ? this.eclipticInnerAngle : this.eclipticOuterAngle;
+  private correctOffAngle(angle: number): number {
+    if (this.eclipticInnerAngle.length === 0)
+      return 0;
 
-    for (let i = 0; i < xs.length; ++i) {
-      let match: number;
-
-      if (xs[i] === angle || xs[i] === angle2)
-        return mod(ys[i], 360);
-      else if ((xs[i] < angle && angle < xs[i + 1]) || ((xs[i] > angle && angle > xs[i + 1])))
-        match = angle;
-      else if ((xs[i] < angle2 && angle2 < xs[i + 1]) || (xs[i] > angle2 && angle2 > xs[i + 1]))
-        match = angle2;
-      else
-        continue;
-
-      return interpolateModular(xs[i], match, xs[i + 1], ys[i], ys[i + 1], 360);
-    }
-
-    return NaN;
+    return interpolateAngle(this.slightlyOffEclipticAngle, this.trueEclipticAngle, angle);
   }
 
   private adjustForEclipticWheel(angle: number): AngleTriplet {
@@ -509,8 +517,10 @@ export class AppComponent implements OnInit, SettingsHolder {
       const outer = eclipticIntercept(x, y, ECLIPTIC_OUTER_RADIUS);
 
       this.trueEclipticAngle[i + 2] = i * 6;
-      this.eclipticInnerAngle[i + 2] = mod(atan2_deg(inner.y - ECLIPTIC_CENTER_OFFSET, inner.x), 360) - (i < 8 ? 0 : 360);
-      this.eclipticOuterAngle[i + 2] = mod(atan2_deg(outer.y - ECLIPTIC_CENTER_OFFSET, outer.x), 360) - (i < 8 ? 0 : 360);
+      this.slightlyOffEclipticAngle[i + 2] = mod(atan2_deg(ECLIPTIC_CENTER_OFFSET - inner.y, inner.x), 360)
+        - (i < 0 ? 360 : 0) + (i > 59 ? 360 : 0);
+      this.eclipticInnerAngle[i + 2] = mod(atan2_deg(inner.y, inner.x), 360) + (i < 5 ? 360 : 0);
+      this.eclipticOuterAngle[i + 2] = mod(atan2_deg(outer.y, outer.x), 360) + (i < 4 ? 360 : 0);
     }
 
     this.primeNgConfig.setTranslation({
@@ -1343,9 +1353,9 @@ export class AppComponent implements OnInit, SettingsHolder {
   }
 
   private calculateEclipticAnglesFromHandAngle(handAngle: number, siderealAngle: number): AngleTriplet {
-    const eclipticAngle = mod2(90 - handAngle + siderealAngle, 360);
-    console.log(handAngle, siderealAngle, eclipticAngle);
-    return { orig: eclipticAngle, ie: 90 + this.eclipticToOffCenter(eclipticAngle) };
+    const eclipticAngle = this.correctOffAngle(mod(90 - handAngle + siderealAngle, 360));
+
+    return { orig: eclipticAngle, ie: mod(90 + this.eclipticToOffCenter(eclipticAngle), 360) };
   }
 
   rotate(angle: number): string {
