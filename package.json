@@ -1,6 +1,6 @@
 {
   "name": "prague-clock",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --configuration=development",
@@ -8,6 +8,7 @@
     "start:de": "ng serve --configuration=de",
     "start:es": "ng serve --configuration=es",
     "start:fr": "ng serve --configuration=fr",
+    "i18n": "ng extract-i18n",
     "build": "ng build --base-href /orloj/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
