@@ -1,6 +1,23 @@
+## 1.3.3
+
+* Added ecliptic longitude tooltips to the large sun and moon icons, instead of just the smaller true positions markers.
+* Fixed a bug with showing the Advanced Options panel while to Control panel is collapsed.
+
+## 1.3.2
+
+* Additional translations to French and German.
+* Fixed inaccuracies in placement of sun/moon/planet markers.
+* Added tooltips for ecliptic longitude.
+
+## 1.3.1
+
+* Fixed Firefox map drawing bug.
+* Fixed i18n website path formation.
+
 ## 1.3.0
 
 * New “Advanced Options” panel.
+* Added animation play/fast-forward/stop buttons.
 * Option added to display greater mechanical detail of the clock.
 * Option added for emulation of mechanical timekeeping (supersedes “Align sun to hand pointer” from version 1.2.0).
 * Option for sun/moon "real position" markers.
@@ -8,7 +25,7 @@
 * For greater consistency with post-2018 appearance, globe map can be hidden.
 * Collapsed control panel displays currently-set time.
 * Option added for keeping SVG shading at the risk of slower graphics.
-* Add info panel with time readouts, sun/moon rise/set times, and other data.
+* Added info panel with time readouts, sun/moon rise/set times, and other data.
 
 ## 1.2.0
 

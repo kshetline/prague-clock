@@ -343,7 +343,10 @@ export class AppComponent implements OnInit, SettingsHolder {
     { label: $localize`↔ Sunrise/transit/sunset`, icon: 'pi pi-circle',
       command: (): void => this.setEventType(EventType.RISE_SET) },
     { separator : true },
-    { label: $localize`Advanced options...`, icon: 'pi pi-circle', command: (): void => this.advancedOptions?.show() },
+    { label: $localize`Advanced options...`, icon: 'pi pi-circle', command: (): void => {
+      this.collapsed = false;
+      this.advancedOptions?.show();
+    } },
     { label: $localize`Language`, icon: 'pi pi-circle', items: menuLanguageList },
     { separator : true },
     { label: $localize`Code on GitHub`, icon: 'pi pi-github', url: 'https://github.com/kshetline/prague-clock',
