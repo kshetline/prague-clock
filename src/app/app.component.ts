@@ -1,9 +1,18 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService, PrimeNGConfig } from 'primeng/api';
-import { abs, atan2_deg, atan_deg, cos_deg, floor, interpolateModular, max, min, mod, mod2, PI, Point, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
-import { clone, extendDelimited, forEach, getCssValue, isEqual, isLikelyMobile, isObject, isSafari, processMillis, toNumber } from '@tubular/util';
+import {
+  abs, atan2_deg, atan_deg, cos_deg, floor, interpolateModular, max, min, mod, mod2, PI, Point, sign, sin_deg,
+  sqrt, tan_deg
+} from '@tubular/math';
+import {
+  clone, extendDelimited, forEach, getCssValue, isEqual, isLikelyMobile, isObject, isSafari, processMillis, toNumber
+} from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
-import { AstroEvent, EventFinder, FALL_EQUINOX, FIRST_QUARTER, FULL_MOON, JUPITER, LAST_QUARTER, MARS, MERCURY, MOON, NEW_MOON, RISE_EVENT, SATURN, SET_EVENT, SkyObserver, SolarSystem, SPRING_EQUINOX, SUMMER_SOLSTICE, SUN, TRANSIT_EVENT, VENUS, WINTER_SOLSTICE } from '@tubular/astronomy';
+import {
+  AstroEvent, EventFinder, FALL_EQUINOX, FIRST_QUARTER, FULL_MOON, JUPITER, LAST_QUARTER, MARS, MERCURY, MOON,
+  NEW_MOON, RISE_EVENT, SATURN, SET_EVENT, SkyObserver, SolarSystem, SPRING_EQUINOX, SUMMER_SOLSTICE, SUN,
+  TRANSIT_EVENT, VENUS, WINTER_SOLSTICE
+} from '@tubular/astronomy';
 import ttime, { DateAndTime, DateTime, Timezone, utToTdt } from '@tubular/time';
 import { TzsLocation } from '../timezone-selector/timezone-selector.component';
 import { Globe } from '../globe/globe';
@@ -666,9 +675,13 @@ export class AppComponent implements OnInit, SettingsHolder {
   get appearance(): Appearance { return this._appearance; }
   set appearance(value: Appearance) {
     if (this.appearance !== value) {
+      const wasEmptyCenter = this.emptyCenter;
       this._appearance = value;
       this.emptyCenter = (value === Appearance.ORIGINAL_1410);
       this.globe?.setAppearance(value);
+
+      if (this.emptyCenter !== wasEmptyCenter)
+        setTimeout(() => this.adjustLatitude());
     }
   }
 
@@ -973,7 +986,8 @@ export class AppComponent implements OnInit, SettingsHolder {
     this.updateObserver();
     this.placeName = '';
     ({ cy: this.horizonCy, d: this.horizonPath, r: this.horizonR } = this.getAltitudeCircle(0, true));
-    ({ cy: this.darkCy, r: this.darkR } = this.getAltitudeCircle(-18));
+    ({ cy: this.darkCy, r: this.darkR } =
+      this.getAltitudeCircle(this.appearance === Appearance.ORIGINAL_1410 ? -10 : -18));
 
     const absLat = abs(this._latitude);
     const excessLatitude = absLat - ARCTIC;

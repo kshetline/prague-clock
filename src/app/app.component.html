@@ -219,6 +219,12 @@
           <circle cx="0" cy="0" r="250"/>
         </g>
       </mask>
+      <mask id="baseArea-center-hole">
+        <g class="maskWhite">
+          <circle cx="0" cy="0" r="250"/>
+          <circle cx="0" cy="0" r="107.7" class="hole"/>
+        </g>
+      </mask>
       <mask id="dayArea">
         <g class="maskWhite">
           <path [attr.d]="dayAreaMask"/>
@@ -361,7 +367,8 @@
           <path [attr.d]="hourArcs[11]" class="unequalHourBorder"/>
           <path d="M0 0L0 -400" class="unequalHourBorder"/>
         </g>
-        <g id="horizonBorder" mask="url(#baseArea)" [attr.filter]="filterRelief">
+        <g id="horizonBorder" [attr.mask]="emptyCenter ? 'url(#baseArea-center-hole)': 'url(#baseArea)'"
+            [attr.filter]="filterRelief">
           <circle *ngIf="midnightSunR" [attr.r]="midnightSunR" cx="0" cy="0" class="midnightSunCircle"/>
           <circle id="horizonBorder" [attr.r]="horizonR" cx="0" [attr.cy]="horizonCy" class="baseCircle"/>
         </g>

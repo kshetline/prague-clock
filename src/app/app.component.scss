@@ -454,6 +454,10 @@ svg {
 
 .maskWhite {
   fill: white;
+
+  .hole {
+    fill: black;
+  }
 }
 
 .textPath {
@@ -665,6 +669,10 @@ svg {
 
 .horizonArea {
   fill: #D3964D;
+
+  &.center {
+    stroke: none;
+  }
 }
 
 .darkArea {
@@ -777,6 +785,10 @@ svg {
   #globe-host {
     border: 2px $gold-trim solid;
   }
+
+  .handSymbol {
+    fill: $gold-trim;
+  }
 }
 
 #moon-true, #sun-true, #mercury, #venus, #mars, #jupiter, #saturn {
@@ -819,5 +831,32 @@ svg {
     max-width: 110px;
     white-space: normal !important;
     width: 110px;
+  }
+}
+
+.orig-1410 {
+  .eclipticSymbol,
+  .handSymbol,
+  .hourAngleStarSymbol,
+  .outerRingText,
+  .timeText {
+    fill: $gold-trim-1410;
+  }
+
+  .sunBeamLargeSymbol,
+  .sunBeamSmallSymbol {
+    fill: #DFC388;
+  }
+
+  .baseCircle,
+  .eclipticCircle,
+  .eclipticDial,
+  .outerRingBorder,
+  .unequalHourBorder {
+    stroke: $gold-trim-1410;
+  }
+
+  .leverRafieGolden {
+    stroke: $dark-metal;
   }
 }
