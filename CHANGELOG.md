@@ -1,3 +1,7 @@
+## 1.4.0
+
+* New option for a speculated original 1410 appearance of the orloj.
+
 ## 1.3.3
 
 * Added ecliptic longitude tooltips to the large sun and moon icons, instead of just the smaller true positions markers.

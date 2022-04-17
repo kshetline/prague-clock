@@ -1,14 +1,16 @@
 import { Component, ElementRef } from '@angular/core';
 
+export enum Appearance { CURRENT, CURRENT_NO_MAP, PRE_2018, ORIGINAL_1410 }
 export enum Timing { MODERN, MECHANICAL_ORIGINAL, MECHANICAL_UPDATED }
 
 export interface SettingsHolder {
   additionalPlanets: boolean;
+  appearance: Appearance;
   background: string;
   detailedMechanism: boolean;
   fasterGraphics: boolean;
-  hideMap: boolean;
-  post2018: boolean;
+  hideMap?: boolean;
+  post2018?: boolean;
   realPositionMarkers: boolean;
   showInfoPanel: boolean;
   timing: Timing;
@@ -26,6 +28,13 @@ export class AdvancedOptionsComponent {
   MECHANICAL_UPDATED = Timing.MECHANICAL_UPDATED;
 
   private shown = false;
+
+  appearanceOptions = [
+    { label: $localize`Post-2018 colors`, value: Appearance.CURRENT },
+    { label: $localize`Post-2018 colors, no map`, value: Appearance.CURRENT_NO_MAP },
+    { label: $localize`Pre-2018 colors`, value: Appearance.PRE_2018 },
+    { label: $localize`Original 1410 look?`, value: Appearance.ORIGINAL_1410 }
+  ];
 
   settingsHolder: SettingsHolder;
 
@@ -48,9 +57,6 @@ export class AdvancedOptionsComponent {
       this.shown = false;
     }
   }
-
-  get pre2018(): boolean { return !this.settingsHolder.post2018; }
-  set pre2018(value: boolean) { this.settingsHolder.post2018 = !value; }
 
   clicker = (evt: MouseEvent): void => {
     const r = this.elementRef.nativeElement?.getBoundingClientRect();

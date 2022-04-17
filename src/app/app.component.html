@@ -129,7 +129,9 @@
   </div>
 </div>
 
-<div id="svg-wrapper" [class.post-2018]="post2018">
+<div id="svg-wrapper"
+    [class.post-2018]="appearance === CURRENT || appearance === CURRENT_NO_MAP"
+    [class.orig-1410]="appearance === ORIGINAL_1410">
   <svg viewBox="0 0 600 600" xml:space="preserve" [class.controls-collapsed]="collapsed">
     <defs>
       <filter id="filterHand" x="0" y="0" width="200%" height="200%">
@@ -364,7 +366,7 @@
           <circle id="horizonBorder" [attr.r]="horizonR" cx="0" [attr.cy]="horizonCy" class="baseCircle"/>
         </g>
         <g id="baseCircles" [attr.filter]="filterRelief">
-          <circle cx="0" cy="0" r="107.7" class="baseCircle innerCircle"/>
+          <circle cx="0" cy="0" r="107.7" class="baseCircle innerCircle" [style.fill]="emptyCenter ? 'none' : null"/>
           <circle cx="0" cy="0" r="164.1" class="baseCircle"/>
           <circle cx="0" cy="0" r="250" class="baseCircle"/>
         </g>
@@ -434,7 +436,7 @@
 
   <!-- I would have used <foreignObject> to host the map canvas, but the positioning and layering behavior weren't
        consistent across browsers, with Safari and Chrome on Android having particular problems. -->
-  <div id="globe-host"></div>
+  <div id="globe-host" [style.opacity]="emptyCenter ? '0' : '1'"></div>
 
   <svg viewBox="0 0 600 600" xml:space="preserve" class="svg-overlay" [class.controls-collapsed]="collapsed">
     <defs>

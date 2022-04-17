@@ -725,6 +725,60 @@ svg {
   }
 }
 
+.orig-1410 {
+  .midnightSunColor {
+    fill: $sky-color-1410;
+  }
+
+  .innerCircle {
+    fill: $sky-color-1410;
+  }
+
+  .signsArea {
+    fill: $dark-background-1410;
+  }
+
+  .outerRingBackground {
+    fill: $dark-background-1410;
+  }
+
+  .unequalHour6 {
+    fill: $sky-color-1410;
+  }
+
+  .unequalHour5 {
+    fill: $sky-color-1410;
+  }
+
+  .unequalHour4 {
+    fill: $sky-color-1410;
+  }
+
+  .unequalHour3 {
+    fill: $sky-color-1410;
+  }
+
+  .unequalHour2 {
+    fill: $sky-color-1410;
+  }
+
+  .unequalHour1 {
+    fill: #A4C5D2;
+  }
+
+  .horizonArea {
+    fill: #AE2325;
+  }
+
+  .darkArea {
+    fill: $dark-background-1410;
+  }
+
+  #globe-host {
+    border: 2px $gold-trim solid;
+  }
+}
+
 #moon-true, #sun-true, #mercury, #venus, #mars, #jupiter, #saturn {
   stroke-width: 0.5;
   stroke: #4D4D4D;
