@@ -352,7 +352,7 @@ export class AppComponent implements OnInit, SettingsHolder {
     { separator : true },
     { label: $localize`Code on GitHub`, icon: 'pi pi-github', url: 'https://github.com/kshetline/prague-clock',
       target: '_blank' },
-    { label: $localize`Official web site`, icon: 'pi pi-home', url: 'https://www.orloj.eu/', target: '_blank' },
+    { label: $localize`Czech Horological Society site`, icon: 'pi pi-home', url: 'https://www.orloj.eu/', target: '_blank' },
     { label: $localize`About the real clock`, icon: 'pi pi-info-circle',
       url: $localize`:Language-specific Wikipedia URL:https://en.wikipedia.org/wiki/Prague_astronomical_clock`,
       target: '_blank' },
