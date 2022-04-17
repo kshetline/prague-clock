@@ -2,7 +2,8 @@
 <div i18n class="header">Advanced Options</div>
 
 <div class="appearance">
-  <p-dropdown tzeDropdownFix [autoDisplayFirst]="false" [style]="{ 'min-width': '250px' }"
+  <p-dropdown tzeDropdownFix [autoDisplayFirst]="false"
+     [style]="{ 'min-width': '250px', 'max-width': '310px' }"
      [options]="appearanceOptions" [(ngModel)]="settingsHolder.appearance" appendTo="body"></p-dropdown>
   <div class="background-input-wrapper">
     <label i18n for="app-background">Background</label>
