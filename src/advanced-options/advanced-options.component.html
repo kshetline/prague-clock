@@ -3,9 +3,12 @@
 
 <div class="appearance">
   <p-dropdown tzeDropdownFix [autoDisplayFirst]="false"
-     [style]="{ 'min-width': '250px', 'max-width': '310px' }"
+     [style]="{ 'min-width': '250px', 'max-width': '290px' }"
      [options]="appearanceOptions" [(ngModel)]="settingsHolder.appearance" appendTo="body"></p-dropdown>
   <div class="background-input-wrapper">
+    <div class="reset" (click)="settingsHolder.background = '#4D4D4D'">
+      <i class="pi pi-undo" [style.opacity]="settingsHolder.background === '#4D4D4D' ? '0' : '1'"></i>
+    </div>
     <label i18n for="app-background">Background</label>
     <input id="app-background" name="clock-background" type="color" [(ngModel)]="settingsHolder.background">
   </div>

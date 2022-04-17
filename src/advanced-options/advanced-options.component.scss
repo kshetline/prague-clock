@@ -50,4 +50,17 @@
     right: 0;
     top: calc(100% + 0.5em);
   }
+
+  .reset {
+    bottom: 0;
+    left: -2em;
+    position: absolute;
+    top: 0;
+    width: 2em;
+
+    i {
+      position: relative;
+      top: 0.33em;
+    }
+  }
 }

@@ -360,6 +360,7 @@ export class AppComponent implements OnInit, SettingsHolder {
       target: '_blank' }
   ];
 
+  altFour = false;
   bohemianTime = '';
   canEditName = false;
   canSaveName = false;
@@ -678,6 +679,7 @@ export class AppComponent implements OnInit, SettingsHolder {
       const wasEmptyCenter = this.emptyCenter;
       this._appearance = value;
       this.emptyCenter = (value === Appearance.ORIGINAL_1410);
+      this.altFour = this.emptyCenter;
       this.globe?.setAppearance(value);
 
       if (this.emptyCenter !== wasEmptyCenter)

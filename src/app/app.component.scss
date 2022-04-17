@@ -477,6 +477,12 @@ svg {
   fill: none;
 }
 
+.ring-gap {
+  stroke: #4D4D4D;
+  stroke-width: 8px;
+  fill: none;
+}
+
 .midnightSunCircle {
   stroke: #BCD;
   stroke-width: 3px;
@@ -488,7 +494,7 @@ svg {
 }
 
 .innerCircle {
-  fill: #4C8388;
+  fill: #639EA4;
 }
 
 .eclipticWheel {
@@ -668,7 +674,7 @@ svg {
 }
 
 .horizonArea {
-  fill: #D3964D;
+  fill: #E58A20;
 
   &.center {
     stroke: none;
@@ -676,7 +682,7 @@ svg {
 }
 
 .darkArea {
-  fill: #05304F;
+  fill: #172A38;
 }
 
 .post-2018 {
@@ -877,7 +883,20 @@ svg {
     stroke: $gold-trim-1410;
   }
 
-  .leverRafieGolden {
-    stroke: $dark-metal;
+  .leverRafieGolden,
+  .moon-ring {
+    stroke: $dark-metal-1410;
+  }
+
+  .leverRafieSymbol,
+  .leverSymbol,
+  .pin,
+  .sun-moon-arms,
+  .sun-moon-guides {
+    fill: $dark-metal-1410;
+  }
+
+  .ring-gap {
+    stroke: #9CA5A8;
   }
 }

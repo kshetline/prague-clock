@@ -300,7 +300,7 @@
             <text><textPath xlink:href="#timeTextPath" startOffset="4.2%" class="timeText">I</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="8.3%" class="timeText">II</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="12.5%" class="timeText">III</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="16.7%" class="timeText">IV</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="16.7%" class="timeText">{{ altFour ? 'IIII' : 'IV'}}</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="20.8%" class="timeText">V</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="25.0%" class="timeText">VI</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="29.2%" class="timeText">VII</textPath></text>
@@ -312,7 +312,7 @@
             <text><textPath xlink:href="#timeTextPath" startOffset="54.2%" class="timeText">I</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="58.3%" class="timeText">II</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="62.5%" class="timeText">III</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="66.7%" class="timeText">IV</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="66.7%" class="timeText">{{ altFour ? 'IIII' : 'IV'}}</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="70.8%" class="timeText">V</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="75.0%" class="timeText">VI</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="79.2%" class="timeText">VII</textPath></text>
@@ -332,7 +332,7 @@
             <text><textPath xlink:href="#timeTextPath" startOffset="20.8%" class="timeText">VII</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="25.0%" class="timeText">VI</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="29.2%" class="timeText">V</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="33.3%" class="timeText">IV</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="33.3%" class="timeText">{{ altFour ? 'IIII' : 'IV'}}</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="37.5%" class="timeText">III</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="41.7%" class="timeText">II</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="45.8%" class="timeText">I</textPath></text>
@@ -344,7 +344,7 @@
             <text><textPath xlink:href="#timeTextPath" startOffset="70.8%" class="timeText">VII</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="75.0%" class="timeText">VI</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="79.2%" class="timeText">V</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="83.3%" class="timeText">IV</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="83.3%" class="timeText">{{ altFour ? 'IIII' : 'IV'}}</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="87.5%" class="timeText">III</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="91.7%" class="timeText">II</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="95.8%" class="timeText">I</textPath></text>
@@ -375,6 +375,7 @@
         <g id="baseCircles" [attr.filter]="filterRelief">
           <circle cx="0" cy="0" r="107.7" class="baseCircle innerCircle" [style.fill]="emptyCenter ? 'none' : null"/>
           <circle cx="0" cy="0" r="164.1" class="baseCircle"/>
+          <circle cx="0" cy="0" r="253" class="ring-gap"/>
           <circle cx="0" cy="0" r="250" class="baseCircle"/>
         </g>
       </g>
