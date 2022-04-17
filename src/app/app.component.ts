@@ -1008,7 +1008,7 @@ export class AppComponent implements OnInit, SettingsHolder {
       const x2 = cos_deg(75) * r;
       const y2 = sin_deg(75) * r;
 
-      this.solNoctisPath = `M ${x1} ${y1} A ${r} ${r} 0 0 0${x2} ${y2}`;
+      this.solNoctisPath = `M ${x1} ${y1} A ${r} ${r} 0 0 0 ${x2} ${y2}`;
       this.createDayAreaMask(this.midnightSunR);
     }
 

@@ -266,6 +266,9 @@
           <path id="sunrisePath" [attr.d]="sunriseLabelPath" class="textPath"/>
           <path id="sunsetPath" [attr.d]="sunsetLabelPath" class="textPath"/>
           <path id="solNoctis" [attr.d]="solNoctisPath" class="textPath"/>
+          <path id="c-capricorni-path" d="M -49.5 85.7 A 99 99 0 0 0 49.5 85.7" class="textPath"/>
+          <path id="equator-path" d="M -78 135 A 156 156 0 0 0 78 135" class="textPath"/>
+          <path id="c-cancri-path" d="M -62.3 232.8 A 241 241 0 0 0 62.3 232.8" class="textPath"/>
           <!-- cspell:disable -->
           <text>
             <textPath xlink:href="#sunrisePath" [attr.startOffset]="southern ? '40%' : '54%'" class="eventText">
@@ -288,10 +291,39 @@
             </textPath>
           </text>
           <text *ngIf="midnightSunR">
-            <textPath xlink:href="#solNoctis" startOffset="49%" class="eventText">
-              <tspan dy="-2" [style.font-size]="'12px'">ⓈⓄⓁ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ⓃⓄⒸⓉⒾⓈ</tspan>
+            <textPath xlink:href="#solNoctis" startOffset="54%" class="eventText sol-noctis">
+              <tspan dy="-2">ⓈⓄⓁ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ⓃⓄⒸⓉⒾⓈ</tspan>
             </textPath>
           </text>
+          <text *ngIf="latitude > -80 && latitude < 80">
+            <textPath xlink:href="#equator-path" startOffset="50%" class="latitude-text">
+              <tspan dy="-2">ⒸⒾⓇⒸⓋⓁⓋⓈ&nbsp;ⒶⒺⓆⓋⒾⓃⓄⒸⓉⒾⒾ</tspan>
+            </textPath>
+          </text>
+          <ng-container *ngIf="!southern">
+            <text *ngIf="latitude < 56">
+              <textPath xlink:href="#c-cancri-path" startOffset="46%" class="latitude-text">
+                <tspan dy="-2">ⒸⒾⓇⒸⓋⓁⓋⓈ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ⒸⒶⓃⒸⓇⒾ</tspan>
+              </textPath>
+            </text>
+            <text>
+              <textPath xlink:href="#c-capricorni-path" startOffset="50%" class="latitude-text">
+                <tspan dy="-2">ⒸⒾⓇⒸⓋⓁⓋⓈ&nbsp;ⒸⒶⓅⓇⒾⒸⓄⓇⓃⒾ</tspan>
+              </textPath>
+            </text>
+          </ng-container>
+          <ng-container *ngIf="southern">
+            <text *ngIf="latitude > -56">
+              <textPath xlink:href="#c-cancri-path" startOffset="52%" class="latitude-text smaller">
+                <tspan dy="-2">ⒸⒾⓇⒸⓋⓁⓋⓈ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ⒸⒶⓅⓇⒾⒸⓄⓇⓃⒾ</tspan>
+              </textPath>
+            </text>
+            <text>
+              <textPath xlink:href="#c-capricorni-path" startOffset="50%" class="latitude-text">
+                <tspan dy="-2">ⒸⒾⓇⒸⓋⓁⓋⓈ&nbsp;ⒸⒶⓃⒸⓇⒾ</tspan>
+              </textPath>
+            </text>
+          </ng-container>
           <!-- cspell:enable -->
         </g>
         <g id="time">

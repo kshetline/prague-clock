@@ -638,6 +638,24 @@ svg {
   tspan {
     alignment-baseline: central;
   }
+
+  &.sol-noctis {
+    font-size: 10px;
+  }
+}
+
+.latitude-text {
+  fill: #C5B983;
+  font-size: 8px;
+  text-anchor: middle;
+
+  &.smaller {
+    font-size: 7px;
+  }
+
+  tspan {
+    alignment-baseline: central;
+  }
 }
 
 .unequalHourArea {
