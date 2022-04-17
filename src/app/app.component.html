@@ -298,34 +298,36 @@
               <tspan dy="-2">ⓈⓄⓁ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ⓃⓄⒸⓉⒾⓈ</tspan>
             </textPath>
           </text>
-          <text *ngIf="latitude > -80 && latitude < 80">
-            <textPath xlink:href="#equator-path" startOffset="50%" class="latitude-text">
-              <tspan dy="-2">ⒸⒾⓇⒸⓋⓁⓋⓈ&nbsp;ⒶⒺⓆⓋⒾⓃⓄⒸⓉⒾⒾ</tspan>
-            </textPath>
-          </text>
-          <ng-container *ngIf="!southern">
-            <text *ngIf="latitude < 56">
-              <textPath xlink:href="#c-cancri-path" startOffset="46%" class="latitude-text">
-                <tspan dy="-2">ⒸⒾⓇⒸⓋⓁⓋⓈ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ⒸⒶⓃⒸⓇⒾ</tspan>
+          <ng-container *ngIf="appearance === ORIGINAL_1410">
+            <text *ngIf="latitude > -80 && latitude < 80">
+              <textPath xlink:href="#equator-path" startOffset="50%" class="latitude-text">
+                <tspan dy="-2">ⒸⒾⓇⒸⓋⓁⓋⓈ&nbsp;ⒶⒺⓆⓋⒾⓃⓄⒸⓉⒾⒾ</tspan>
               </textPath>
             </text>
-            <text>
-              <textPath xlink:href="#c-capricorni-path" startOffset="50%" class="latitude-text">
-                <tspan dy="-2">ⒸⒾⓇⒸⓋⓁⓋⓈ&nbsp;ⒸⒶⓅⓇⒾⒸⓄⓇⓃⒾ</tspan>
-              </textPath>
-            </text>
-          </ng-container>
-          <ng-container *ngIf="southern">
-            <text *ngIf="latitude > -56">
-              <textPath xlink:href="#c-cancri-path" startOffset="52%" class="latitude-text smaller">
-                <tspan dy="-2">ⒸⒾⓇⒸⓋⓁⓋⓈ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ⒸⒶⓅⓇⒾⒸⓄⓇⓃⒾ</tspan>
-              </textPath>
-            </text>
-            <text>
-              <textPath xlink:href="#c-capricorni-path" startOffset="50%" class="latitude-text">
-                <tspan dy="-2">ⒸⒾⓇⒸⓋⓁⓋⓈ&nbsp;ⒸⒶⓃⒸⓇⒾ</tspan>
-              </textPath>
-            </text>
+            <ng-container *ngIf="!southern">
+              <text *ngIf="latitude < 56">
+                <textPath xlink:href="#c-cancri-path" startOffset="46%" class="latitude-text">
+                  <tspan dy="-2">ⒸⒾⓇⒸⓋⓁⓋⓈ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ⒸⒶⓃⒸⓇⒾ</tspan>
+                </textPath>
+              </text>
+              <text>
+                <textPath xlink:href="#c-capricorni-path" startOffset="50%" class="latitude-text">
+                  <tspan dy="-2">ⒸⒾⓇⒸⓋⓁⓋⓈ&nbsp;ⒸⒶⓅⓇⒾⒸⓄⓇⓃⒾ</tspan>
+                </textPath>
+              </text>
+            </ng-container>
+            <ng-container *ngIf="southern">
+              <text *ngIf="latitude > -56">
+                <textPath xlink:href="#c-cancri-path" startOffset="52%" class="latitude-text smaller">
+                  <tspan dy="-2">ⒸⒾⓇⒸⓋⓁⓋⓈ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ⒸⒶⓅⓇⒾⒸⓄⓇⓃⒾ</tspan>
+                </textPath>
+              </text>
+              <text>
+                <textPath xlink:href="#c-capricorni-path" startOffset="50%" class="latitude-text">
+                  <tspan dy="-2">ⒸⒾⓇⒸⓋⓁⓋⓈ&nbsp;ⒸⒶⓃⒸⓇⒾ</tspan>
+                </textPath>
+              </text>
+            </ng-container>
           </ng-container>
           <!-- cspell:enable -->
         </g>
