@@ -10,36 +10,12 @@
           <context context-type="linenumber">2</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="8878423859870707732" datatype="html">
-        <source>Post-2018 colors</source>
-        <target>Farben nach 2018</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
-          <context context-type="linenumber">6</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="6570307737686849942" datatype="html">
-        <source>Pre-2018 colors</source>
-        <target>Farben vor 2018</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
-          <context context-type="linenumber">8</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="2329568225243157511" datatype="html">
-        <source>Hide globe map</source>
-        <target>Globuskarte ausblenden</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
-          <context context-type="linenumber">13</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="4531310590867542081" datatype="html">
         <source>Background</source>
         <target>Hintergrund</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
-          <context context-type="linenumber">14</context>
+          <context context-type="linenumber">12</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6279790077821649421" datatype="html">
@@ -47,7 +23,7 @@
         <target>Durchscheinende Ekliptik</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
-          <context context-type="linenumber">19</context>
+          <context context-type="linenumber">18</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3864890029983081377" datatype="html">
@@ -55,7 +31,7 @@
         <target>Mechanisch detailliertes Ziffernblatt</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
-          <context context-type="linenumber">22</context>
+          <context context-type="linenumber">21</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4567987203058794647" datatype="html">
@@ -63,7 +39,7 @@
         <target>Schnellere Grafik / weniger Schattierung</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
-          <context context-type="linenumber">25</context>
+          <context context-type="linenumber">24</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3014525842864089961" datatype="html">
@@ -71,7 +47,7 @@
         <target>Reale Positionsmarkierungen für Sonne/Mond</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">27</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5705294303388560916" datatype="html">
@@ -79,7 +55,7 @@
         <target>Zusätzliche Planetenmarker</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">30</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7916151852478572756" datatype="html">
@@ -87,7 +63,7 @@
         <target>Infotafel anzeigen</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
-          <context context-type="linenumber">33</context>
+          <context context-type="linenumber">32</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4007552823040341727" datatype="html">
@@ -95,7 +71,7 @@
         <target>Astronomisch genaue, nicht mechanische Zeit</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
-          <context context-type="linenumber">37</context>
+          <context context-type="linenumber">36</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7560881997360709341" datatype="html">
@@ -103,7 +79,7 @@
         <target>Mech. Zeit vor 1866, vierteljährlich neu kalibriert</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
-          <context context-type="linenumber">39</context>
+          <context context-type="linenumber">38</context>
         </context-group>
       </trans-unit>
       <trans-unit id="669874847217859055" datatype="html">
@@ -111,7 +87,39 @@
         <target>Mechanische Zeit, jährlich neu kalibriert</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
-          <context context-type="linenumber">41</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8878423859870707732" datatype="html">
+        <source>Post-2018 colors</source>
+        <target>Farben nach 2018</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/advanced-options/advanced-options.component.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4047805937999581180" datatype="html">
+        <source>Post-2018 colors, no map</source>
+        <target>Farben nach 2018, keine Karte</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/advanced-options/advanced-options.component.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6570307737686849942" datatype="html">
+        <source>Pre-2018 colors</source>
+        <target>Farben vor 2018</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/advanced-options/advanced-options.component.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2749282813926463743" datatype="html">
+        <source>Original 1410 look?</source>
+        <target>Original 1410-Look?</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/advanced-options/advanced-options.component.ts</context>
+          <context context-type="linenumber">36</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2682762672767208455" datatype="html">
@@ -275,7 +283,7 @@
         <target>Originale SVG-Uhrengrafik von Jan Tošovský</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
-          <context context-type="linenumber">788</context>
+          <context context-type="linenumber">839</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7419523574846171274" datatype="html">
@@ -283,7 +291,7 @@
         <target>Zeit ändern</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
-          <context context-type="linenumber">791</context>
+          <context context-type="linenumber">842</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5441122631150042416" datatype="html">
@@ -299,7 +307,7 @@
         <target>Default</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">262</context>
+          <context context-type="linenumber">261</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8682509701325907552" datatype="html">
@@ -339,7 +347,7 @@
         <target>Sprache / Language</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">347</context>
+          <context context-type="linenumber">350</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6195195247247362503" datatype="html">
@@ -347,15 +355,15 @@
         <target>Code auf GitHub</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">349</context>
+          <context context-type="linenumber">352</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="3756357829704667628" datatype="html">
-        <source>Official web site</source>
-        <target>Offizielle Website</target>
+      <trans-unit id="3825322612214091906" datatype="html">
+        <source>Czech Horological Society site</source>
+        <target>Tschechische Uhrengesellschaft</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">351</context>
+          <context context-type="linenumber">354</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1316081974854732948" datatype="html">
@@ -363,7 +371,7 @@
         <target>Über die echte Uhr</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">352</context>
+          <context context-type="linenumber">355</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6726437050434882980" datatype="html">
@@ -371,7 +379,7 @@
         <target>https://de.wikipedia.org/wiki/Prager_Rathausuhr</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">353</context>
+          <context context-type="linenumber">356</context>
         </context-group>
         <note priority="1" from="description">Language-specific Wikipedia URL</note>
       </trans-unit>
@@ -380,7 +388,7 @@
         <target>Über diesen Simulator</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">355</context>
+          <context context-type="linenumber">358</context>
         </context-group>
       </trans-unit>
       <trans-unit id="399827913225042410" datatype="html">
@@ -388,7 +396,7 @@
         <target>Bildschirmtastatur unterdrücken</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">461</context>
+          <context context-type="linenumber">466</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2807800733729323332" datatype="html">
@@ -396,7 +404,7 @@
         <target>Ja</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">533</context>
+          <context context-type="linenumber">532</context>
         </context-group>
         <note priority="1" from="description">for dialog button</note>
       </trans-unit>
@@ -405,7 +413,7 @@
         <target>Nein</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">534</context>
+          <context context-type="linenumber">533</context>
         </context-group>
         <note priority="1" from="description">for dialog button</note>
       </trans-unit>
@@ -414,7 +422,7 @@
         <target>"Aktuelle Uhrzeit verfolgen" deaktivieren, damit Sie die Zeit bearbeiten können?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1451</context>
+          <context context-type="linenumber">1448</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1653085740327060302" datatype="html">
@@ -422,7 +430,7 @@
         <target>"Aktuelle Uhrzeit verfolgen" deaktivieren und die Uhrzeit ändern?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1526</context>
+          <context context-type="linenumber">1523</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3304972143698843178" datatype="html">
@@ -430,11 +438,11 @@
         <target>Vorfall</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1567</context>
+          <context context-type="linenumber">1564</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1571</context>
+          <context context-type="linenumber">1568</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5379240220330466138" datatype="html">
@@ -442,7 +450,7 @@
         <target>Ereignis außerhalb des Zeitraums von <x id="PH" equiv-text="this.MIN_YEAR"/> bis <x id="PH_1" equiv-text="this.MAX_YEAR"/> Jahren.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1568</context>
+          <context context-type="linenumber">1565</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7225188300874994693" datatype="html">
@@ -450,7 +458,7 @@
         <target>Sonnenaufgang</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1578</context>
+          <context context-type="linenumber">1575</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6447558907113574235" datatype="html">
@@ -458,7 +466,7 @@
         <target>Sonnenuntergang</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1580</context>
+          <context context-type="linenumber">1577</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6054510843574670830" datatype="html">
@@ -466,7 +474,7 @@
         <target>Transit</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1582</context>
+          <context context-type="linenumber">1579</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5740316636928173013" datatype="html">
@@ -474,7 +482,7 @@
         <target>Frühlings-Tagundnachtgleiche</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1584</context>
+          <context context-type="linenumber">1581</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2020422354780153562" datatype="html">
@@ -482,7 +490,7 @@
         <target>Sommersonnenwende</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1586</context>
+          <context context-type="linenumber">1583</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7383670398589052638" datatype="html">
@@ -490,7 +498,7 @@
         <target>Herbsttagundnachtgleiche</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1588</context>
+          <context context-type="linenumber">1585</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3382598256887949674" datatype="html">
@@ -498,7 +506,7 @@
         <target>Wintersonnenwende</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1590</context>
+          <context context-type="linenumber">1587</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5087039501580395567" datatype="html">
@@ -506,7 +514,7 @@
         <target>Neumond</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1592</context>
+          <context context-type="linenumber">1589</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5246077877231873167" datatype="html">
@@ -514,7 +522,7 @@
         <target>Mond im ersten Viertel</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1594</context>
+          <context context-type="linenumber">1591</context>
         </context-group>
       </trans-unit>
       <trans-unit id="315285506816329608" datatype="html">
@@ -522,7 +530,7 @@
         <target>Vollmond</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1596</context>
+          <context context-type="linenumber">1593</context>
         </context-group>
       </trans-unit>
       <trans-unit id="409860942378561532" datatype="html">
@@ -530,7 +538,7 @@
         <target>Mond im dritten Viertel</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1598</context>
+          <context context-type="linenumber">1595</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3251116876185403930" datatype="html">

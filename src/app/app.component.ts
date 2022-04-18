@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService, PrimeNGConfig } from 'primeng/api';
 import {
-  abs, atan2_deg, atan_deg, cos_deg, floor, interpolateModular, max, min, mod, mod2, PI, Point, sign,
-  sin_deg, sqrt, tan_deg
+  abs, atan2_deg, atan_deg, cos_deg, floor, interpolateModular, max, min, mod, mod2, PI, Point, sign, sin_deg,
+  sqrt, tan_deg
 } from '@tubular/math';
 import {
   clone, extendDelimited, forEach, getCssValue, isEqual, isLikelyMobile, isObject, isSafari, processMillis, toNumber
@@ -18,7 +18,7 @@ import { TzsLocation } from '../timezone-selector/timezone-selector.component';
 import { Globe } from '../globe/globe';
 import { basePath, languageList, localeSuffix, SOUTH_NORTH, specificLocale, WEST_EAST } from '../locales/locale-info';
 import { faForward, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
-import { AdvancedOptionsComponent, SettingsHolder, Timing } from '../advanced-options/advanced-options.component';
+import { AdvancedOptionsComponent, Appearance, SettingsHolder, Timing } from '../advanced-options/advanced-options.component';
 
 const { DATE, DATETIME_LOCAL, julianDay, TIME } = ttime;
 
@@ -56,18 +56,17 @@ const pragueLon = 14.4185;
 
 const defaultSettings = {
   additionalPlanets: false,
+  appearance: Appearance.CURRENT,
   background: '#4D4D4D',
   collapsed: false,
   detailedMechanism: false,
   disableDst: true,
   eventType: EventType.EQUISOLSTICE,
   fasterGraphics: true,
-  hideMap: false,
   isoFormat: false,
   latitude: pragueLat,
   longitude: pragueLon,
   placeName: prague,
-  post2018: true,
   realPositionMarkers: false,
   recentLocations: [{
     lastTimeUsed: 0,
@@ -273,6 +272,8 @@ export class AppComponent implements OnInit, SettingsHolder {
   faPlay = faPlay;
   faStop = faStop;
 
+  CURRENT = Appearance.CURRENT;
+  CURRENT_NO_MAP = Appearance.CURRENT_NO_MAP;
   DD = AngleStyle.DD;
   DDD = AngleStyle.DDD;
   FAST = PlaySpeed.FAST;
@@ -280,6 +281,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   MAX_YEAR = 2399;
   MIN_YEAR = 1400;
   NORMAL = PlaySpeed.NORMAL;
+  ORIGINAL_1410 = Appearance.ORIGINAL_1410;
   SOUTH_NORTH = SOUTH_NORTH;
   specificLocale = specificLocale;
   toZodiac = (angle: number): string => '♈♉♊♋♌♍♎♏♐♑♒♓'.charAt(floor(mod(angle, 360) / 30)) + '\uFE0E';
@@ -296,6 +298,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   ISO_OPTS = ['ISO', this.LOCAL_OPTS, { showUtcOffset: true }];
 
   private _additionalPlanets = false;
+  private _appearance = Appearance.CURRENT;
   private _background = '#4D4D4D';
   private _collapsed = false;
   private delayedCollapse = false;
@@ -307,7 +310,6 @@ export class AppComponent implements OnInit, SettingsHolder {
   private graphicsChangeLastTime = -1;
   private graphicsChangeStartTime = -1;
   private graphicsChangeStopTimer: any;
-  private _hideMap = false;
   private initDone = false;
   private _isoFormat = false;
   private lastSavedSettings: any = null;
@@ -319,9 +321,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   private _playing = false;
   private playTimeBase: number;
   private playTimeProcessBase: number;
-  private _post2018 = false;
   private _realPositionMarkers = false;
-  private slightlyOffEclipticAngle: number[] = [];
   private solarSystem = new SolarSystem();
   private sunsetA: AstroEvent = null;
   private sunsetB: AstroEvent = null;
@@ -351,7 +351,7 @@ export class AppComponent implements OnInit, SettingsHolder {
     { separator : true },
     { label: $localize`Code on GitHub`, icon: 'pi pi-github', url: 'https://github.com/kshetline/prague-clock',
       target: '_blank' },
-    { label: $localize`Official web site`, icon: 'pi pi-home', url: 'https://www.orloj.eu/', target: '_blank' },
+    { label: $localize`Czech Horological Society site`, icon: 'pi pi-home', url: 'https://www.orloj.eu/', target: '_blank' },
     { label: $localize`About the real clock`, icon: 'pi pi-info-circle',
       url: $localize`:Language-specific Wikipedia URL:https://en.wikipedia.org/wiki/Prague_astronomical_clock`,
       target: '_blank' },
@@ -359,6 +359,7 @@ export class AppComponent implements OnInit, SettingsHolder {
       target: '_blank' }
   ];
 
+  altFour = false;
   bohemianTime = '';
   canEditName = false;
   canSaveName = false;
@@ -373,6 +374,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   duskGradientAdjustment = 80;
   duskLabelPath: string;
   duskTextOffset: number;
+  emptyCenter = false;
   equatorSunriseAngle: number = null;
   errorMoon = 0;
   errorMoonDays = 0;
@@ -473,6 +475,14 @@ export class AppComponent implements OnInit, SettingsHolder {
         settings.recentLocations.forEach((loc: any) => { loc.name = loc.name || loc.placeName; delete loc.placeName; });
         settings.recentLocations[0].name = prague;
       }
+
+      if (settings.post2018 != null) {
+        settings.appearance = (settings.post2018 ? (settings.hideMap === true ?
+          Appearance.CURRENT_NO_MAP : Appearance.CURRENT) : Appearance.PRE_2018);
+        delete settings.appearance;
+      }
+
+      delete settings.hideMap;
     }
     catch {
       settings = null;
@@ -492,18 +502,6 @@ export class AppComponent implements OnInit, SettingsHolder {
       return 0;
 
     return interpolateAngle(this.trueEclipticAngle, inner ? this.eclipticInnerAngle : this.eclipticOuterAngle, angle);
-  }
-
-  // The markings on the SVG graphics for the ecliptic wheel are slightly off in some places, by a degree or two
-  // (for instance, the line between Aries and Taurus is at about 28° instead of 30°), so this method corrects
-  // for those small errors. This is needed when the clock is operating in mechanical simulation mode, in order for
-  // the sun and the moon to be correctly aligned on the ecliptic wheel as if they had been guided into place by the
-  // sun and the moon hands of the clock.
-  private correctOffAngle(angle: number): number {
-    if (this.eclipticInnerAngle.length === 0)
-      return 0;
-
-    return interpolateAngle(this.slightlyOffEclipticAngle, this.trueEclipticAngle, angle);
   }
 
   private adjustForEclipticWheel(angle: number): AngleTriplet {
@@ -526,8 +524,6 @@ export class AppComponent implements OnInit, SettingsHolder {
       const outer = eclipticIntercept(x, y, ECLIPTIC_OUTER_RADIUS);
 
       this.trueEclipticAngle[i + 2] = i * 6;
-      this.slightlyOffEclipticAngle[i + 2] = mod(atan2_deg(ECLIPTIC_CENTER_OFFSET - inner.y, inner.x), 360)
-        - (i < 0 ? 360 : 0) + (i > 59 ? 360 : 0);
       this.eclipticInnerAngle[i + 2] = mod(atan2_deg(inner.y, inner.x), 360) + (i < 5 ? 360 : 0);
       this.eclipticOuterAngle[i + 2] = mod(atan2_deg(outer.y, outer.x), 360) + (i < 4 ? 360 : 0);
     }
@@ -541,8 +537,7 @@ export class AppComponent implements OnInit, SettingsHolder {
 
     this.initDone = true;
     this.globe = new Globe('globe-host');
-    this.globe.setColorScheme(this.post2018);
-    this.globe.setHideMap(this.hideMap);
+    this.globe.setAppearance(this.appearance);
     this.adjustLatitude();
 
     this.setNow();
@@ -663,19 +658,17 @@ export class AppComponent implements OnInit, SettingsHolder {
     }
   }
 
-  get post2018(): boolean { return this._post2018; }
-  set post2018(value: boolean) {
-    if (this._post2018 !== value) {
-      this._post2018 = value;
-      this.globe?.setColorScheme(value);
-    }
-  }
+  get appearance(): Appearance { return this._appearance; }
+  set appearance(value: Appearance) {
+    if (this.appearance !== value) {
+      const wasEmptyCenter = this.emptyCenter;
+      this._appearance = value;
+      this.emptyCenter = (value === Appearance.ORIGINAL_1410);
+      this.altFour = this.emptyCenter;
+      this.globe?.setAppearance(value);
 
-  get hideMap(): boolean { return this._hideMap; }
-  set hideMap(value: boolean) {
-    if (this._hideMap !== value) {
-      this._hideMap = value;
-      this.globe?.setHideMap(value);
+      if (this.emptyCenter !== wasEmptyCenter)
+        setTimeout(() => this.adjustLatitude());
     }
   }
 
@@ -980,7 +973,8 @@ export class AppComponent implements OnInit, SettingsHolder {
     this.updateObserver();
     this.placeName = '';
     ({ cy: this.horizonCy, d: this.horizonPath, r: this.horizonR } = this.getAltitudeCircle(0, true));
-    ({ cy: this.darkCy, r: this.darkR } = this.getAltitudeCircle(-18));
+    ({ cy: this.darkCy, r: this.darkR } =
+      this.getAltitudeCircle(this.appearance === Appearance.ORIGINAL_1410 ? -10 : -18));
 
     const absLat = abs(this._latitude);
     const excessLatitude = absLat - ARCTIC;
@@ -999,7 +993,7 @@ export class AppComponent implements OnInit, SettingsHolder {
       const x2 = cos_deg(75) * r;
       const y2 = sin_deg(75) * r;
 
-      this.solNoctisPath = `M ${x1} ${y1} A ${r} ${r} 0 0 0${x2} ${y2}`;
+      this.solNoctisPath = `M ${x1} ${y1} A ${r} ${r} 0 0 0 ${x2} ${y2}`;
       this.createDayAreaMask(this.midnightSunR);
     }
 
@@ -1362,7 +1356,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   }
 
   private calculateEclipticAnglesFromHandAngle(handAngle: number, siderealAngle: number): AngleTriplet {
-    const eclipticAngle = this.correctOffAngle(mod(90 - handAngle + siderealAngle, 360));
+    const eclipticAngle = mod(90 - handAngle + siderealAngle, 360);
 
     return {
       orig: eclipticAngle,

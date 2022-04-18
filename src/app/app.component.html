@@ -129,7 +129,9 @@
   </div>
 </div>
 
-<div id="svg-wrapper" [class.post-2018]="post2018">
+<div id="svg-wrapper"
+    [class.post-2018]="appearance === CURRENT || appearance === CURRENT_NO_MAP"
+    [class.orig-1410]="appearance === ORIGINAL_1410">
   <svg viewBox="0 0 600 600" xml:space="preserve" [class.controls-collapsed]="collapsed">
     <defs>
       <filter id="filterHand" x="0" y="0" width="200%" height="200%">
@@ -183,8 +185,11 @@
       <symbol id="leverData" overflow="visible">
         <path d="M2.0 -200.0L2.0 -11.313708498984761A4.0 4.0 0 0 0 4.0 -6.928203230275509A8.0 8.0 0 0 1 6.928203230275509 -4.0A4.0 4.0 0 0 0 11.313708498984761 -2.0L100.0 -2.0L100.0 -1.25L200.0 -1.25L200.0 1.25L100.0 1.25L100.0 2.0L11.313708498984761 2.0A4.0 4.0 0 0 0 6.928203230275509 4.0A8.0 8.0 0 0 1 4.0 6.928203230275509A4.0 4.0 0 0 0 2.0 11.313708498984761L2.0 80.0L-2.0 80.0L-2.0 11.313708498984761A4.0 4.0 0 0 0 -4.0 6.928203230275509A8.0 8.0 0 0 1 -6.928203230275509 4.0A4.0 4.0 0 0 0 -11.313708498984761 2.0L-100.0 2.0L-100.0 -2.0L-11.313708498984761 -2.0A4.0 4.0 0 0 0 -6.928203230275509 -4.0A8.0 8.0 0 0 1 -4.0 -6.928203230275509A4.0 4.0 0 0 0 -2.0 -11.313708498984761L-2.0 -200.0"/>
       </symbol>
+      <symbol id="leverData-1410" overflow="visible">
+        <path d="M2.0 -200.0L2.0 -11.313708498984761A4.0 4.0 0 0 0 4.0 -6.928203230275509A8.0 8.0 0 0 1 6.928203230275509 -4.0A4.0 4.0 0 0 0 11.313708498984761 -2.0L100.0 -2.0L100.0 -1.25L150.0 -1.25L150.0 1.25L100.0 1.25L100.0 2.0L11.313708498984761 2.0A4.0 4.0 0 0 0 6.928203230275509 4.0A8.0 8.0 0 0 1 4.0 6.928203230275509A4.0 4.0 0 0 0 2.0 11.313708498984761L2.0 80.0L-2.0 80.0L-2.0 11.313708498984761A4.0 4.0 0 0 0 -4.0 6.928203230275509A8.0 8.0 0 0 1 -6.928203230275509 4.0A4.0 4.0 0 0 0 -11.313708498984761 2.0L-100.0 2.0L-100.0 -2.0L-11.313708498984761 -2.0A4.0 4.0 0 0 0 -6.928203230275509 -4.0A8.0 8.0 0 0 1 -4.0 -6.928203230275509A4.0 4.0 0 0 0 -2.0 -11.313708498984761L-2.0 -200.0"/>
+      </symbol>
       <symbol id="leverSymbol" overflow="visible">
-        <use xlink:href="#leverData" class="leverSymbol"/>
+        <use [attr.xlink:href]="appearance === ORIGINAL_1410 ? '#leverData-1410' : '#leverData'" class="leverSymbol"/>
       </symbol>
       <symbol id="hourAngleStarData" overflow="visible">
         <path d="M193.0 5.0L197.5 7.8L197.3 2.5L202.0 0.0L197.3 -2.5L197.5 -7.8L193.0 -5.0L188.5 -7.8L188.7 -2.5L184.0 -0.0L188.7 2.5L188.5 7.8"/>
@@ -215,6 +220,12 @@
       <mask id="baseArea">
         <g class="maskWhite">
           <circle cx="0" cy="0" r="250"/>
+        </g>
+      </mask>
+      <mask id="baseArea-center-hole">
+        <g class="maskWhite">
+          <circle cx="0" cy="0" r="250"/>
+          <circle cx="0" cy="0" r="107.7" class="hole"/>
         </g>
       </mask>
       <mask id="dayArea">
@@ -258,6 +269,9 @@
           <path id="sunrisePath" [attr.d]="sunriseLabelPath" class="textPath"/>
           <path id="sunsetPath" [attr.d]="sunsetLabelPath" class="textPath"/>
           <path id="solNoctis" [attr.d]="solNoctisPath" class="textPath"/>
+          <path id="c-capricorni-path" d="M -49.5 85.7 A 99 99 0 0 0 49.5 85.7" class="textPath"/>
+          <path id="equator-path" d="M -78 135 A 156 156 0 0 0 78 135" class="textPath"/>
+          <path id="c-cancri-path" d="M -62.3 232.8 A 241 241 0 0 0 62.3 232.8" class="textPath"/>
           <!-- cspell:disable -->
           <text>
             <textPath xlink:href="#sunrisePath" [attr.startOffset]="southern ? '40%' : '54%'" class="eventText">
@@ -280,10 +294,41 @@
             </textPath>
           </text>
           <text *ngIf="midnightSunR">
-            <textPath xlink:href="#solNoctis" startOffset="49%" class="eventText">
-              <tspan dy="-2" [style.font-size]="'12px'">ⓈⓄⓁ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ⓃⓄⒸⓉⒾⓈ</tspan>
+            <textPath xlink:href="#solNoctis" startOffset="54%" class="eventText sol-noctis">
+              <tspan dy="-2">ⓈⓄⓁ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ⓃⓄⒸⓉⒾⓈ</tspan>
             </textPath>
           </text>
+          <ng-container *ngIf="appearance === ORIGINAL_1410">
+            <text *ngIf="latitude > -80 && latitude < 80">
+              <textPath xlink:href="#equator-path" startOffset="50%" class="latitude-text">
+                <tspan dy="-2">ⒸⒾⓇⒸⓋⓁⓋⓈ&nbsp;ⒶⒺⓆⓋⒾⓃⓄⒸⓉⒾⒾ</tspan>
+              </textPath>
+            </text>
+            <ng-container *ngIf="!southern">
+              <text *ngIf="latitude < 56">
+                <textPath xlink:href="#c-cancri-path" startOffset="46%" class="latitude-text">
+                  <tspan dy="-2">ⒸⒾⓇⒸⓋⓁⓋⓈ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ⒸⒶⓃⒸⓇⒾ</tspan>
+                </textPath>
+              </text>
+              <text>
+                <textPath xlink:href="#c-capricorni-path" startOffset="50%" class="latitude-text">
+                  <tspan dy="-2">ⒸⒾⓇⒸⓋⓁⓋⓈ&nbsp;ⒸⒶⓅⓇⒾⒸⓄⓇⓃⒾ</tspan>
+                </textPath>
+              </text>
+            </ng-container>
+            <ng-container *ngIf="southern">
+              <text *ngIf="latitude > -56">
+                <textPath xlink:href="#c-cancri-path" startOffset="52%" class="latitude-text smaller">
+                  <tspan dy="-2">ⒸⒾⓇⒸⓋⓁⓋⓈ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ⒸⒶⓅⓇⒾⒸⓄⓇⓃⒾ</tspan>
+                </textPath>
+              </text>
+              <text>
+                <textPath xlink:href="#c-capricorni-path" startOffset="50%" class="latitude-text">
+                  <tspan dy="-2">ⒸⒾⓇⒸⓋⓁⓋⓈ&nbsp;ⒸⒶⓃⒸⓇⒾ</tspan>
+                </textPath>
+              </text>
+            </ng-container>
+          </ng-container>
           <!-- cspell:enable -->
         </g>
         <g id="time">
@@ -292,7 +337,7 @@
             <text><textPath xlink:href="#timeTextPath" startOffset="4.2%" class="timeText">I</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="8.3%" class="timeText">II</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="12.5%" class="timeText">III</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="16.7%" class="timeText">IV</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="16.7%" class="timeText">{{ altFour ? 'IIII' : 'IV'}}</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="20.8%" class="timeText">V</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="25.0%" class="timeText">VI</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="29.2%" class="timeText">VII</textPath></text>
@@ -304,7 +349,7 @@
             <text><textPath xlink:href="#timeTextPath" startOffset="54.2%" class="timeText">I</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="58.3%" class="timeText">II</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="62.5%" class="timeText">III</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="66.7%" class="timeText">IV</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="66.7%" class="timeText">{{ altFour ? 'IIII' : 'IV'}}</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="70.8%" class="timeText">V</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="75.0%" class="timeText">VI</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="79.2%" class="timeText">VII</textPath></text>
@@ -324,7 +369,7 @@
             <text><textPath xlink:href="#timeTextPath" startOffset="20.8%" class="timeText">VII</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="25.0%" class="timeText">VI</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="29.2%" class="timeText">V</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="33.3%" class="timeText">IV</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="33.3%" class="timeText">{{ altFour ? 'IIII' : 'IV'}}</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="37.5%" class="timeText">III</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="41.7%" class="timeText">II</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="45.8%" class="timeText">I</textPath></text>
@@ -336,7 +381,7 @@
             <text><textPath xlink:href="#timeTextPath" startOffset="70.8%" class="timeText">VII</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="75.0%" class="timeText">VI</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="79.2%" class="timeText">V</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="83.3%" class="timeText">IV</textPath></text>
+            <text><textPath xlink:href="#timeTextPath" startOffset="83.3%" class="timeText">{{ altFour ? 'IIII' : 'IV'}}</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="87.5%" class="timeText">III</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="91.7%" class="timeText">II</textPath></text>
             <text><textPath xlink:href="#timeTextPath" startOffset="95.8%" class="timeText">I</textPath></text>
@@ -359,13 +404,15 @@
           <path [attr.d]="hourArcs[11]" class="unequalHourBorder"/>
           <path d="M0 0L0 -400" class="unequalHourBorder"/>
         </g>
-        <g id="horizonBorder" mask="url(#baseArea)" [attr.filter]="filterRelief">
+        <g id="horizonBorder" [attr.mask]="emptyCenter ? 'url(#baseArea-center-hole)': 'url(#baseArea)'"
+            [attr.filter]="filterRelief">
           <circle *ngIf="midnightSunR" [attr.r]="midnightSunR" cx="0" cy="0" class="midnightSunCircle"/>
           <circle id="horizonBorder" [attr.r]="horizonR" cx="0" [attr.cy]="horizonCy" class="baseCircle"/>
         </g>
         <g id="baseCircles" [attr.filter]="filterRelief">
-          <circle cx="0" cy="0" r="107.7" class="baseCircle innerCircle"/>
+          <circle cx="0" cy="0" r="107.7" class="baseCircle innerCircle" [style.fill]="emptyCenter ? 'none' : null"/>
           <circle cx="0" cy="0" r="164.1" class="baseCircle"/>
+          <circle cx="0" cy="0" r="253" class="ring-gap"/>
           <circle cx="0" cy="0" r="250" class="baseCircle"/>
         </g>
       </g>
@@ -434,7 +481,7 @@
 
   <!-- I would have used <foreignObject> to host the map canvas, but the positioning and layering behavior weren't
        consistent across browsers, with Safari and Chrome on Android having particular problems. -->
-  <div id="globe-host"></div>
+  <div id="globe-host" [style.opacity]="emptyCenter ? '0' : '1'"></div>
 
   <svg viewBox="0 0 600 600" xml:space="preserve" class="svg-overlay" [class.controls-collapsed]="collapsed">
     <defs>
@@ -469,7 +516,7 @@
               <use xlink:href="#leverSymbol" class="leverSymbol"/>
             </g>
           </g>
-          <g [attr.filter]="filterRelief">
+          <g *ngIf="appearance !== ORIGINAL_1410" [attr.filter]="filterRelief">
             <g id="ecliptic_positive_hourAngleStar" [attr.transform]="rotate(siderealAngle * rotateSign)">
               <use xlink:href="#hourAngleStarSymbol" class="hourAngleStarSymbol"/>
             </g>
@@ -493,143 +540,143 @@
                     <path d="M0.0 -178.9C98.8 -178.9 178.9 -98.8 178.9 0.0C178.9 98.8 98.8 178.9 0.0 178.9C-98.8 178.9 -178.9 98.8 -178.9 0.0C-178.9 -98.8 -98.8 -178.9 0.0 -178.9M0.0 -116.3C-64.2 -116.3 -116.3 -64.2 -116.3 0.0C-116.3 64.2 -64.2 116.3 0.0 116.3C64.2 116.3 116.3 64.2 116.3 0.0C116.3 -64.2 64.2 -116.3 0.0 -116.3" class="maskWhite"/>
                   </mask>
                   <g mask="url('#maskSmall')">
-                    <path id="ref-01" d="M0 71.1L40.7 426.5" class="eclipticDial"/>
-                    <path id="ref-02" d="M0 71.1L80.7 419.6" class="eclipticDial"/>
-                    <path id="ref-03" d="M0 71.1L119.4 408.3" class="eclipticDial"/>
-                    <path id="ref-04" d="M0 71.1L156.2 393.0" class="eclipticDial"/>
-                    <path id="ref-06" d="M0 71.1L222.1 351.6" class="eclipticDial"/>
-                    <path id="ref-07" d="M0 71.1L250.6 326.5" class="eclipticDial"/>
-                    <path id="ref-08" d="M0 71.1L275.8 299.0" class="eclipticDial"/>
-                    <path id="ref-09" d="M0 71.1L297.7 269.6" class="eclipticDial"/>
-                    <path id="ref-11" d="M0 71.1L331.2 206.4" class="eclipticDial"/>
-                    <path id="ref-12" d="M0 71.1L342.8 173.3" class="eclipticDial"/>
-                    <path id="ref-13" d="M0 71.1L351.1 139.6" class="eclipticDial"/>
-                    <path id="ref-14" d="M0 71.1L356.1 105.5" class="eclipticDial"/>
-                    <path id="ref-16" d="M0 71.1L356.1 36.8" class="eclipticDial"/>
-                    <path id="ref-17" d="M0 71.1L351.1 2.7" class="eclipticDial"/>
-                    <path id="ref-18" d="M0 71.1L342.8 -31.1" class="eclipticDial"/>
-                    <path id="ref-19" d="M0 71.1L331.2 -64.1" class="eclipticDial"/>
-                    <path id="ref-21" d="M0 71.1L297.7 -127.3" class="eclipticDial"/>
-                    <path id="ref-22" d="M0 71.1L275.8 -156.7" class="eclipticDial"/>
-                    <path id="ref-23" d="M0 71.1L250.6 -184.2" class="eclipticDial"/>
-                    <path id="ref-24" d="M0 71.1L222.1 -209.3" class="eclipticDial"/>
-                    <path id="ref-26" d="M0 71.1L156.2 -250.7" class="eclipticDial"/>
-                    <path id="ref-27" d="M0 71.1L119.4 -266.1" class="eclipticDial"/>
-                    <path id="ref-28" d="M0 71.1L80.7 -277.4" class="eclipticDial"/>
-                    <path id="ref-29" d="M0 71.1L40.7 -284.3" class="eclipticDial"/>
-                    <path id="ref-31" d="M0 71.1L-40.7 -284.3" class="eclipticDial"/>
-                    <path id="ref-32" d="M0 71.1L-80.7 -277.4" class="eclipticDial"/>
-                    <path id="ref-33" d="M0 71.1L-119.4 -266.1" class="eclipticDial"/>
-                    <path id="ref-34" d="M0 71.1L-156.2 -250.7" class="eclipticDial"/>
-                    <path id="ref-36" d="M0 71.1L-222.1 -209.3" class="eclipticDial"/>
-                    <path id="ref-37" d="M0 71.1L-250.6 -184.2" class="eclipticDial"/>
-                    <path id="ref-38" d="M0 71.1L-275.8 -156.7" class="eclipticDial"/>
-                    <path id="ref-39" d="M0 71.1L-297.7 -127.3" class="eclipticDial"/>
-                    <path id="ref-41" d="M0 71.1L-331.2 -64.1" class="eclipticDial"/>
-                    <path id="ref-42" d="M0 71.1L-342.8 -31.1" class="eclipticDial"/>
-                    <path id="ref-43" d="M0 71.1L-351.1 2.7" class="eclipticDial"/>
-                    <path id="ref-44" d="M0 71.1L-356.1 36.8" class="eclipticDial"/>
-                    <path id="ref-46" d="M0 71.1L-356.1 105.5" class="eclipticDial"/>
-                    <path id="ref-47" d="M0 71.1L-351.1 139.6" class="eclipticDial"/>
-                    <path id="ref-48" d="M0 71.1L-342.8 173.3" class="eclipticDial"/>
-                    <path id="ref-49" d="M0 71.1L-331.2 206.4" class="eclipticDial"/>
-                    <path id="ref-51" d="M0 71.1L-297.7 269.6" class="eclipticDial"/>
-                    <path id="ref-52" d="M0 71.1L-275.8 299.0" class="eclipticDial"/>
-                    <path id="ref-53" d="M0 71.1L-250.6 326.5" class="eclipticDial"/>
-                    <path id="ref-54" d="M0 71.1L-222.1 351.6" class="eclipticDial"/>
-                    <path id="ref-56" d="M0 71.1L-156.2 393.0" class="eclipticDial"/>
-                    <path id="ref-57" d="M0 71.1L-119.4 408.3" class="eclipticDial"/>
-                    <path id="ref-58" d="M0 71.1L-80.7 419.6" class="eclipticDial"/>
-                    <path id="ref-59" d="M0 71.1L-40.7 426.5" class="eclipticDial"/>
+                    <path id="ref-01" d="M0 71.1L11.72 182.56" class="eclipticDial"/>
+                    <path id="ref-02" d="M0 71.1L23.48 181.54" class="eclipticDial"/>
+                    <path id="ref-03" d="M0 71.1L35.32 179.80" class="eclipticDial"/>
+                    <path id="ref-04" d="M0 71.1L47.27 177.27" class="eclipticDial"/>
+                    <path id="ref-06" d="M0 71.1L71.49 169.50" class="eclipticDial"/>
+                    <path id="ref-07" d="M0 71.1L83.69 164.05" class="eclipticDial"/>
+                    <path id="ref-08" d="M0 71.1L95.87 157.42" class="eclipticDial"/>
+                    <path id="ref-09" d="M0 71.1L107.92 149.51" class="eclipticDial"/>
+                    <path id="ref-11" d="M0 71.1L131.06 129.45" class="eclipticDial"/>
+                    <path id="ref-12" d="M0 71.1L141.81 117.18" class="eclipticDial"/>
+                    <path id="ref-13" d="M0 71.1L151.72 103.35" class="eclipticDial"/>
+                    <path id="ref-14" d="M0 71.1L160.59 87.98" class="eclipticDial"/>
+                    <path id="ref-16" d="M0 71.1L174.16 52.79" class="eclipticDial"/>
+                    <path id="ref-17" d="M0 71.1L178.34 33.19" class="eclipticDial"/>
+                    <path id="ref-18" d="M0 71.1L180.44 12.47" class="eclipticDial"/>
+                    <path id="ref-19" d="M0 71.1L180.17 -9.12" class="eclipticDial"/>
+                    <path id="ref-21" d="M0 71.1L171.72 -53.67" class="eclipticDial"/>
+                    <path id="ref-22" d="M0 71.1L163.17 -75.82" class="eclipticDial"/>
+                    <path id="ref-23" d="M0 71.1L151.60 -97.27" class="eclipticDial"/>
+                    <path id="ref-24" d="M0 71.1L137.01 -117.48" class="eclipticDial"/>
+                    <path id="ref-26" d="M0 71.1L99.30 -151.94" class="eclipticDial"/>
+                    <path id="ref-27" d="M0 71.1L76.74 -165.09" class="eclipticDial"/>
+                    <path id="ref-28" d="M0 71.1L52.28 -174.85" class="eclipticDial"/>
+                    <path id="ref-29" d="M0 71.1L26.48 -180.87" class="eclipticDial"/>
+                    <path id="ref-31" d="M0 71.1L-26.48 -180.87" class="eclipticDial"/>
+                    <path id="ref-32" d="M0 71.1L-52.28 -174.85" class="eclipticDial"/>
+                    <path id="ref-33" d="M0 71.1L-76.74 -165.09" class="eclipticDial"/>
+                    <path id="ref-34" d="M0 71.1L-99.30 -151.94" class="eclipticDial"/>
+                    <path id="ref-36" d="M0 71.1L-137.01 -117.48" class="eclipticDial"/>
+                    <path id="ref-37" d="M0 71.1L-151.60 -97.27" class="eclipticDial"/>
+                    <path id="ref-38" d="M0 71.1L-163.17 -75.82" class="eclipticDial"/>
+                    <path id="ref-39" d="M0 71.1L-171.72 -53.67" class="eclipticDial"/>
+                    <path id="ref-41" d="M0 71.1L-180.17 -9.12" class="eclipticDial"/>
+                    <path id="ref-42" d="M0 71.1L-180.44 12.47" class="eclipticDial"/>
+                    <path id="ref-43" d="M0 71.1L-178.34 33.19" class="eclipticDial"/>
+                    <path id="ref-44" d="M0 71.1L-174.16 52.79" class="eclipticDial"/>
+                    <path id="ref-46" d="M0 71.1L-160.59 87.98" class="eclipticDial"/>
+                    <path id="ref-47" d="M0 71.1L-151.72 103.35" class="eclipticDial"/>
+                    <path id="ref-48" d="M0 71.1L-141.81 117.18" class="eclipticDial"/>
+                    <path id="ref-49" d="M0 71.1L-131.06 129.45" class="eclipticDial"/>
+                    <path id="ref-51" d="M0 71.1L-107.92 149.51" class="eclipticDial"/>
+                    <path id="ref-52" d="M0 71.1L-95.87 157.42" class="eclipticDial"/>
+                    <path id="ref-53" d="M0 71.1L-83.69 164.05" class="eclipticDial"/>
+                    <path id="ref-54" d="M0 71.1L-71.49 169.50" class="eclipticDial"/>
+                    <path id="ref-56" d="M0 71.1L-47.27 177.27" class="eclipticDial"/>
+                    <path id="ref-57" d="M0 71.1L-35.32 179.80" class="eclipticDial"/>
+                    <path id="ref-58" d="M0 71.1L-23.48 181.54" class="eclipticDial"/>
+                    <path id="ref-59" d="M0 71.1L-11.72 182.56" class="eclipticDial"/>
                   </g>
                   <g mask="url('#maskLarge')">
-                    <path id="ref-00" d="M0 71.1L0.0 428.9" class="eclipticCircle"/>
-                    <path id="ref-05" d="M0 71.1L190.5 373.9" class="eclipticCircle"/>
-                    <path id="ref-10" d="M0 71.1L316.1 238.6" class="eclipticCircle"/>
-                    <path id="ref-15" d="M0 71.1L357.7 71.1" class="eclipticCircle"/>
-                    <path id="ref-20" d="M0 71.1L316.1 -96.3" class="eclipticCircle"/>
-                    <path id="ref-25" d="M0 71.1L190.5 -231.6" class="eclipticCircle"/>
-                    <path id="ref-30" d="M0 71.1L0.0 -286.6" class="eclipticCircle"/>
-                    <path id="ref-35" d="M0 71.1L-190.5 -231.6" class="eclipticCircle"/>
-                    <path id="ref-40" d="M0 71.1L-316.1 -96.3" class="eclipticCircle"/>
-                    <path id="ref-45" d="M0 71.1L-357.7 71.1" class="eclipticCircle"/>
-                    <path id="ref-50" d="M0 71.1L-316.1 238.6" class="eclipticCircle"/>
-                    <path id="ref-55" d="M0 71.1L-190.5 373.9" class="eclipticCircle"/>
+                    <path id="ref-00" d="M0 71.1L0.00 182.90" class="eclipticCircle"/>
+                    <path id="ref-05" d="M0 71.1L59.33 173.87" class="eclipticCircle"/>
+                    <path id="ref-10" d="M0 71.1L119.70 140.21" class="eclipticCircle"/>
+                    <path id="ref-15" d="M0 71.1L168.16 71.10" class="eclipticCircle"/>
+                    <path id="ref-20" d="M0 71.1L177.34 -31.29" class="eclipticCircle"/>
+                    <path id="ref-25" d="M0 71.1L119.51 -135.90" class="eclipticCircle"/>
+                    <path id="ref-30" d="M0 71.1L0.00 -182.90" class="eclipticCircle"/>
+                    <path id="ref-35" d="M0 71.1L-119.51 -135.90" class="eclipticCircle"/>
+                    <path id="ref-40" d="M0 71.1L-177.34 -31.29" class="eclipticCircle"/>
+                    <path id="ref-45" d="M0 71.1L-168.16 71.10" class="eclipticCircle"/>
+                    <path id="ref-50" d="M0 71.1L-119.70 140.21" class="eclipticCircle"/>
+                    <path id="ref-55" d="M0 71.1L-59.33 173.87" class="eclipticCircle"/>
                   </g>
                 </g>
                 <g *ngIf="!southern" id="symbols" transform="translate(0, 71.1)">
-                  <g transform="rotate(76.2) translate(0,-110.5)">
+                  <g transform="rotate(74) translate(0,-117)">
                     <text class="eclipticSymbol">♈&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(47.5) translate(0,-151.9)">
+                  <g transform="rotate(45) translate(0,-157)">
                     <text class="eclipticSymbol">♉&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(16.3) translate(0,-182.8)">
+                  <g transform="rotate(16) translate(0,-183.5)">
                     <text class="eclipticSymbol">♊&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(-16.3) translate(0,-182.8)">
+                  <g transform="rotate(-15) translate(0,-183.5)">
                     <text class="eclipticSymbol">♋&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(-47.5) translate(0,-151.9)">
+                  <g transform="rotate(-44) translate(0,-156.5)">
                     <text class="eclipticSymbol">♌&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(-76.2) translate(0,-110.5)">
+                  <g transform="rotate(-74) translate(0,-115)">
                     <text class="eclipticSymbol">♍&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(256.2) translate(0,-76.5)">
+                  <g transform="rotate(255.5) translate(0,-76.5)">
                     <text class="eclipticSymbol">♎&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(227.5) translate(0,-55.7)">
+                  <g transform="rotate(225.5) translate(0,-58)">
                     <text class="eclipticSymbol">♏&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(196.3) translate(0,-46.3)">
+                  <g transform="rotate(195.5) translate(0,-46.3)">
                     <text class="eclipticSymbol">♐&#xFE0E;</text>
                   </g>
                   <g transform="rotate(163.7) translate(0,-46.3)">
                     <text class="eclipticSymbol">♑&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(132.5) translate(0,-55.7)">
+                  <g transform="rotate(133.5) translate(0,-58)">
                     <text class="eclipticSymbol">♒&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(103.8) translate(0,-76.5)">
+                  <g transform="rotate(104.5) translate(0,-79)">
                     <text class="eclipticSymbol">♓&#xFE0E;</text>
                   </g>
                 </g>
                 <g *ngIf="southern" id="symbols" transform="translate(0, 71.1)">
-                  <g transform="rotate(-76.2) translate(0,-110.5) scale(-1, 1)">
+                  <g transform="rotate(-74) translate(0,-117) scale(-1, 1)">
                     <text class="eclipticSymbol">♈&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(-47.5) translate(0,-151.9) scale(-1, 1)">
+                  <g transform="rotate(-45) translate(0,-157) scale(-1, 1)">
                     <text class="eclipticSymbol">♉&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(-16.3) translate(0,-182.8) scale(-1, 1)">
+                  <g transform="rotate(-16) translate(0,-183.5) scale(-1, 1)">
                     <text class="eclipticSymbol">♊&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(16.3) translate(0,-182.8) scale(-1, 1)">
+                  <g transform="rotate(15) translate(0,-183.5) scale(-1, 1)">
                     <text class="eclipticSymbol">♋&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(47.5) translate(0,-151.9) scale(-1, 1)">
+                  <g transform="rotate(44) translate(0,-156.5) scale(-1, 1)">
                     <text class="eclipticSymbol">♌&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(76.2) translate(0,-110.5) scale(-1, 1)">
+                  <g transform="rotate(74) translate(0,-115) scale(-1, 1)">
                     <text class="eclipticSymbol">♍&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(-256.2) translate(0,-76.5) scale(-1, 1)">
+                  <g transform="rotate(-255.5) translate(0,-76.5) scale(-1, 1)">
                     <text class="eclipticSymbol">♎&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(-227.5) translate(0,-55.7) scale(-1, 1)">
+                  <g transform="rotate(-225.5) translate(0,-58) scale(-1, 1)">
                     <text class="eclipticSymbol">♏&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(-196.3) translate(0,-46.3) scale(-1, 1)">
+                  <g transform="rotate(-195.5) translate(0,-46.3) scale(-1, 1)">
                     <text class="eclipticSymbol">♐&#xFE0E;</text>
                   </g>
                   <g transform="rotate(-163.7) translate(0,-46.3) scale(-1, 1)">
                     <text class="eclipticSymbol">♑&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(-132.5) translate(0,-55.7) scale(-1, 1)">
+                  <g transform="rotate(-133.5) translate(0,-58) scale(-1, 1)">
                     <text class="eclipticSymbol">♒&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(-103.8) translate(0,-76.5) scale(-1, 1)">
+                  <g transform="rotate(-104.5) translate(0,-79) scale(-1, 1)">
                     <text class="eclipticSymbol">♓&#xFE0E;</text>
                   </g>
                 </g>

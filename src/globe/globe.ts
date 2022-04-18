@@ -1,10 +1,8 @@
-import {
-  BufferGeometry, CanvasTexture, CylinderGeometry, DoubleSide, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene,
-  SphereGeometry, WebGLRenderer
-} from 'three';
+import { BufferGeometry, CanvasTexture, CylinderGeometry, DoubleSide, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, SphereGeometry, WebGLRenderer } from 'three';
 import { isFirefox, isString } from '@tubular/util';
 import { cos, PI, sin, to_radian } from '@tubular/math';
 import { mergeBufferGeometries } from '../three/three-utils';
+import { Appearance } from '../advanced-options/advanced-options.component';
 
 const MAP_HEIGHT = 500;
 const MAP_WIDTH = 1000;
@@ -30,9 +28,9 @@ export class Globe {
   private static mapLoading = false;
   private static waitList: { resolve: () => void, reject: (reason: any) => void }[] = [];
 
+  private appearance = Appearance.CURRENT;
   private camera: PerspectiveCamera;
   private globeMesh: Mesh;
-  private hideMap = false;
   private initialized = false;
   private lastLatitude: number;
   private lastLongitude: number;
@@ -40,7 +38,6 @@ export class Globe {
   private lastRenderer: HTMLElement;
   private renderer: WebGLRenderer;
   private rendererHost: HTMLElement;
-  private post2018 = true;
   private scene: Scene;
 
   static loadMap(): void {
@@ -134,23 +131,17 @@ export class Globe {
 
     this.globeMesh.rotation.y = -to_radian(lon);
     this.globeMesh.rotation.x = to_radian(lat);
-    this.camera.rotation.z = (lat >= 0 || this.post2018 ? PI : 0);
+    this.camera.rotation.z = (lat >= 0 || this.appearance === Appearance.CURRENT ||
+      this.appearance === Appearance.CURRENT_NO_MAP ? PI : 0);
     this.lastLatitude = lat;
     this.lastLongitude = lon;
 
     requestAnimationFrame(() => this.renderer.render(this.scene, this.camera));
   }
 
-  setColorScheme(post2018: boolean): void {
-    if (this.post2018 !== post2018) {
-      this.post2018 = post2018;
-      this.resetRenderer();
-    }
-  }
-
-  setHideMap(value: boolean): void {
-    if (this.hideMap !== value) {
-      this.hideMap = value;
+  setAppearance(appearance: Appearance): void {
+    if (this.appearance !== appearance) {
+      this.appearance = appearance;
       this.resetRenderer();
     }
   }
@@ -165,26 +156,28 @@ export class Globe {
   }
 
   private setUpRenderer(): void {
-    this.camera = new PerspectiveCamera(this.post2018 ? FIELD_OF_VIEW_2018 : FIELD_OF_VIEW, 1);
+    const post2018 = (this.appearance === Appearance.CURRENT || this.appearance === Appearance.CURRENT_NO_MAP);
+
+    this.camera = new PerspectiveCamera(post2018 ? FIELD_OF_VIEW_2018 : FIELD_OF_VIEW, 1);
     this.scene = new Scene();
     const globe = new SphereGeometry(GLOBE_RADIUS, 50, 50);
     globe.rotateY(-PI / 2);
 
-    if (!this.post2018)
+    if (!post2018)
       globe.scale(-1, -1, -1);
 
-    if (this.post2018 && this.hideMap)
+    if (this.appearance === Appearance.CURRENT_NO_MAP)
       this.globeMesh = new Mesh(globe, new MeshBasicMaterial({ color: Globe.getSkyColorColor2018() }));
     else
       this.globeMesh = new Mesh(globe,
         new MeshBasicMaterial(
-          { map: new CanvasTexture(this.post2018 ? Globe.mapCanvas2018 : Globe.mapCanvas), side: DoubleSide }));
+          { map: new CanvasTexture(post2018 ? Globe.mapCanvas2018 : Globe.mapCanvas), side: DoubleSide }));
 
     this.scene.add(this.globeMesh);
 
     const lines: BufferGeometry[] = [];
-    const thickness = this.post2018 ? LINE_THICKNESS_2018 : LINE_THICKNESS;
-    const hag = this.post2018 ? HAG_2018 : HAG;
+    const thickness = post2018 ? LINE_THICKNESS_2018 : LINE_THICKNESS;
+    const hag = post2018 ? HAG_2018 : HAG;
     const arcAdjust = 0.02;
 
     // Lines of longitude
@@ -210,9 +203,9 @@ export class Globe {
     }
 
     this.globeMesh.add(new Mesh(mergeBufferGeometries(lines),
-      new MeshBasicMaterial({ color: this.post2018 ? Globe.getGoldTrimColor() : GRID_COLOR, side: DoubleSide })));
+      new MeshBasicMaterial({ color: post2018 ? Globe.getGoldTrimColor() : GRID_COLOR, side: DoubleSide })));
 
-    this.camera.position.z = this.post2018 ? VIEW_DISTANCE_2018 : VIEW_DISTANCE;
+    this.camera.position.z = post2018 ? VIEW_DISTANCE_2018 : VIEW_DISTANCE;
     this.renderer = new WebGLRenderer({ alpha: true, antialias: true });
 
     if (this.lastRenderer)

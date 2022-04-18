@@ -29,26 +29,38 @@
   top: 0;
 }
 
-.colors {
+.appearance {
   align-items: center;
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   gap: 1em;
-}
-
-.map-and-colors {
-  align-items: center;
-  display: flex;
-  flex-direction: row;
-  gap: 1em;
-  margin-left: 3em;
-  margin-top: -0.5em;
-}
-
-:lang(de).map-and-colors {
-  margin-left: 1em;
+  width: 100%;
 }
 
 .spacer {
   height: 0.33em;
+}
+
+.background-input-wrapper {
+  position: relative;
+
+  label {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.5em);
+  }
+
+  .reset {
+    bottom: 0;
+    left: -2em;
+    position: absolute;
+    top: 0;
+    width: 2em;
+
+    i {
+      position: relative;
+      top: 0.33em;
+    }
+  }
 }

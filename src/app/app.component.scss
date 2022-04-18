@@ -454,6 +454,10 @@ svg {
 
 .maskWhite {
   fill: white;
+
+  .hole {
+    fill: black;
+  }
 }
 
 .textPath {
@@ -473,6 +477,12 @@ svg {
   fill: none;
 }
 
+.ring-gap {
+  stroke: #4D4D4D;
+  stroke-width: 8px;
+  fill: none;
+}
+
 .midnightSunCircle {
   stroke: #BCD;
   stroke-width: 3px;
@@ -484,7 +494,7 @@ svg {
 }
 
 .innerCircle {
-  fill: #4C8388;
+  fill: #639EA4;
 }
 
 .eclipticWheel {
@@ -628,6 +638,24 @@ svg {
   tspan {
     alignment-baseline: central;
   }
+
+  &.sol-noctis {
+    font-size: 10px;
+  }
+}
+
+.latitude-text {
+  fill: #C5B983;
+  font-size: 8px;
+  text-anchor: middle;
+
+  &.smaller {
+    font-size: 7px;
+  }
+
+  tspan {
+    alignment-baseline: central;
+  }
 }
 
 .unequalHourArea {
@@ -664,11 +692,15 @@ svg {
 }
 
 .horizonArea {
-  fill: #D3964D;
+  fill: #E58A20;
+
+  &.center {
+    stroke: none;
+  }
 }
 
 .darkArea {
-  fill: #05304F;
+  fill: #172A38;
 }
 
 .post-2018 {
@@ -725,6 +757,64 @@ svg {
   }
 }
 
+.orig-1410 {
+  .midnightSunColor {
+    fill: $sky-color-1410;
+  }
+
+  .innerCircle {
+    fill: $sky-color-1410;
+  }
+
+  .signsArea {
+    fill: $dark-background-1410;
+  }
+
+  .outerRingBackground {
+    fill: $dark-background-1410;
+  }
+
+  .unequalHour6 {
+    fill: $sky-color-1410;
+  }
+
+  .unequalHour5 {
+    fill: $sky-color-1410;
+  }
+
+  .unequalHour4 {
+    fill: $sky-color-1410;
+  }
+
+  .unequalHour3 {
+    fill: $sky-color-1410;
+  }
+
+  .unequalHour2 {
+    fill: $sky-color-1410;
+  }
+
+  .unequalHour1 {
+    fill: #95C1D2;
+  }
+
+  .horizonArea {
+    fill: #B31919;
+  }
+
+  .darkArea {
+    fill: $dark-background-1410;
+  }
+
+  #globe-host {
+    border: 2px $gold-trim solid;
+  }
+
+  .handSymbol {
+    fill: $gold-trim;
+  }
+}
+
 #moon-true, #sun-true, #mercury, #venus, #mars, #jupiter, #saturn {
   stroke-width: 0.5;
   stroke: #4D4D4D;
@@ -765,5 +855,66 @@ svg {
     max-width: 110px;
     white-space: normal !important;
     width: 110px;
+  }
+}
+
+.post-2018 {
+  .eclipticSymbol,
+  .handSymbol,
+  .hourAngleStarSymbol,
+  .outerRingText,
+  .sunBeamLargeSymbol,
+  .sunBeamSmallSymbol,
+  .timeText {
+    fill: $gold-trim-2018;
+  }
+
+  .baseCircle,
+  .eclipticCircle,
+  .eclipticDial,
+  .leverRafieGolden,
+  .outerRingBorder,
+  .unequalHourBorder {
+    stroke: $gold-trim-2018;
+  }
+}
+
+.orig-1410 {
+  .eclipticSymbol,
+  .handSymbol,
+  .hourAngleStarSymbol,
+  .outerRingText,
+  .timeText {
+    fill: $gold-trim-1410;
+  }
+
+  .sunBeamLargeSymbol,
+  .sunBeamSmallSymbol {
+    fill: #DFC388;
+  }
+
+  .baseCircle,
+  .eclipticCircle,
+  .eclipticDial,
+  .outerRingBorder,
+  .unequalHourBorder {
+    stroke: $gold-trim-1410;
+  }
+
+  .leverRafieGolden,
+  .moon-ring {
+    stroke: $dark-metal-1410;
+  }
+
+  .leverRafieSymbol,
+  .leverSymbol,
+  .pin,
+  .sun-moon-arms,
+  .sun-moon-guides {
+    fill: $dark-metal-1410;
+  }
+
+  .ring-gap {
+    stroke: #9CA5A8;
   }
 }
