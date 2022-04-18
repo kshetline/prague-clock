@@ -1,3 +1,7 @@
+## 1.4.1
+
+* Fix skewed ecliptic wheel angles than had been baked into the original SVG graphics.
+
 ## 1.4.0
 
 * New option for a speculated original 1410 appearance of the orloj.
