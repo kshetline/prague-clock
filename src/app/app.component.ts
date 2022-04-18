@@ -322,7 +322,6 @@ export class AppComponent implements OnInit, SettingsHolder {
   private playTimeBase: number;
   private playTimeProcessBase: number;
   private _realPositionMarkers = false;
-  private slightlyOffEclipticAngle: number[] = [];
   private solarSystem = new SolarSystem();
   private sunsetA: AstroEvent = null;
   private sunsetB: AstroEvent = null;
@@ -505,18 +504,6 @@ export class AppComponent implements OnInit, SettingsHolder {
     return interpolateAngle(this.trueEclipticAngle, inner ? this.eclipticInnerAngle : this.eclipticOuterAngle, angle);
   }
 
-  // The markings on the SVG graphics for the ecliptic wheel are slightly off in some places, by a degree or two
-  // (for instance, the line between Aries and Taurus is at about 28° instead of 30°), so this method corrects
-  // for those small errors. This is needed when the clock is operating in mechanical simulation mode, in order for
-  // the sun and the moon to be correctly aligned on the ecliptic wheel as if they had been guided into place by the
-  // sun and the moon hands of the clock.
-  private correctOffAngle(angle: number): number {
-    if (this.eclipticInnerAngle.length === 0)
-      return 0;
-
-    return interpolateAngle(this.slightlyOffEclipticAngle, this.trueEclipticAngle, angle);
-  }
-
   private adjustForEclipticWheel(angle: number): AngleTriplet {
     return {
       orig: angle,
@@ -537,8 +524,6 @@ export class AppComponent implements OnInit, SettingsHolder {
       const outer = eclipticIntercept(x, y, ECLIPTIC_OUTER_RADIUS);
 
       this.trueEclipticAngle[i + 2] = i * 6;
-      this.slightlyOffEclipticAngle[i + 2] = mod(atan2_deg(ECLIPTIC_CENTER_OFFSET - inner.y, inner.x), 360)
-        - (i < 0 ? 360 : 0) + (i > 59 ? 360 : 0);
       this.eclipticInnerAngle[i + 2] = mod(atan2_deg(inner.y, inner.x), 360) + (i < 5 ? 360 : 0);
       this.eclipticOuterAngle[i + 2] = mod(atan2_deg(outer.y, outer.x), 360) + (i < 4 ? 360 : 0);
     }
@@ -1371,7 +1356,7 @@ export class AppComponent implements OnInit, SettingsHolder {
   }
 
   private calculateEclipticAnglesFromHandAngle(handAngle: number, siderealAngle: number): AngleTriplet {
-    const eclipticAngle = this.correctOffAngle(mod(90 - handAngle + siderealAngle, 360));
+    const eclipticAngle = mod(90 - handAngle + siderealAngle, 360);
 
     return {
       orig: eclipticAngle,
