@@ -360,7 +360,7 @@
       </trans-unit>
       <trans-unit id="3825322612214091906" datatype="html">
         <source>Czech Horological Society site</source>
-        <target>Stránky České horologické společnosti</target>
+        <target>Stránky Českého spolku horologického</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">354</context>
