@@ -1,11 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService, PrimeNGConfig } from 'primeng/api';
 import {
-  abs, atan2_deg, atan_deg, cos_deg, floor, interpolateModular, max, min, mod, mod2, PI, Point, sign, sin_deg,
-  sqrt, tan_deg
+  abs, atan2_deg, atan_deg, cos_deg, floor, max, min, mod, mod2, PI, Point, sign, sin_deg, sqrt, tan_deg
 } from '@tubular/math';
 import {
-  clone, extendDelimited, forEach, getCssValue, isEqual, isLikelyMobile, isObject, isSafari, processMillis, toNumber
+  clone, extendDelimited, forEach, getCssValue, isEqual, isLikelyMobile, isObject, isSafari, processMillis
 } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import {
@@ -30,7 +29,6 @@ const EQUATOR_RADIUS = 164.1;
 const HORIZON_RADIUS = CLOCK_RADIUS * tan_deg((90 - INCLINATION) / 2);
 const TROPIC_RADIUS = HORIZON_RADIUS * tan_deg((90 - INCLINATION) / 2);
 const ECLIPTIC_INNER_RADIUS = 161;
-const ECLIPTIC_OUTER_RADIUS = 178.9;
 const ECLIPTIC_CENTER_OFFSET = 71.1;
 const MAX_UNEVEN_HOUR_LATITUDE = 86;
 const RESUME_FILTERING_DELAY = 1000;
@@ -171,29 +169,6 @@ function findCircleRadius(x1: number, y1: number, x2: number, y2: number, x3: nu
   return sqrt(sqr_of_r);
 }
 
-function interpolateAngle(xx: number[], yy: number[], angle: number): number {
-  angle = mod(angle, 360);
-
-  const angle2 = angle - 360;
-
-  for (let i = 0; i < xx.length; ++i) {
-    let match: number;
-
-    if (xx[i] === angle || xx[i] === angle2)
-      return mod(yy[i], 360);
-    else if ((xx[i] < angle && angle < xx[i + 1]) || ((xx[i] > angle && angle > xx[i + 1])))
-      match = angle;
-    else if ((xx[i] < angle2 && angle2 < xx[i + 1]) || (xx[i] > angle2 && angle2 > xx[i + 1]))
-      match = angle2;
-    else
-      continue;
-
-    return interpolateModular(xx[i], match, xx[i + 1], yy[i], yy[i + 1], 360);
-  }
-
-  return NaN;
-}
-
 interface AngleTriplet {
   ie: number; // inner ecliptic
   oe: number; // outer ecliptic
@@ -202,22 +177,29 @@ interface AngleTriplet {
 
 const ZeroAngles: AngleTriplet = { ie: 0, oe: 0, orig: 0 };
 
-function eclipticIntercept(x1: number, y1: number, r: number): Point {
-  if (y1 === ECLIPTIC_CENTER_OFFSET)
-    y1 -= 0.001 * sign(x1); // Calculation fails of y1 is exactly equal to ECLIPTIC_CENTER_OFFSET
+function eclipticToOffCenter(angle: number, inner = true): number {
+  // The inner angle is the angle produced by the too-small ecliptic wheel diameter that was calculated in 1864.
+  // The mechanical movement of the sun and the moon are still tied to this incorrect value, despite the outer
+  // segmented ring that was added later to make the wheel the correct size.
+  return mod((inner ? 26.207 : 23.4172) * cos_deg(angle) - angle, 360);
+}
 
-  const sgn = (y1 < ECLIPTIC_CENTER_OFFSET ? -1 : 1);
-  const y2 = ECLIPTIC_CENTER_OFFSET;
-  const dx = -x1;
-  const dy = y2 - y1;
-  const dr = sqrt(dx ** 2 + dy ** 2);
-  const D = x1 * y2;
-  const dr2 = dr ** 2;
-  const root = sqrt(r ** 2 * dr2 - D ** 2);
-  const x = (D * dy + sgn * sign(dy) * dx * root) / dr2;
-  const y = (-D * dx + sgn * abs(dy) * root) / dr2;
+function adjustForEclipticWheel(angle: number): AngleTriplet {
+  return {
+    orig: angle,
+    ie: 90 + eclipticToOffCenter(angle),
+    oe: 90 + eclipticToOffCenter(angle, false)
+  };
+}
 
-  return { x, y };
+function calculateEclipticAnglesFromHandAngle(handAngle: number, siderealAngle: number): AngleTriplet {
+  const eclipticAngle = mod(90 - handAngle + siderealAngle, 360);
+
+  return {
+    orig: eclipticAngle,
+    ie: mod(90 + eclipticToOffCenter(eclipticAngle), 360),
+    oe: mod(90 + eclipticToOffCenter(eclipticAngle, false), 360)
+  };
 }
 
 function bpKey(key: string): boolean { return !key.startsWith('_'); }
@@ -302,8 +284,6 @@ export class AppComponent implements OnInit, SettingsHolder {
   private _background = '#4D4D4D';
   private _collapsed = false;
   private delayedCollapse = false;
-  private eclipticInnerAngle: number[] = [];
-  private eclipticOuterAngle: number[] = [];
   private eventFinder = new EventFinder();
   private eventType = EventType.EQUISOLSTICE;
   private globe: Globe
@@ -331,7 +311,6 @@ export class AppComponent implements OnInit, SettingsHolder {
   private _timing = Timing.MODERN;
   private timingReference: BasicPositions| null | undefined;
   private _trackTime = false;
-  private trueEclipticAngle: number[] = [];
   private _zone = 'Europe/Prague';
   private zoneFixTimeout: any;
 
@@ -497,37 +476,7 @@ export class AppComponent implements OnInit, SettingsHolder {
     setInterval(() => this.saveSettings(), 5000);
   }
 
-  private eclipticToOffCenter(angle: number, inner = true): number {
-    if (this.eclipticInnerAngle.length === 0)
-      return 0;
-
-    return interpolateAngle(this.trueEclipticAngle, inner ? this.eclipticInnerAngle : this.eclipticOuterAngle, angle);
-  }
-
-  private adjustForEclipticWheel(angle: number): AngleTriplet {
-    return {
-      orig: angle,
-      ie: 90 + this.eclipticToOffCenter(angle),
-      oe: 90 + this.eclipticToOffCenter(angle, false)
-    };
-  }
-
   ngOnInit(): void {
-    // Go backwards from coordinates already pre-defined in the SVG graphics to generate angle
-    // conversions guaranteed to align precisely with the graphics.
-    for (let i = -2; i <= 62; ++i) { // -2, 62
-      const elem = document.getElementById('ref-' + mod(i + 15, 60).toString().padStart(2, '0'));
-      const coords = /([-0-9.]+)\s+([-0-9.]+)$/.exec(elem.getAttribute('d'));
-      const x = toNumber(coords[1]);
-      const y = toNumber(coords[2]);
-      const inner = eclipticIntercept(x, y, ECLIPTIC_INNER_RADIUS);
-      const outer = eclipticIntercept(x, y, ECLIPTIC_OUTER_RADIUS);
-
-      this.trueEclipticAngle[i + 2] = i * 6;
-      this.eclipticInnerAngle[i + 2] = mod(atan2_deg(inner.y, inner.x), 360) + (i < 5 ? 360 : 0);
-      this.eclipticOuterAngle[i + 2] = mod(atan2_deg(outer.y, outer.x), 360) + (i < 4 ? 360 : 0);
-    }
-
     this.primeNgConfig.setTranslation({
       accept: $localize`:for dialog button:Yes`,
       reject: $localize`:for dialog button:No`
@@ -1217,11 +1166,11 @@ export class AppComponent implements OnInit, SettingsHolder {
 
     forEach(basicPositions as any, (key, value) => bpKey(key) && ((this as any)['true_' + key] = value));
 
-    this.mercuryAngle = this.adjustForEclipticWheel(this.solarSystem.getEclipticPosition(MERCURY, jde).longitude.degrees);
-    this.venusAngle = this.adjustForEclipticWheel(this.solarSystem.getEclipticPosition(VENUS, jde).longitude.degrees);
-    this.marsAngle = this.adjustForEclipticWheel(this.solarSystem.getEclipticPosition(MARS, jde).longitude.degrees);
-    this.jupiterAngle = this.adjustForEclipticWheel(this.solarSystem.getEclipticPosition(JUPITER, jde).longitude.degrees);
-    this.saturnAngle = this.adjustForEclipticWheel(this.solarSystem.getEclipticPosition(SATURN, jde).longitude.degrees);
+    this.mercuryAngle = adjustForEclipticWheel(this.solarSystem.getEclipticPosition(MERCURY, jde).longitude.degrees);
+    this.venusAngle = adjustForEclipticWheel(this.solarSystem.getEclipticPosition(VENUS, jde).longitude.degrees);
+    this.marsAngle = adjustForEclipticWheel(this.solarSystem.getEclipticPosition(MARS, jde).longitude.degrees);
+    this.jupiterAngle = adjustForEclipticWheel(this.solarSystem.getEclipticPosition(JUPITER, jde).longitude.degrees);
+    this.saturnAngle = adjustForEclipticWheel(this.solarSystem.getEclipticPosition(SATURN, jde).longitude.degrees);
 
     if (this.timing !== Timing.MODERN) {
       if (!this.timingReference || this.time < this.timingReference._referenceTime ||
@@ -1317,8 +1266,8 @@ export class AppComponent implements OnInit, SettingsHolder {
     const handAngle = _hourOfDay * 15 - 180;
     const baseSunAngle = this.solarSystem.getEclipticPosition(SUN, _jde).longitude.degrees;
     const baseMoonAngle = this.solarSystem.getEclipticPosition(MOON, _jde).longitude.degrees;
-    const sunAngle = this.adjustForEclipticWheel(baseSunAngle);
-    const moonAngle = this.adjustForEclipticWheel(baseMoonAngle);
+    const sunAngle = adjustForEclipticWheel(baseSunAngle);
+    const moonAngle = adjustForEclipticWheel(baseMoonAngle);
     const siderealAngle = this.observer.getLocalHourAngle(_jdu, true).degrees - 90;
     const moonPhase = mod((baseMoonAngle - baseSunAngle) * this.rotateSign, 360);
     const moonHandAngle = AppComponent.calculateMoonHandAngle(moonAngle.ie, siderealAngle);
@@ -1338,11 +1287,11 @@ export class AppComponent implements OnInit, SettingsHolder {
 
     return {
       handAngle,
-      moonAngle: this.calculateEclipticAnglesFromHandAngle(moonHandAngle, siderealAngle),
+      moonAngle: calculateEclipticAnglesFromHandAngle(moonHandAngle, siderealAngle),
       moonHandAngle,
       moonPhase: mod(ref.moonPhase + phaseCycles * 360, 360),
       siderealAngle,
-      sunAngle: this.calculateEclipticAnglesFromHandAngle(handAngle, siderealAngle)
+      sunAngle: calculateEclipticAnglesFromHandAngle(handAngle, siderealAngle)
     };
   }
 
@@ -1353,16 +1302,6 @@ export class AppComponent implements OnInit, SettingsHolder {
     const y = -cos_deg(moonAngle) * ECLIPTIC_INNER_RADIUS - ECLIPTIC_CENTER_OFFSET;
 
     return 90 + atan2_deg(y, x) + siderealAngle;
-  }
-
-  private calculateEclipticAnglesFromHandAngle(handAngle: number, siderealAngle: number): AngleTriplet {
-    const eclipticAngle = mod(90 - handAngle + siderealAngle, 360);
-
-    return {
-      orig: eclipticAngle,
-      ie: mod(90 + this.eclipticToOffCenter(eclipticAngle), 360),
-      oe: mod(90 + this.eclipticToOffCenter(eclipticAngle, false), 360)
-    };
   }
 
   rotate(angle: number): string {
