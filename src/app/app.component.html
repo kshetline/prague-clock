@@ -104,7 +104,7 @@
     <p-checkbox [(ngModel)]="disableDst" [binary]="true" [disabled]="timing !== MODERN" id="disable-dst"
         i18n-label label="Disable DST on clock" (onChange)="updateTime(true)"></p-checkbox>
   </div>
-  <tze-zone-selector [(ngModel)]="zone" [recents]="recentLocations" (clearItem)='clearItem($event)' (clearRecents)="clearRecents()"
+  <tze-zone-selector [(ngModel)]="zone" [recents]="recentLocations" (clearItem)='clearLocationItem($event)' (clearRecents)="clearRecents()"
       [autofocus]="false" [disabled]="canSaveName" (location)="changeLocation($event)"></tze-zone-selector>
   <div class="button-row time-row">
     <p-checkbox [(ngModel)]="trackTime" [binary]="true" [disabled]="playing" id="track-time"
