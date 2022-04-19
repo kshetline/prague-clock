@@ -1,6 +1,8 @@
 import { abs, atan2_deg, atan_deg, cos_deg, max, min, PI, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
 import { Appearance } from 'src/advanced-options/advanced-options.component';
 import { circleIntersections, findCircleRadius } from 'src/math/math';
+import { Pipe, PipeTransform } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 const CLOCK_RADIUS = 250;
 const INCLINATION = 23.5;
@@ -11,34 +13,71 @@ const HORIZON_RADIUS = CLOCK_RADIUS * tan_deg((90 - INCLINATION) / 2);
 const TROPIC_RADIUS = HORIZON_RADIUS * tan_deg((90 - INCLINATION) / 2);
 const MAX_UNEVEN_HOUR_LATITUDE = 86;
 
+@Pipe({ name: 'safe' })
+export class SafeHtmlPipe implements PipeTransform {
+  constructor(private sanitizer: DomSanitizer) {}
+
+  transform(html: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(html);
+  }
+}
+
 export interface SvgHost {
   appearance: Appearance;
-  darkCy: number;
-  darkR: number;
-  dawnLabelPath: string;
-  dawnTextOffset: number;
-  dayAreaMask: string;
-  duskGradientAdjustment: number;
-  duskLabelPath: string;
-  duskTextOffset: number;
-  equatorSunriseAngle: number;
-  hourArcs: string[];
-  hourStroke: number;
-  hourWedges: string[];
-  horizonCy: number;
-  horizonPath: string;
-  horizonR: number;
-  innerSunriseAngle: number;
+  bohemianHours?: string;
+  bohemianHoursSouth?: string;
+  darkCy?: number;
+  darkR?: number;
+  dawnLabelPath?: string;
+  dawnTextOffset?: number;
+  dayAreaMask?: string;
+  duskGradientAdjustment?: number;
+  duskLabelPath?: string;
+  duskTextOffset?: number;
+  equatorSunriseAngle?: number;
+  hourArcs?: string[];
+  hourStroke?: number;
+  hourWedges?: string[];
+  horizonCy?: number;
+  horizonPath?: string;
+  horizonR?: number;
+  innerSunriseAngle?: number;
   latitude: number;
   longitude: number;
-  midnightSunR: number | null;
-  outerSunriseAngle: number | null;
-  riseSetFontSize: string;
+  midnightSunR?: number | null;
+  outerSunriseAngle?: number | null;
+  riseSetFontSize?: string;
   rotateSign: number;
-  solNoctisPath: string;
-  southern: boolean;
-  sunriseLabelPath: string;
-  sunsetLabelPath: string;
+  solNoctisPath?: string;
+  southern?: boolean;
+  sunriseLabelPath?: string;
+  sunsetLabelPath?: string;
+}
+
+export function initSvgHost(host: SvgHost): void {
+  host.hourArcs = [];
+  host.hourWedges = [];
+
+  host.duskGradientAdjustment = 80;
+  host.equatorSunriseAngle = null;
+  host.hourStroke = 2;
+  host.innerSunriseAngle = null;
+  host.midnightSunR = 0;
+  host.outerSunriseAngle = null;
+  host.riseSetFontSize = '15px';
+  host.solNoctisPath = '';
+  host.southern = false;
+
+  host.bohemianHours = host.bohemianHoursSouth = '';
+
+  for (let i = 1; i <= 24; ++i) {
+    host.bohemianHours += `<text><textPath xlink:href="#outerRingTextPath" startOffset="${
+      (100 * i / 24).toFixed(1)}%" class="outerRingText">${String.fromCharCode(0x26F + i)}</textPath></text>\n`;
+    host.bohemianHoursSouth += `<text><textPath xlink:href="#outerRingTextPath" startOffset="${
+      (100 * (24 - i) / 24).toFixed(1)}%" class="outerRingText">${String.fromCharCode(0x26F + i)}</textPath></text>\n`;
+  }
+
+  console.log(host.bohemianHoursSouth);
 }
 
 function getHourArc(host: SvgHost, hour: number, asWedge = false, reverse = false): string {

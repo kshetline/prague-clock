@@ -21,7 +21,7 @@ import {
   adjustForEclipticWheel, BasicPositions, calculateBasicPositions, calculateMechanicalPositions, MILLIS_PER_DAY,
   solarSystem, ZeroAngles
 } from 'src/math/math';
-import { adjustGraphicsForLatitude, SvgHost } from 'src/svg/svg';
+import { adjustGraphicsForLatitude, initSvgHost, SvgHost } from 'src/svg/svg';
 
 const { DATE, DATETIME_LOCAL, julianDay, TIME } = ttime;
 
@@ -206,23 +206,18 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
       target: '_blank' }
   ];
 
+  // This trick is need to be able to access SvgHost fields which are not explicitly declared here.
+  self: AppComponent & SvgHost = this;
+
   altFour = false;
   bohemianTime = '';
   canEditName = false;
   canSaveName = false;
-  darkCy: number;
-  darkR: number;
-  dayAreaMask: string;
   dawnDuskFontSize = '15px';
-  dawnLabelPath: string;
   dawnTextOffset: number;
   detailedMechanism = false;
   disableDst = true;
-  duskGradientAdjustment = 80;
-  duskLabelPath: string;
-  duskTextOffset: number;
   emptyCenter = false;
-  equatorSunriseAngle: number = null;
   errorMoon = 0;
   errorMoonDays = 0;
   errorPhase = 0;
@@ -231,13 +226,6 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   errorSunMinutes = 0;
   fasterGraphics = true;
   handAngle = 0;
-  hourStroke = 2;
-  horizonCy: number;
-  horizonPath: string;
-  horizonR: number;
-  hourArcs: string[] = [];
-  hourWedges: string[] = [];
-  innerSunriseAngle: number = null;
   inputLength = 0;
   inputName: string;
   jupiterAngle = ZeroAngles;
@@ -247,7 +235,6 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   localSolarTime = '';
   localTime = '';
   marsAngle = ZeroAngles;
-  midnightSunR = 0;
   mercuryAngle = ZeroAngles;
   moonAngle = ZeroAngles;
   moonHandAngle = 0;
@@ -260,7 +247,6 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   placeName = 'Prague, CZE';
   playSpeed = PlaySpeed.NORMAL;
   recentLocations: TzsLocation[] = [];
-  riseSetFontSize = '15px';
   rotateSign = 1;
   saturnAngle = ZeroAngles;
   showErrors = false;
@@ -268,13 +254,9 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   siderealAngle = 0;
   siderealTime = '';
   siderealTimeOrloj = '';
-  solNoctisPath = '';
-  southern = false;
   sunAngle = ZeroAngles;
   sunrise: string;
-  sunriseLabelPath: string;
   sunset: string;
-  sunsetLabelPath: string;
   svgFilteringOn = true;
   timeText = '';
   translucentEcliptic = false;
@@ -306,6 +288,8 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
     private messageService: MessageService,
     private primeNgConfig: PrimeNGConfig
   ) {
+    initSvgHost(this);
+
     let settings: any;
 
     if (isLikelyMobile()) {

@@ -53,7 +53,6 @@ export class Globe {
           requestAnimationFrame(() => {
             let checkCount = 0;
             const renderCheck = setInterval(() => {
-              console.log({ renderCheck: checkCount + 1 });
               if (image.naturalWidth > 0 && image.naturalHeight > 0) {
                 clearInterval(renderCheck);
                 resolve(image);
