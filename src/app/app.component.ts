@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService, PrimeNGConfig } from 'primeng/api';
 import {
-  abs, atan2_deg, atan_deg, cos_deg, floor, max, min, mod, mod2, PI, Point, sign, sin_deg, sqrt, tan_deg
+  abs, atan2_deg, atan_deg, cos_deg, floor, max, min, mod, mod2, PI, sign, sin_deg, sqrt, tan_deg
 } from '@tubular/math';
 import {
   clone, extendDelimited, forEach, getCssValue, isEqual, isLikelyMobile, isObject, isSafari, processMillis
@@ -9,15 +9,19 @@ import {
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import {
   AstroEvent, EventFinder, FALL_EQUINOX, FIRST_QUARTER, FULL_MOON, JUPITER, LAST_QUARTER, MARS, MERCURY, MOON,
-  NEW_MOON, RISE_EVENT, SATURN, SET_EVENT, SkyObserver, SolarSystem, SPRING_EQUINOX, SUMMER_SOLSTICE, SUN,
+  NEW_MOON, RISE_EVENT, SATURN, SET_EVENT, SkyObserver, SPRING_EQUINOX, SUMMER_SOLSTICE, SUN,
   TRANSIT_EVENT, VENUS, WINTER_SOLSTICE
 } from '@tubular/astronomy';
-import ttime, { DateAndTime, DateTime, Timezone, utToTdt } from '@tubular/time';
+import ttime, { DateAndTime, DateTime, Timezone } from '@tubular/time';
 import { TzsLocation } from '../timezone-selector/timezone-selector.component';
 import { Globe } from '../globe/globe';
 import { basePath, languageList, localeSuffix, SOUTH_NORTH, specificLocale, WEST_EAST } from '../locales/locale-info';
 import { faForward, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 import { AdvancedOptionsComponent, Appearance, SettingsHolder, Timing } from '../advanced-options/advanced-options.component';
+import {
+  adjustForEclipticWheel, BasicPositions, calculateBasicPositions, calculateMechanicalPositions, circleIntersections,
+  findCircleRadius, MILLIS_PER_DAY, solarSystem, ZeroAngles
+} from 'src/math/math';
 
 const { DATE, DATETIME_LOCAL, julianDay, TIME } = ttime;
 
@@ -28,13 +32,10 @@ const LABEL_RADIUS = 212;
 const EQUATOR_RADIUS = 164.1;
 const HORIZON_RADIUS = CLOCK_RADIUS * tan_deg((90 - INCLINATION) / 2);
 const TROPIC_RADIUS = HORIZON_RADIUS * tan_deg((90 - INCLINATION) / 2);
-const ECLIPTIC_INNER_RADIUS = 161;
-const ECLIPTIC_CENTER_OFFSET = 71.1;
 const MAX_UNEVEN_HOUR_LATITUDE = 86;
 const RESUME_FILTERING_DELAY = 1000;
 const START_FILTERING_DELAY = 500;
 const STOP_FILTERING_DELAY = isSafari() ? 1000 : 3000;
-const MILLIS_PER_DAY = 86_400_000;
 const RECOMPUTED_WHEN_NEEDED: null = null;
 
 interface CircleAttributes {
@@ -99,125 +100,7 @@ function removeOldestLocation(locations: TzsLocation[]): TzsLocation[] {
   return locations;
 }
 
-function circleIntersections(x1: number, y1: number, r1: number, x2: number, y2: number, r2: number): Point[] {
-  // See https://planetcalc.com/8098/
-  if (x1 === x2 && y1 === y2 && r1 === r2)
-    return null;
-  else if (r1 === 0 && r2 === 0)
-    return [];
-
-  const d = sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
-
-  if (d === 0 || d > r1 + r2 || d < abs(r1 - r2))
-    return [];
-
-  const a = (r1 ** 2 - r2 ** 2 + d ** 2) / 2 / d;
-  const h = sqrt(max(r1 ** 2 - a ** 2, 0));
-  const x3 = x1 + a * (x2 - x1) / d;
-  const y3 = y1 + a * (y2 - y1) / d;
-
-  if (h === 0)
-    return [{ x: x3, y: y3 }];
-
-  return [
-    { x: x3 + h * (y2 - y1) / d, y: y3 - h * (x2 - x1) / d },
-    { x: x3 - h * (y2 - y1) / d, y: y3 + h * (x2 - x1) / d }
-  ];
-}
-
-function findCircleRadius(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number): number {
-  // See https://www.geeksforgeeks.org/equation-of-circle-when-three-points-on-the-circle-are-given/
-  const x12 = x1 - x2;
-  const x13 = x1 - x3;
-
-  const y12 = y1 - y2;
-  const y13 = y1 - y3;
-
-  const y31 = y3 - y1;
-  const y21 = y2 - y1;
-
-  const x31 = x3 - x1;
-  const x21 = x2 - x1;
-
-  const sx13 = x1 ** 2 - x3 ** 2;
-
-  const sy13 = y1 ** 2 - y3 ** 2;
-
-  const sx21 = x2 ** 2 - x1 ** 2;
-  const sy21 = y2 ** 2 - y1 ** 2;
-
-  const f = ((sx13) * (x12)
-           + (sy13) * (x12)
-           + (sx21) * (x13)
-           + (sy21) * (x13))
-          / (2 * ((y31) * (x12) - (y21) * (x13)));
-  const g = ((sx13) * (y12)
-           + (sy13) * (y12)
-           + (sx21) * (y13)
-           + (sy21) * (y13))
-          / (2 * ((x31) * (y12) - (x21) * (y13)));
-
-  const c = -(x1 ** 2) - y1 ** 2 - 2 * g * x1 - 2 * f * y1;
-
-  // eqn of circle be x^2 + y^2 + 2*g*x + 2*f*y + c = 0
-  // where centre is (h = -g, k = -f) and radius r
-  // as r^2 = h^2 + k^2 - c
-  const h = -g;
-  const k = -f;
-  const sqr_of_r = h * h + k * k - c;
-
-  return sqrt(sqr_of_r);
-}
-
-interface AngleTriplet {
-  ie: number; // inner ecliptic
-  oe: number; // outer ecliptic
-  orig: number;
-}
-
-const ZeroAngles: AngleTriplet = { ie: 0, oe: 0, orig: 0 };
-
-function eclipticToOffCenter(angle: number, inner = true): number {
-  // The inner angle is the angle produced by the too-small ecliptic wheel diameter that was calculated in 1864.
-  // The mechanical movement of the sun and the moon are still tied to this incorrect value, despite the outer
-  // segmented ring that was added later to make the wheel the correct size.
-  return mod((inner ? 26.207 : 23.4172) * cos_deg(angle) - angle, 360);
-}
-
-function adjustForEclipticWheel(angle: number): AngleTriplet {
-  return {
-    orig: angle,
-    ie: 90 + eclipticToOffCenter(angle),
-    oe: 90 + eclipticToOffCenter(angle, false)
-  };
-}
-
-function calculateEclipticAnglesFromHandAngle(handAngle: number, siderealAngle: number): AngleTriplet {
-  const eclipticAngle = mod(90 - handAngle + siderealAngle, 360);
-
-  return {
-    orig: eclipticAngle,
-    ie: mod(90 + eclipticToOffCenter(eclipticAngle), 360),
-    oe: mod(90 + eclipticToOffCenter(eclipticAngle, false), 360)
-  };
-}
-
 function bpKey(key: string): boolean { return !key.startsWith('_'); }
-
-interface BasicPositions {
-  _date?: DateTime;
-  _endTime?: number;
-  _hourOfDay?: number;
-  _jde?: number;
-  _jdu?: number;
-  _referenceTime?: number;
-  handAngle: number;
-  moonAngle: AngleTriplet;
-  moonHandAngle: number;
-  moonPhase: number;
-  siderealAngle: number;
-  sunAngle: AngleTriplet;
-}
 
 function formatTimeOfDay(hours: number | DateTime | DateAndTime, force24 = false, zeroIs24 = false): string {
   if (hours instanceof DateTime)
@@ -302,14 +185,13 @@ export class AppComponent implements OnInit, SettingsHolder {
   private playTimeBase: number;
   private playTimeProcessBase: number;
   private _realPositionMarkers = false;
-  private solarSystem = new SolarSystem();
   private sunsetA: AstroEvent = null;
   private sunsetB: AstroEvent = null;
   private _suppressOsKeyboard = false;
   private _time = 0;
   private timeCheck: any;
   private _timing = Timing.MODERN;
-  private timingReference: BasicPositions| null | undefined;
+  private timingReference: BasicPositions | null | undefined;
   private _trackTime = false;
   private _zone = 'Europe/Prague';
   private zoneFixTimeout: any;
@@ -664,7 +546,9 @@ export class AppComponent implements OnInit, SettingsHolder {
       endTime = new DateTime([wt.y, wt.m - (wt.m % 3), 1], this.zone).add('months', 3);
     }
 
-    this.timingReference = this.calculateBasicPositions(refTime.utcMillis);
+    this.timingReference = calculateBasicPositions(refTime.utcMillis, this.zone, this.observer,
+      this.rotateSign, this.disableDst, this.timing);
+    this.lastWallTime = this.timingReference._date?.wallTime;
     this.timingReference._referenceTime = refTime.utcMillis;
     this.timingReference._endTime = endTime.utcMillis;
     this.lastRecalibration = refTime.format(this.isoFormat ? DATE :
@@ -1158,26 +1042,28 @@ export class AppComponent implements OnInit, SettingsHolder {
 
     const dayLength = this.sunsetB.ut - this.sunsetA.ut;
     const bohemianHour = (jdu - this.sunsetA.ut) / dayLength * 24;
-    const basicPositions = this.calculateBasicPositions(this.time);
+    const basicPositions =
+      calculateBasicPositions(this.time, this.zone, this.observer, this.rotateSign, this.disableDst, this.timing);
     const date = basicPositions._date;
     const wt = date.wallTime;
     const dateLocal = new DateTime(this.time, this.localTimezone);
     const jde = basicPositions._jde;
 
+    this.lastWallTime = basicPositions._date?.wallTime;
     forEach(basicPositions as any, (key, value) => bpKey(key) && ((this as any)['true_' + key] = value));
 
-    this.mercuryAngle = adjustForEclipticWheel(this.solarSystem.getEclipticPosition(MERCURY, jde).longitude.degrees);
-    this.venusAngle = adjustForEclipticWheel(this.solarSystem.getEclipticPosition(VENUS, jde).longitude.degrees);
-    this.marsAngle = adjustForEclipticWheel(this.solarSystem.getEclipticPosition(MARS, jde).longitude.degrees);
-    this.jupiterAngle = adjustForEclipticWheel(this.solarSystem.getEclipticPosition(JUPITER, jde).longitude.degrees);
-    this.saturnAngle = adjustForEclipticWheel(this.solarSystem.getEclipticPosition(SATURN, jde).longitude.degrees);
+    this.mercuryAngle = adjustForEclipticWheel(solarSystem.getEclipticPosition(MERCURY, jde).longitude.degrees);
+    this.venusAngle = adjustForEclipticWheel(solarSystem.getEclipticPosition(VENUS, jde).longitude.degrees);
+    this.marsAngle = adjustForEclipticWheel(solarSystem.getEclipticPosition(MARS, jde).longitude.degrees);
+    this.jupiterAngle = adjustForEclipticWheel(solarSystem.getEclipticPosition(JUPITER, jde).longitude.degrees);
+    this.saturnAngle = adjustForEclipticWheel(solarSystem.getEclipticPosition(SATURN, jde).longitude.degrees);
 
     if (this.timing !== Timing.MODERN) {
       if (!this.timingReference || this.time < this.timingReference._referenceTime ||
           this.time >= this.timingReference._endTime)
         this.adjustMechanicalTimingReference();
 
-      forEach(this.calculateMechanicalPositions(this.time, this.timingReference) as any,
+      forEach(calculateMechanicalPositions(this.time, this.timing, this.timingReference) as any,
         (key, value) => bpKey(key) && ((this as any)[key] = value));
     }
     else
@@ -1254,54 +1140,6 @@ export class AppComponent implements OnInit, SettingsHolder {
 
       this.overlapShift[i] = maxShift;
     }
-  }
-
-  private calculateBasicPositions(time: number): BasicPositions {
-    const _jdu = julianDay(time);
-    const _jde = utToTdt(_jdu);
-    const _date = new DateTime(time, this.zone);
-    const wt = this.lastWallTime = _date.wallTime;
-    const _hourOfDay = wt.hour + wt.minute / 60 -
-      (this.disableDst || this.timing !== Timing.MODERN ? wt.dstOffset / 3600 : 0);
-    const handAngle = _hourOfDay * 15 - 180;
-    const baseSunAngle = this.solarSystem.getEclipticPosition(SUN, _jde).longitude.degrees;
-    const baseMoonAngle = this.solarSystem.getEclipticPosition(MOON, _jde).longitude.degrees;
-    const sunAngle = adjustForEclipticWheel(baseSunAngle);
-    const moonAngle = adjustForEclipticWheel(baseMoonAngle);
-    const siderealAngle = this.observer.getLocalHourAngle(_jdu, true).degrees - 90;
-    const moonPhase = mod((baseMoonAngle - baseSunAngle) * this.rotateSign, 360);
-    const moonHandAngle = AppComponent.calculateMoonHandAngle(moonAngle.ie, siderealAngle);
-
-    return { _jde, _jdu, _hourOfDay, _date, handAngle, moonAngle, moonHandAngle, moonPhase, siderealAngle, sunAngle };
-  }
-
-  private calculateMechanicalPositions(time: number, ref: BasicPositions): BasicPositions {
-    const deltaDays = (time - ref._referenceTime) / MILLIS_PER_DAY;
-    const deltaSiderealDays = deltaDays * 366 / 365;
-    // The moon is off by about one day every three months with the original 366 / 379 gear ratio.
-    const deltaMoonDays = deltaDays * (this.timing === Timing.MECHANICAL_ORIGINAL ? 366 / 379 : 0.966139); // 0.966137 is closer to the true mean synodic lunar month
-    const phaseCycles = deltaMoonDays * 2 / 57;
-    const handAngle = mod(ref.handAngle + deltaDays * 360, 360);
-    const moonHandAngle = mod(ref.moonHandAngle + deltaMoonDays * 360, 360);
-    const siderealAngle = mod(ref.siderealAngle + deltaSiderealDays * 360, 360);
-
-    return {
-      handAngle,
-      moonAngle: calculateEclipticAnglesFromHandAngle(moonHandAngle, siderealAngle),
-      moonHandAngle,
-      moonPhase: mod(ref.moonPhase + phaseCycles * 360, 360),
-      siderealAngle,
-      sunAngle: calculateEclipticAnglesFromHandAngle(handAngle, siderealAngle)
-    };
-  }
-
-  private static calculateMoonHandAngle(moonAngle: number, siderealAngle: number): number {
-    // Note: SVG angles start at "noon" and go clockwise, rather than at 3:00 going counterclockwise,
-    // so the roles of sin and cos are swapped, and signs are changed.
-    const x = sin_deg(moonAngle) * ECLIPTIC_INNER_RADIUS;
-    const y = -cos_deg(moonAngle) * ECLIPTIC_INNER_RADIUS - ECLIPTIC_CENTER_OFFSET;
-
-    return 90 + atan2_deg(y, x) + siderealAngle;
   }
 
   rotate(angle: number): string {

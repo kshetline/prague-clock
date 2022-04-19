@@ -1,5 +1,5 @@
 import { BufferGeometry, CanvasTexture, CylinderGeometry, DoubleSide, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, SphereGeometry, WebGLRenderer } from 'three';
-import { isFirefox, isString } from '@tubular/util';
+import { isString } from '@tubular/util';
 import { cos, PI, sin, to_radian } from '@tubular/math';
 import { mergeBufferGeometries } from '../three/three-utils';
 import { Appearance } from '../advanced-options/advanced-options.component';
@@ -51,10 +51,18 @@ export class Globe {
 
         image.onload = (): void => {
           requestAnimationFrame(() => {
-            if (isFirefox())
-              setTimeout(() => resolve(image), 250);
-            else
-              resolve(image);
+            let checkCount = 0;
+            const renderCheck = setInterval(() => {
+              console.log({ renderCheck: checkCount + 1 });
+              if (image.naturalWidth > 0 && image.naturalHeight > 0) {
+                clearInterval(renderCheck);
+                resolve(image);
+              }
+              else if (++checkCount > 300) {
+                clearInterval(renderCheck);
+                reject(new Error('Map image failed to render from: ' + image.src));
+              }
+            }, 50);
           });
         };
         image.onerror = (): void => {
@@ -95,7 +103,7 @@ export class Globe {
   }
 
   private static getGoldTrimColor(): string {
-    return getComputedStyle(document.documentElement).getPropertyValue('--gold-trim').trim() || '#FFE696';
+    return getComputedStyle(document.documentElement).getPropertyValue('--gold-trim-2018').trim() || '#FFECAE';
   }
 
   private static getSkyColorColor2018(): string {
@@ -115,7 +123,7 @@ export class Globe {
   async orient(lon: number, lat: number): Promise<void> {
     if (Globe.mapFailed)
       throw new Error('Map not available');
-    else if (!Globe.mapImage)
+    else if (!Globe.mapImage2018)
       await new Promise<void>((resolve, reject) => Globe.waitList.push({ resolve, reject }));
 
     if (!this.initialized)
