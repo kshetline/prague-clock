@@ -222,3 +222,27 @@ span.p-menuitem-text {
   text-anchor: middle;
   fill: $gold-trim;
 }
+
+.timeText {
+  font-size: 50px;
+  text-anchor: middle;
+  fill: $gold-trim;
+}
+
+.four-iv {
+  opacity: 1;
+}
+
+.four-iiii {
+  opacity: 0;
+}
+
+.four-as-iiii {
+  .four-iv {
+    opacity: 0;
+  }
+
+  .four-iiii {
+    opacity: 1;
+  }
+}

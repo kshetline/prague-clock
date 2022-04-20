@@ -331,77 +331,15 @@
           </ng-container>
           <!-- cspell:enable -->
         </g>
-        <g id="time">
+        <g id="time" [class.four-as-iiii]="altFour">
           <path id="timeTextPath" d="M0.0 -221.0C122.0 -221.0 221.0 -122.0 221.0 0.0C221.0 122.0 122.0 221.0 0.0 221.0C-122.0 221.0 -221.0 122.0 -221.0 0.0C-221.0 -122.0 -122.0 -221.0 0.0 -221.0" class="textPath"/>
-          <g *ngIf="!self.southern" [attr.filter]="filterRelief">
-            <text><textPath xlink:href="#timeTextPath" startOffset="4.2%" class="timeText">I</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="8.3%" class="timeText">II</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="12.5%" class="timeText">III</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="16.7%" class="timeText">{{ altFour ? 'IIII' : 'IV'}}</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="20.8%" class="timeText">V</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="25.0%" class="timeText">VI</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="29.2%" class="timeText">VII</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="33.3%" class="timeText">VIII</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="37.5%" class="timeText">IX</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="41.7%" class="timeText">X</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="45.8%" class="timeText">XI</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="50.0%" class="timeText">XII</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="54.2%" class="timeText">I</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="58.3%" class="timeText">II</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="62.5%" class="timeText">III</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="66.7%" class="timeText">{{ altFour ? 'IIII' : 'IV'}}</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="70.8%" class="timeText">V</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="75.0%" class="timeText">VI</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="79.2%" class="timeText">VII</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="83.3%" class="timeText">VIII</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="87.5%" class="timeText">IX</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="91.7%" class="timeText">X</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="95.8%" class="timeText">XI</textPath></text>
-            <g transform="rotate(180)">
-              <text><textPath xlink:href="#timeTextPath" startOffset="50.0%" class="timeText">XII</textPath></text>
-            </g>
-          </g>
-          <g *ngIf="self.southern" [attr.filter]="filterRelief">
-            <text><textPath xlink:href="#timeTextPath" startOffset="4.2%" class="timeText">XI</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="8.3%" class="timeText">X</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="12.5%" class="timeText">IX</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="16.7%" class="timeText">VIII</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="20.8%" class="timeText">VII</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="25.0%" class="timeText">VI</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="29.2%" class="timeText">V</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="33.3%" class="timeText">{{ altFour ? 'IIII' : 'IV'}}</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="37.5%" class="timeText">III</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="41.7%" class="timeText">II</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="45.8%" class="timeText">I</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="50.0%" class="timeText">XII</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="54.2%" class="timeText">XI</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="58.3%" class="timeText">X</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="62.5%" class="timeText">IX</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="66.7%" class="timeText">VIII</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="70.8%" class="timeText">VII</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="75.0%" class="timeText">VI</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="79.2%" class="timeText">V</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="83.3%" class="timeText">{{ altFour ? 'IIII' : 'IV'}}</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="87.5%" class="timeText">III</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="91.7%" class="timeText">II</textPath></text>
-            <text><textPath xlink:href="#timeTextPath" startOffset="95.8%" class="timeText">I</textPath></text>
-            <g transform="rotate(180)">
-              <text><textPath xlink:href="#timeTextPath" startOffset="50.0%" class="timeText">XII</textPath></text>
-            </g>
-          </g>
+          <g *ngIf="!self.southern" [attr.filter]="filterRelief" [innerHTML]="self.romanHours | safe"/>
+          <g *ngIf="self.southern" [attr.filter]="filterRelief" [innerHTML]="self.romanHoursSouth | safe"/>
         </g>
         <g id="unequalHourBorders" mask="url(#dayArea)" [attr.filter]="filterRelief"
             [attr.stroke-width]="self.hourStroke + 'px'">
-          <path [attr.d]="self.hourArcs[1]" class="unequalHourBorder"/>
-          <path [attr.d]="self.hourArcs[2]" class="unequalHourBorder"/>
-          <path [attr.d]="self.hourArcs[3]" class="unequalHourBorder"/>
-          <path [attr.d]="self.hourArcs[4]" class="unequalHourBorder"/>
-          <path [attr.d]="self.hourArcs[5]" class="unequalHourBorder"/>
-          <path [attr.d]="self.hourArcs[7]" class="unequalHourBorder"/>
-          <path [attr.d]="self.hourArcs[8]" class="unequalHourBorder"/>
-          <path [attr.d]="self.hourArcs[9]" class="unequalHourBorder"/>
-          <path [attr.d]="self.hourArcs[10]" class="unequalHourBorder"/>
-          <path [attr.d]="self.hourArcs[11]" class="unequalHourBorder"/>
+          <path *ngFor='let item of [].constructor(11); let i = index'
+              [attr.d]="self.hourArcs[i + 1]" class="unequalHourBorder"/>
           <path d="M0 0L0 -400" class="unequalHourBorder"/>
         </g>
         <g id="horizonBorder" [attr.mask]="emptyCenter ? 'url(#baseArea-center-hole)': 'url(#baseArea)'"

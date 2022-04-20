@@ -47,6 +47,8 @@ export interface SvgHost {
   midnightSunR?: number | null;
   outerSunriseAngle?: number | null;
   riseSetFontSize?: string;
+  romanHours?: string;
+  romanHoursSouth?: string;
   rotateSign: number;
   solNoctisPath?: string;
   southern?: boolean;
@@ -70,14 +72,38 @@ export function initSvgHost(host: SvgHost): void {
 
   host.bohemianHours = host.bohemianHoursSouth = '';
 
+  const bh = (p: number, i: number): string => `<text><textPath xlink:href="#outerRingTextPath" startOffset="${
+    (100 * p / 24).toFixed(1)}%" class="outerRingText">${String.fromCharCode(0x26F + i)}</textPath></text>`;
+
   for (let i = 1; i <= 24; ++i) {
-    host.bohemianHours += `<text><textPath xlink:href="#outerRingTextPath" startOffset="${
-      (100 * i / 24).toFixed(1)}%" class="outerRingText">${String.fromCharCode(0x26F + i)}</textPath></text>\n`;
-    host.bohemianHoursSouth += `<text><textPath xlink:href="#outerRingTextPath" startOffset="${
-      (100 * (24 - i) / 24).toFixed(1)}%" class="outerRingText">${String.fromCharCode(0x26F + i)}</textPath></text>\n`;
+    host.bohemianHours += bh(i, i);
+    host.bohemianHoursSouth += bh(24 - i, i);
   }
 
-  console.log(host.bohemianHoursSouth);
+  host.romanHours = host.romanHoursSouth = '';
+
+  const hours = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+  const rh = (p: number, i: number, t?: string): string => {
+    const pct = (i === 24 ? '50.0' : (100 * p / 24).toFixed(1));
+    const text = t || hours[(i - 1) % 12];
+    const mod = (t ? ' class="four-iiii"' :
+      i === 24 ? ' transform="rotate(180)"' : i === 4 || i === 16 ? ' class="four-iv"' : '');
+
+    return `<text${mod}><textPath xlink:href="#timeTextPath" startOffset="${
+      pct}%" class="timeText">${text}</textPath></text>\n`;
+  };
+
+  for (let i = 1; i <= 24; ++i) {
+    host.romanHours += rh(i, i);
+    host.romanHoursSouth += rh(24 - i, i);
+
+    if (i === 4 || i === 16) {
+      host.romanHours += rh(i, i, 'IIII');
+      host.romanHoursSouth += rh(24 - i, i, 'IIII');
+    }
+  }
+
+  console.log(host.romanHours);
 }
 
 function getHourArc(host: SvgHost, hour: number, asWedge = false, reverse = false): string {
