@@ -5,8 +5,9 @@ import { Timing } from 'src/advanced-options/advanced-options.component';
 
 const { julianDay } = ttime;
 
-const ECLIPTIC_INNER_RADIUS = 161;
-const ECLIPTIC_CENTER_OFFSET = 71.1;
+export const ECLIPTIC_INNER_RADIUS = 161;
+export const ECLIPTIC_OUTER_RADIUS = 178.9;
+export const ECLIPTIC_CENTER_OFFSET = 71.1;
 
 export const solarSystem = new SolarSystem();
 export const MILLIS_PER_DAY = 86_400_000;

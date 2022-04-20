@@ -1,6 +1,6 @@
 import { abs, atan2_deg, atan_deg, cos_deg, max, min, PI, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
 import { Appearance } from 'src/advanced-options/advanced-options.component';
-import { circleIntersections, findCircleRadius } from 'src/math/math';
+import { circleIntersections, ECLIPTIC_OUTER_RADIUS, eclipticToOffCenter, findCircleRadius } from 'src/math/math';
 import { Pipe, PipeTransform } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
@@ -34,6 +34,8 @@ export interface SvgHost {
   duskGradientAdjustment?: number;
   duskLabelPath?: string;
   duskTextOffset?: number;
+  eclipticMajorTicks?: string;
+  eclipticMinorTicks?: string;
   equatorSunriseAngle?: number;
   hourArcs?: string[];
   hourStroke?: number;
@@ -103,7 +105,18 @@ export function initSvgHost(host: SvgHost): void {
     }
   }
 
-  console.log(host.romanHours);
+  host.eclipticMajorTicks = host.eclipticMinorTicks = '';
+
+  for (let a = -90; a < 270; a += 6) {
+    const angle = eclipticToOffCenter(a, false);
+    const x = cos_deg(angle) * ECLIPTIC_OUTER_RADIUS;
+    const y = sin_deg(angle) * ECLIPTIC_OUTER_RADIUS;
+
+    if (a % 30 === 0)
+      host.eclipticMajorTicks += `<path d="M0 71.1L${x.toFixed(2)} ${y.toFixed(2)}" class="eclipticCircle"/>`;
+    else
+      host.eclipticMinorTicks += `<path d="M0 71.1L${x.toFixed(2)} ${y.toFixed(2)}" class="eclipticDial"/>`;
+  }
 }
 
 function getHourArc(host: SvgHost, hour: number, asWedge = false, reverse = false): string {

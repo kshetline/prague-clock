@@ -412,79 +412,17 @@
             <g id="ecliptic_positive_ecliptic" [attr.transform]="rotate(siderealAngle * rotateSign)">
               <g transform="translate(0, -71.1)">
                 <g id="disc">
-                  <path d="M0.0 -178.9C98.8 -178.9 178.9 -98.8 178.9 0.0C178.9 98.8 98.8 178.9 0.0 178.9C-98.8 178.9 -178.9 98.8 -178.9 0.0C-178.9 -98.8 -98.8 -178.9 0.0 -178.9" class="eclipticCircle"/>
-                  <path d="M0.0 -161.0C88.9 -161.0 161.0 -88.9 161.0 0.0C161.0 88.9 88.9 161.0 0.0 161.0C-88.9 161.0 -161.0 88.9 -161.0 0.0C-161.0 -88.9 -88.9 -161.0 0.0 -161.0" class="eclipticCircle"/>
-                  <path d="M0.0 -116.3C64.2 -116.3 116.3 -64.2 116.3 0.0C116.3 64.2 64.2 116.3 0.0 116.3C-64.2 116.3 -116.3 64.2 -116.3 0.0C-116.3 -64.2 -64.2 -116.3 0.0 -116.3" class="eclipticCircle"/>
+                  <circle cx="0" cy="0" r="178.9" class="eclipticCircle"/>
+                  <circle cx="0" cy="0" r="161.0" class="eclipticCircle"/>
+                  <circle cx="0" cy="0" r="116.3" class="eclipticCircle"/>
                   <mask id="maskSmall">
                     <path d="M0.0 -178.9C98.8 -178.9 178.9 -98.8 178.9 0.0C178.9 98.8 98.8 178.9 0.0 178.9C-98.8 178.9 -178.9 98.8 -178.9 0.0C-178.9 -98.8 -98.8 -178.9 0.0 -178.9M0.0 -161.0C-88.9 -161.0 -161.0 -88.9 -161.0 0.0C-161.0 88.9 -88.9 161.0 0.0 161.0C88.9 161.0 161.0 88.9 161.0 0.0C161.0 -88.9 88.9 -161.0 0.0 -161.0" class="maskWhite"/>
                   </mask>
                   <mask id="maskLarge">
                     <path d="M0.0 -178.9C98.8 -178.9 178.9 -98.8 178.9 0.0C178.9 98.8 98.8 178.9 0.0 178.9C-98.8 178.9 -178.9 98.8 -178.9 0.0C-178.9 -98.8 -98.8 -178.9 0.0 -178.9M0.0 -116.3C-64.2 -116.3 -116.3 -64.2 -116.3 0.0C-116.3 64.2 -64.2 116.3 0.0 116.3C64.2 116.3 116.3 64.2 116.3 0.0C116.3 -64.2 64.2 -116.3 0.0 -116.3" class="maskWhite"/>
                   </mask>
-                  <g mask="url('#maskSmall')">
-                    <path d="M0 71.1L11.72 182.56" class="eclipticDial"/>
-                    <path d="M0 71.1L23.48 181.54" class="eclipticDial"/>
-                    <path d="M0 71.1L35.32 179.80" class="eclipticDial"/>
-                    <path d="M0 71.1L47.27 177.27" class="eclipticDial"/>
-                    <path d="M0 71.1L71.49 169.50" class="eclipticDial"/>
-                    <path d="M0 71.1L83.69 164.05" class="eclipticDial"/>
-                    <path d="M0 71.1L95.87 157.42" class="eclipticDial"/>
-                    <path d="M0 71.1L107.92 149.51" class="eclipticDial"/>
-                    <path d="M0 71.1L131.06 129.45" class="eclipticDial"/>
-                    <path d="M0 71.1L141.81 117.18" class="eclipticDial"/>
-                    <path d="M0 71.1L151.72 103.35" class="eclipticDial"/>
-                    <path d="M0 71.1L160.59 87.98" class="eclipticDial"/>
-                    <path d="M0 71.1L174.16 52.79" class="eclipticDial"/>
-                    <path d="M0 71.1L178.34 33.19" class="eclipticDial"/>
-                    <path d="M0 71.1L180.44 12.47" class="eclipticDial"/>
-                    <path d="M0 71.1L180.17 -9.12" class="eclipticDial"/>
-                    <path d="M0 71.1L171.72 -53.67" class="eclipticDial"/>
-                    <path d="M0 71.1L163.17 -75.82" class="eclipticDial"/>
-                    <path d="M0 71.1L151.60 -97.27" class="eclipticDial"/>
-                    <path d="M0 71.1L137.01 -117.48" class="eclipticDial"/>
-                    <path d="M0 71.1L99.30 -151.94" class="eclipticDial"/>
-                    <path d="M0 71.1L76.74 -165.09" class="eclipticDial"/>
-                    <path d="M0 71.1L52.28 -174.85" class="eclipticDial"/>
-                    <path d="M0 71.1L26.48 -180.87" class="eclipticDial"/>
-                    <path d="M0 71.1L-26.48 -180.87" class="eclipticDial"/>
-                    <path d="M0 71.1L-52.28 -174.85" class="eclipticDial"/>
-                    <path d="M0 71.1L-76.74 -165.09" class="eclipticDial"/>
-                    <path d="M0 71.1L-99.30 -151.94" class="eclipticDial"/>
-                    <path d="M0 71.1L-137.01 -117.48" class="eclipticDial"/>
-                    <path d="M0 71.1L-151.60 -97.27" class="eclipticDial"/>
-                    <path d="M0 71.1L-163.17 -75.82" class="eclipticDial"/>
-                    <path d="M0 71.1L-171.72 -53.67" class="eclipticDial"/>
-                    <path d="M0 71.1L-180.17 -9.12" class="eclipticDial"/>
-                    <path d="M0 71.1L-180.44 12.47" class="eclipticDial"/>
-                    <path d="M0 71.1L-178.34 33.19" class="eclipticDial"/>
-                    <path d="M0 71.1L-174.16 52.79" class="eclipticDial"/>
-                    <path d="M0 71.1L-160.59 87.98" class="eclipticDial"/>
-                    <path d="M0 71.1L-151.72 103.35" class="eclipticDial"/>
-                    <path d="M0 71.1L-141.81 117.18" class="eclipticDial"/>
-                    <path d="M0 71.1L-131.06 129.45" class="eclipticDial"/>
-                    <path d="M0 71.1L-107.92 149.51" class="eclipticDial"/>
-                    <path d="M0 71.1L-95.87 157.42" class="eclipticDial"/>
-                    <path d="M0 71.1L-83.69 164.05" class="eclipticDial"/>
-                    <path d="M0 71.1L-71.49 169.50" class="eclipticDial"/>
-                    <path d="M0 71.1L-47.27 177.27" class="eclipticDial"/>
-                    <path d="M0 71.1L-35.32 179.80" class="eclipticDial"/>
-                    <path d="M0 71.1L-23.48 181.54" class="eclipticDial"/>
-                    <path d="M0 71.1L-11.72 182.56" class="eclipticDial"/>
-                  </g>
-                  <g mask="url('#maskLarge')">
-                    <path d="M0 71.1L0.00 182.90" class="eclipticCircle"/>
-                    <path d="M0 71.1L59.33 173.87" class="eclipticCircle"/>
-                    <path d="M0 71.1L119.70 140.21" class="eclipticCircle"/>
-                    <path d="M0 71.1L168.16 71.10" class="eclipticCircle"/>
-                    <path d="M0 71.1L177.34 -31.29" class="eclipticCircle"/>
-                    <path d="M0 71.1L119.51 -135.90" class="eclipticCircle"/>
-                    <path d="M0 71.1L0.00 -182.90" class="eclipticCircle"/>
-                    <path d="M0 71.1L-119.51 -135.90" class="eclipticCircle"/>
-                    <path d="M0 71.1L-177.34 -31.29" class="eclipticCircle"/>
-                    <path d="M0 71.1L-168.16 71.10" class="eclipticCircle"/>
-                    <path d="M0 71.1L-119.70 140.21" class="eclipticCircle"/>
-                    <path d="M0 71.1L-59.33 173.87" class="eclipticCircle"/>
-                  </g>
+                  <g mask="url('#maskSmall')" [innerHTML]="self.eclipticMinorTicks | safe"/>
+                  <g mask="url('#maskLarge')" [innerHTML]="self.eclipticMajorTicks | safe"/>
                 </g>
                 <g *ngIf="!self.southern" id="symbols" transform="translate(0, 71.1)">
                   <g transform="rotate(74) translate(0,-117)">

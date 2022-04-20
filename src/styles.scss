@@ -217,6 +217,12 @@ span.p-menuitem-text {
   }
 }
 
+.eclipticCircle {
+  stroke: $gold-trim;
+  stroke-width: 4px;
+  fill: none;
+}
+
 .eclipticDial {
   stroke: $gold-trim;
   stroke-width: 3px;
