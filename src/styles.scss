@@ -217,6 +217,12 @@ span.p-menuitem-text {
   }
 }
 
+.eclipticDial {
+  stroke: $gold-trim;
+  stroke-width: 3px;
+  fill: none;
+}
+
 .outerRingText {
   font-size: 60px;
   text-anchor: middle;

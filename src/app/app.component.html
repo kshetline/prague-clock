@@ -249,16 +249,8 @@
         <g id="unequalHourAreas" mask="url('#baseArea')">
           <circle *ngIf="self.midnightSunR" cx="0" cy="0" r="250" class="midnightSunColor"/>
           <circle cx="0" cy="0" [attr.r]="self.midnightSunR ? self.midnightSunR : 250" class="unequalHour6"/>
-          <path [attr.d]="self.hourWedges[1]"  class="unequalHourArea unequalHour1"/>
-          <path [attr.d]="self.hourWedges[2]"  class="unequalHourArea unequalHour2"/>
-          <path [attr.d]="self.hourWedges[3]"  class="unequalHourArea unequalHour3"/>
-          <path [attr.d]="self.hourWedges[4]"  class="unequalHourArea unequalHour4"/>
-          <path [attr.d]="self.hourWedges[5]"  class="unequalHourArea unequalHour5"/>
-          <path [attr.d]="self.hourWedges[7]"  class="unequalHourArea unequalHour5"/>
-          <path [attr.d]="self.hourWedges[8]"  class="unequalHourArea unequalHour4"/>
-          <path [attr.d]="self.hourWedges[9]"  class="unequalHourArea unequalHour3"/>
-          <path [attr.d]="self.hourWedges[10]" class="unequalHourArea unequalHour2"/>
-          <path [attr.d]="self.hourWedges[11]" class="unequalHourArea unequalHour1"/>
+          <path *ngFor='let item of [].constructor(11); let i = index'
+              [attr.d]="self.hourWedges[i + 1]" class="unequalHourArea unequalHour{{i < 5 ? i + 1 : 11 - i }}"/>
           <circle id="horizonArea" [attr.r]="self.horizonR" cx="0" [attr.cy]="self.horizonCy" class="horizonArea"/>
           <circle id="darkArea" [attr.r]="self.darkR" cx="0" [attr.cy]="self.darkCy" class="darkArea"/>
         </g>
