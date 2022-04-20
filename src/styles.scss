@@ -41,7 +41,7 @@ body {
 .unequalHourText {
   font-size: 30px;
   text-anchor: middle;
-  fill: rgb(black, 33%);
+  fill: rgb(black, 55%);
   font-family: Horologium, sans-serif;
 }
 
@@ -227,6 +227,18 @@ span.p-menuitem-text {
   font-size: 50px;
   text-anchor: middle;
   fill: $gold-trim;
+}
+
+.post-2018 {
+  .timeText, .outerRingText {
+    fill: $gold-trim-2018;
+  }
+}
+
+.orig-1410 {
+  .timeText, .outerRingText {
+    fill: $gold-trim-1410;
+  }
 }
 
 .four-iv {
