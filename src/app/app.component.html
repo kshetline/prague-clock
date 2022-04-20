@@ -535,8 +535,6 @@
                       </g>
                     </g>
                   </g>
-                  <circle *ngIf="detailedMechanism" cx="0" cy="0" r="3.5" class="pin"/>
-                  <circle *ngIf="detailedMechanism" cx="0" cy="0" r="3.5" class="pinSphere"/>
                 </g>
               </g>
             </g>
@@ -599,6 +597,8 @@
                     </g>
                   </g>
                 </g>
+                <circle *ngIf="detailedMechanism" cx="0" cy="0" r="3.5" class="pin"/>
+                <circle *ngIf="detailedMechanism" cx="0" cy="0" r="3.5" class="pinSphere"/>
                 <g *ngIf="additionalPlanets" id="mercury" [attr.transform]="rotate(mercuryAngle.oe * rotateSign)">
                   <title>{{ mercuryAngle.orig | number: '1.1-1' }}°</title>
                   <circle cx="0" [attr.cy]="-178.9 + overlapShift[0]" r="7" fill="#C0C0C0"/>
