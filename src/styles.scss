@@ -245,11 +245,19 @@ span.p-menuitem-text {
   .timeText, .outerRingText {
     fill: $gold-trim-2018;
   }
+
+  .eclipticCircle, .eclipticDial {
+    stroke: $gold-trim-2018;
+  }
 }
 
 .orig-1410 {
   .timeText, .outerRingText {
     fill: $gold-trim-1410;
+  }
+
+  .eclipticCircle, .eclipticDial {
+    stroke: $gold-trim-1410;
   }
 }
 
