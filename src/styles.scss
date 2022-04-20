@@ -14,6 +14,7 @@
 :root {
   --background: #{$app-background};
   --gold-trim: #{$gold-trim};
+  --gold-trim-2018: #{$gold-trim-2018};
   --mfvh: 100vh; // mobile full height
   --mvh: 1vh; // mobile vh-like unit
   --sky-color-2018: #{$sky-color-2018};
@@ -40,7 +41,7 @@ body {
 .unequalHourText {
   font-size: 30px;
   text-anchor: middle;
-  fill: rgb(black, 33%);
+  fill: rgb(black, 55%);
   font-family: Horologium, sans-serif;
 }
 
@@ -111,12 +112,12 @@ input {
   min-width: 50% !important;
 }
 
-.p-tieredmenu .p-menuitem-active>p-tieredmenusub > .p-submenu-list.p-submenu-list-flipped {
+.p-tieredmenu .p-menuitem-active > p-tieredmenusub > .p-submenu-list.p-submenu-list-flipped {
   left: -50% !important;
 }
 
 @media screen and (max-width: 820px) {
-  .p-tieredmenu .p-menuitem-active>p-tieredmenusub > .p-submenu-list {
+  .p-tieredmenu .p-menuitem-active > p-tieredmenusub > .p-submenu-list {
     right: 2em !important;
 
     &.p-submenu-list-flipped {
@@ -124,7 +125,6 @@ input {
     }
   }
 }
-
 
 .p-dialog-content {
   max-width: 95vw;
@@ -214,5 +214,67 @@ span.p-menuitem-text {
   .tbw-dse-steady-cursor {
     background-color: #DDD;
     color: #121212;
+  }
+}
+
+.eclipticCircle {
+  stroke: $gold-trim;
+  stroke-width: 4px;
+  fill: none;
+}
+
+.eclipticDial {
+  stroke: $gold-trim;
+  stroke-width: 3px;
+  fill: none;
+}
+
+.outerRingText {
+  font-size: 60px;
+  text-anchor: middle;
+  fill: $gold-trim;
+}
+
+.timeText {
+  font-size: 50px;
+  text-anchor: middle;
+  fill: $gold-trim;
+}
+
+.post-2018 {
+  .timeText, .outerRingText {
+    fill: $gold-trim-2018;
+  }
+
+  .eclipticCircle, .eclipticDial {
+    stroke: $gold-trim-2018;
+  }
+}
+
+.orig-1410 {
+  .timeText, .outerRingText {
+    fill: $gold-trim-1410;
+  }
+
+  .eclipticCircle, .eclipticDial {
+    stroke: $gold-trim-1410;
+  }
+}
+
+.four-iv {
+  opacity: 1;
+}
+
+.four-iiii {
+  opacity: 0;
+}
+
+.four-as-iiii {
+  .four-iv {
+    opacity: 0;
+  }
+
+  .four-iiii {
+    opacity: 1;
   }
 }

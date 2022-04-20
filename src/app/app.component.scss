@@ -465,12 +465,6 @@ svg {
   fill: none;
 }
 
-.timeText {
-  font-size: 50px;
-  text-anchor: middle;
-  fill: $gold-trim;
-}
-
 .baseCircle {
   stroke: $gold-trim;
   stroke-width: 3px;
@@ -500,18 +494,6 @@ svg {
 .eclipticWheel {
   opacity: 1;
   transition: opacity 1s ease-in-out;
-}
-
-.eclipticDial {
-  stroke: $gold-trim;
-  stroke-width: 3px;
-  fill: none;
-}
-
-.eclipticCircle {
-  stroke: $gold-trim;
-  stroke-width: 4px;
-  fill: none;
 }
 
 .eclipticSymbol {
@@ -623,12 +605,6 @@ svg {
   stroke: $gold-trim;
   stroke-width: 4px;
   fill: none;
-}
-
-.outerRingText {
-  font-size: 60px;
-  text-anchor: middle;
-  fill: $gold-trim;
 }
 
 .eventText {
@@ -755,6 +731,25 @@ svg {
   #globe-host {
     border: 2px $gold-trim solid;
   }
+
+  .eclipticSymbol,
+  .handSymbol,
+  .hourAngleStarSymbol,
+  .outerRingText,
+  .sunBeamLargeSymbol,
+  .sunBeamSmallSymbol,
+  .timeText {
+    fill: $gold-trim-2018;
+  }
+
+  .baseCircle,
+  .eclipticCircle,
+  .eclipticDial,
+  .leverRafieGolden,
+  .outerRingBorder,
+  .unequalHourBorder {
+    stroke: $gold-trim-2018;
+  }
 }
 
 .orig-1410 {
@@ -811,7 +806,44 @@ svg {
   }
 
   .handSymbol {
-    fill: $gold-trim;
+    fill: #DCC393;
+  }
+
+  .eclipticSymbol,
+  .hourAngleStarSymbol,
+  .outerRingText,
+  .timeText {
+    fill: $gold-trim-1410;
+  }
+
+  .sunBeamLargeSymbol,
+  .sunBeamSmallSymbol {
+    fill: #DFC388;
+  }
+
+  .baseCircle,
+  .eclipticCircle,
+  .eclipticDial,
+  .outerRingBorder,
+  .unequalHourBorder {
+    stroke: $gold-trim-1410;
+  }
+
+  .leverRafieGolden,
+  .moon-ring {
+    stroke: $dark-metal-1410;
+  }
+
+  .leverRafieSymbol,
+  .leverSymbol,
+  .pin,
+  .sun-moon-arms,
+  .sun-moon-guides {
+    fill: $dark-metal-1410;
+  }
+
+  .ring-gap {
+    stroke: #9CA5A8;
   }
 }
 
@@ -855,66 +887,5 @@ svg {
     max-width: 110px;
     white-space: normal !important;
     width: 110px;
-  }
-}
-
-.post-2018 {
-  .eclipticSymbol,
-  .handSymbol,
-  .hourAngleStarSymbol,
-  .outerRingText,
-  .sunBeamLargeSymbol,
-  .sunBeamSmallSymbol,
-  .timeText {
-    fill: $gold-trim-2018;
-  }
-
-  .baseCircle,
-  .eclipticCircle,
-  .eclipticDial,
-  .leverRafieGolden,
-  .outerRingBorder,
-  .unequalHourBorder {
-    stroke: $gold-trim-2018;
-  }
-}
-
-.orig-1410 {
-  .eclipticSymbol,
-  .handSymbol,
-  .hourAngleStarSymbol,
-  .outerRingText,
-  .timeText {
-    fill: $gold-trim-1410;
-  }
-
-  .sunBeamLargeSymbol,
-  .sunBeamSmallSymbol {
-    fill: #DFC388;
-  }
-
-  .baseCircle,
-  .eclipticCircle,
-  .eclipticDial,
-  .outerRingBorder,
-  .unequalHourBorder {
-    stroke: $gold-trim-1410;
-  }
-
-  .leverRafieGolden,
-  .moon-ring {
-    stroke: $dark-metal-1410;
-  }
-
-  .leverRafieSymbol,
-  .leverSymbol,
-  .pin,
-  .sun-moon-arms,
-  .sun-moon-guides {
-    fill: $dark-metal-1410;
-  }
-
-  .ring-gap {
-    stroke: #9CA5A8;
   }
 }
