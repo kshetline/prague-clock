@@ -280,7 +280,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   }
 
   get filterRelief(): string {
-    return this.fasterGraphics &&  (!this.svgFilteringOn || this.playing) ? null : 'url("#filterRelief")';
+    return this.fasterGraphics && (!this.svgFilteringOn || this.playing) ? null : 'url("#filterRelief")';
   }
 
   constructor(

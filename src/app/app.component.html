@@ -328,13 +328,12 @@
           <g *ngIf="!self.southern" [attr.filter]="filterRelief" [innerHTML]="self.romanHours | safe"/>
           <g *ngIf="self.southern" [attr.filter]="filterRelief" [innerHTML]="self.romanHoursSouth | safe"/>
         </g>
-        <g id="unequalHourBorders" mask="url(#dayArea)" [attr.filter]="filterRelief"
-            [attr.stroke-width]="self.hourStroke + 'px'">
+        <g id="unequalHourBorders" mask="url('#dayArea')" [attr.stroke-width]="self.hourStroke + 'px'">
           <path *ngFor='let item of [].constructor(11); let i = index'
-              [attr.d]="self.hourArcs[i + 1]" class="unequalHourBorder"/>
-          <path d="M0 0L0 -400" class="unequalHourBorder"/>
+              [attr.d]="self.hourArcs[i + 1]" class="unequalHourBorder" [attr.filter]="filterRelief"/>
+          <path d="M0 0L0 -400" class="unequalHourBorder" [attr.filter]="filterRelief"/>
         </g>
-        <g id="horizonBorder" [attr.mask]="emptyCenter ? 'url(#baseArea-center-hole)': 'url(#baseArea)'"
+        <g id="horizonBorder" [attr.mask]="emptyCenter ? 'url(&quot;#baseArea-center-hole&quot;)': 'url(&quot;#baseArea&quot;)'"
             [attr.filter]="filterRelief">
           <circle *ngIf="self.midnightSunR" [attr.r]="self.midnightSunR" cx="0" cy="0" class="midnightSunCircle"/>
           <circle id="horizonBorder" [attr.r]="self.horizonR" cx="0" [attr.cy]="self.horizonCy" class="baseCircle"/>
