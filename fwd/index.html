@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Pražský Orloj - Prague Astronomical Clock Simulator</title>
+  <meta name="description" content="A simulation of the Prague Astronomical Clock (Pražský Orloj), configurable for any location on Earth, with user-settable time.">
+  <meta name="keywords" content="astronomy, astronomical clocks, prague, pražský, clocks, medieval, horology, timekeeping">
+  <meta name="author" content="Kerry Shetline">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <style>
+    body {
+      background-color: #4D4D4D;
+      color: white;
+      font: 14px Arial, sans-serif;
+      margin: 1em;
+    }
+
+    b {
+      color: dodgerblue;
+    }
+  </style>
+</head>
+<body>
+This page has moved to <b>orloj.org</b>...
+  <script>
+    (() => {
+      // Forward settings to new site
+      let href = 'https://orloj.org' + location.pathname;
+      const settings = localStorage.getItem('pac-settings');
+
+      if (settings)
+        href += '?ls=' + encodeURIComponent(settings);
+
+      location.href = href;
+    })();
+  </script>
+</body>
+</html>

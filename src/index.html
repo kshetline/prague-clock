@@ -14,6 +14,30 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <script>
+    (() => {
+      // Handle forwarding of settings from old site.
+      if (!location.search)
+        return;
+
+      let ls = (new URL(document.location)).searchParams.get('ls');
+
+      if (ls) {
+        try {
+          JSON.parse(ls);
+        }
+        catch (e) {
+          console.error(e);
+          ls = '';
+        }
+
+        if (ls && !localStorage.getItem('pac-settings'))
+          localStorage.setItem('pac-settings', ls);
+
+        location.href = location.origin + location.pathname;
+      }
+    })();
+  </script>
   <style>
     .startup-spinner {
       animation-delay: 0s;
