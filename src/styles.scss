@@ -278,3 +278,11 @@ span.p-menuitem-text {
     opacity: 1;
   }
 }
+
+.orientation-changing {
+  .controls, svg {
+    transition-duration: unset !important;
+    transition-property: unset !important;
+    transition-timing-function: unset !important;
+  }
+}
