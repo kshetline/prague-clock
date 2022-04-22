@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService, PrimeNGConfig } from 'primeng/api';
-import { abs, cos_deg, floor, max, min, mod, mod2 } from '@tubular/math';
+import { abs, floor, max, min, mod, mod2 } from '@tubular/math';
 import {
   clone, extendDelimited, forEach, getCssValue, isEqual, isLikelyMobile, isObject, isSafari, processMillis
 } from '@tubular/util';
@@ -21,7 +21,7 @@ import {
   adjustForEclipticWheel, BasicPositions, calculateBasicPositions, calculateMechanicalPositions, MILLIS_PER_DAY,
   solarSystem, ZeroAngles
 } from 'src/math/math';
-import { adjustGraphicsForLatitude, initSvgHost, SvgHost } from 'src/svg/svg';
+import { adjustGraphicsForLatitude, initSvgHost, sunlitMoonPath, SvgHost } from 'src/svg/svg';
 
 const { DATE, DATETIME_LOCAL, julianDay, TIME } = ttime;
 
@@ -935,11 +935,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   }
 
   sunlitMoonPath(): string {
-    const largeArcFlag = this.moonPhase < 180 ? 1 : 0;
-    const sweepFlag = floor(this.moonPhase / 90) % 2;
-    const x = (abs(cos_deg(this.moonPhase)) * 12).toFixed(1);
-
-    return `M0 -12.0A12.0 12.0 0 0 ${largeArcFlag} 0 12.0A${x} 12.0 0 0 ${sweepFlag} 0 -12.0`;
+    return sunlitMoonPath(this);
   }
 
   checkIfTimeIsEditable(): void {

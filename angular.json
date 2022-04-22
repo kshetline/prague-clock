@@ -59,6 +59,11 @@
           },
           "configurations": {
             "production": {
+              "optimization": {
+                "scripts": true,
+                "fonts": true,
+                "styles": false
+              },
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
