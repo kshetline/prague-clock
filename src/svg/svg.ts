@@ -1,4 +1,4 @@
-import { abs, atan2_deg, atan_deg, cos_deg, max, min, PI, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
+import { abs, atan2_deg, atan_deg, cos_deg, floor, max, min, PI, sign, sin_deg, sqrt, tan_deg } from '@tubular/math';
 import { Appearance } from 'src/advanced-options/advanced-options.component';
 import { circleIntersections, ECLIPTIC_OUTER_RADIUS, eclipticToOffCenter, findCircleRadius } from 'src/math/math';
 import { Pipe, PipeTransform } from '@angular/core';
@@ -47,6 +47,7 @@ export interface SvgHost {
   latitude: number;
   longitude: number;
   midnightSunR?: number | null;
+  moonPhase: number;
   outerSunriseAngle?: number | null;
   riseSetFontSize?: string;
   romanHours?: string;
@@ -74,7 +75,7 @@ export function initSvgHost(host: SvgHost): void {
 
   host.bohemianHours = host.bohemianHoursSouth = '';
 
-  const bh = (p: number, i: number): string => `<text><textPath xlink:href="#outerRingTextPath" startOffset="${
+  const bh = (p: number, i: number): string => `<text><textPath href="#outerRingTextPath" startOffset="${
     (100 * p / 24).toFixed(1)}%" class="outerRingText">${String.fromCharCode(0x26F + i)}</textPath></text>`;
 
   for (let i = 1; i <= 24; ++i) {
@@ -91,7 +92,7 @@ export function initSvgHost(host: SvgHost): void {
     const mod = (t ? ' class="four-iiii"' :
       i === 24 ? ' transform="rotate(180)"' : i === 4 || i === 16 ? ' class="four-iv"' : '');
 
-    return `<text${mod}><textPath xlink:href="#timeTextPath" startOffset="${
+    return `<text${mod}><textPath href="#timeTextPath" startOffset="${
       pct}%" class="timeText">${text}</textPath></text>\n`;
   };
 
@@ -371,4 +372,12 @@ export function adjustGraphicsForLatitude(host: SvgHost): void {
   }
 
   adjustDawnDuskGradient(host);
+}
+
+export function sunlitMoonPath(host: SvgHost): string {
+  const largeArcFlag = host.moonPhase < 180 ? 1 : 0;
+  const sweepFlag = floor(host.moonPhase / 90) % 2;
+  const x = (abs(cos_deg(host.moonPhase)) * 12).toFixed(1);
+
+  return `M0 -12.0A12.0 12.0 0 0 ${largeArcFlag} 0 12.0A${x} 12.0 0 0 ${sweepFlag} 0 -12.0`;
 }
