@@ -1,3 +1,36 @@
+## 1.4.7
+
+* Turned off minimization of CSS, as that seems to be related to unwanted page reloads in iOS Safari when changing from portrait to landscape mode.
+* Other minor tweaks.
+
+## 1.4.6
+
+* Fix layering of the other pivot pin.
+* Add ability to acquire old settings forwarded from previous web location.
+* Fix Firefox bug where filter meant to create shadowing on unequal-hour borders made them disappear instead.
+* Fix French translation of "First quarter".
+
+## 1.4.6
+
+* Fix layering of center-of-ecliptic pivot pin.
+
+## 1.4.4
+
+* Refactor SVG graphics generation and most astronomical calculations into separate modules.
+* Generate much of the previous repetitive SVG originally downloaded post-generated from https://drifted.in/.
+* Improve reliability of globe map rendering.
+* Reorganize Horologium font.
+* Minor graphics tweaks, like lightening shadows, darkening pre-2018 uneven hour text.
+
+## 1.4.3
+
+* Fix mirror-imaging of southern hemisphere zodiac signs.
+
+## 1.4.2
+
+* Czech translation fix.
+* Much simplified angle conversions, now that the issues with the skewed angles of the ecliptic wheel are understood.
+
 ## 1.4.1
 
 * Fix skewed ecliptic wheel angles than had been baked into the original SVG graphics.
