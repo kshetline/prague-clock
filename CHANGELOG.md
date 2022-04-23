@@ -1,3 +1,7 @@
+## 1.4.9
+
+* Fix language submenu positioning for small mobile screens.
+
 ## 1.4.8
 
 * Improved Android phone browser performances.

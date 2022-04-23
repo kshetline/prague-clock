@@ -108,6 +108,7 @@ function formatTimeOfDay(hours: number | DateTime | DateAndTime, force24 = false
 }
 
 const menuLanguageList: MenuItem[] = [];
+const smallMobile = isLikelyMobile() && (screen.width < 460 || screen.height < 460);
 
 menuLanguageList.push({ label: $localize`Default`, url: basePath, target: '_self' });
 menuLanguageList.push({ separator: true });
@@ -130,9 +131,11 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   FAST = PlaySpeed.FAST;
   MODERN = Timing.MODERN;
   MAX_YEAR = 2399;
+  menuLanguageList = menuLanguageList;
   MIN_YEAR = 1400;
   NORMAL = PlaySpeed.NORMAL;
   ORIGINAL_1410 = Appearance.ORIGINAL_1410;
+  smallMobile = smallMobile;
   SOUTH_NORTH = SOUTH_NORTH;
   specificLocale = specificLocale;
   toZodiac = (angle: number): string => '♈♉♊♋♌♍♎♏♐♑♒♓'.charAt(floor(mod(angle, 360) / 30)) + '\uFE0E';
@@ -194,7 +197,9 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
       this.collapsed = false;
       this.advancedOptions?.show();
     } },
-    { label: $localize`Language`, icon: 'pi pi-circle', items: menuLanguageList },
+    { label: $localize`Language` + (smallMobile ? '...' : ''), icon: 'pi pi-circle',
+      items: smallMobile ? undefined : menuLanguageList,
+      command: smallMobile ? (): boolean => this.showLanguageMenu = true : undefined },
     { separator : true },
     { label: $localize`Code on GitHub`, icon: 'pi pi-github', url: 'https://github.com/kshetline/prague-clock',
       target: '_blank' },
@@ -251,6 +256,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   saturnAngle = ZeroAngles;
   showErrors = false;
   showInfoPanel = false;
+  showLanguageMenu = false;
   siderealAngle = 0;
   siderealTime = '';
   siderealTimeOrloj = '';

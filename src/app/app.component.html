@@ -129,6 +129,11 @@
   </div>
 </div>
 
+<div *ngIf="smallMobile" id="alt-language-menu" [style.display]="showLanguageMenu ? 'block' : 'none'">
+  <i class="pi pi-times closer" (click)="showLanguageMenu = false"></i>
+  <p-menu [model]="menuLanguageList"></p-menu>
+</div>
+
 <div id="svg-wrapper"
     [class.post-2018]="appearance === CURRENT || appearance === CURRENT_NO_MAP"
     [class.orig-1410]="appearance === ORIGINAL_1410">
