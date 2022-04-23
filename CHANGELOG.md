@@ -1,3 +1,8 @@
+## 1.4.8
+
+* Improved Android phone browser performances.
+* Add incompatible web browser detection.
+
 ## 1.4.7
 
 * Turned off minimization of CSS, as that seems to be related to unwanted page reloads in iOS Safari when changing from portrait to landscape mode.

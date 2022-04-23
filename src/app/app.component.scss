@@ -234,7 +234,7 @@ svg {
 
   &.controls-collapsed {
     height: calc(max(var(--mfvh) - 16px, 320px));
-    width: calc(max(var(--mfvh) - 16px, 320px));
+    width: calc(min(max(var(--mfvh) - 16px, 320px), calc(100vw - 28px)));
   }
 }
 
@@ -385,8 +385,8 @@ svg {
 
     &.collapsed {
       margin-left: 0;
-      min-width: 400px;
-      width: 400px;
+      min-width: 320px;
+      width: 320px;
     }
 
     i.pi-bars.collapsed {

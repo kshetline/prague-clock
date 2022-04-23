@@ -13,9 +13,32 @@
   <meta property="og:image" content="https://shetline.com/orloj/assets/clock.jpg">
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+  <meta name="mobile-web-app-capable" content="yes">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <script>
-    (() => {
+    (function () {
+      // Test browser feature support.
+      // noinspection ES6ConvertVarToLetConst
+      var success;
+
+      try {
+        eval('// noinspection JSUnusedLocalSymbols\nlet a = `a`');
+        eval('// noinspection JSUnusedLocalSymbols\nconst [x, y] = [1, 2]');
+        eval('(y = 0) => -y');
+        eval('Symbol("symbol")');
+        eval('Array.from([])');
+        eval('new Promise(resolve => resolve()).finally()');
+        success = !!(''.startsWith && document.createElement('canvas').getContext('webgl2'));
+      }
+      catch (e) {
+        success = false;
+      }
+
+      if (!success) {
+        location.href = location.origin + '/orloj/assets/incompatible.html';
+        return;
+      }
+
       // Handle forwarding of settings from old site.
       if (!location.search)
         return;
