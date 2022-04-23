@@ -1,6 +1,7 @@
 ## 1.4.8
 
 * Improved Android phone browser performances.
+* Add incompatible web browser detection.
 
 ## 1.4.7
 
