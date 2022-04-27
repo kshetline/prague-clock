@@ -93,7 +93,7 @@
       [tooltipDisabled]="!trackTime"
       [options]="isoFormat ? ISO_OPTS : LOCAL_OPTS"
       [viewOnly]="trackTime"
-      [timezone]="zone"
+      [timezone]="getZone()"
       [disableMobileKeyboard]="suppressOsKeyboard"
       [(ngModel)]="time"></tbw-time-editor>
     <i class="pi pi-caret-right" (click)="skipToEvent()"></i>
