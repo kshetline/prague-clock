@@ -1,3 +1,8 @@
+## 1.5.0
+
+* Add new "Sun constrained by hour hand".
+* Fix improper handling of Local Mean Time setting.
+
 ## 1.4.9
 
 * Fix language submenu positioning for small mobile screens.

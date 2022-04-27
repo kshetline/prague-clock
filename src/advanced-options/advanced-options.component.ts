@@ -1,7 +1,7 @@
 import { Component, ElementRef } from '@angular/core';
 
 export enum Appearance { CURRENT, CURRENT_NO_MAP, PRE_2018, ORIGINAL_1410 }
-export enum Timing { MODERN, MECHANICAL_ORIGINAL, MECHANICAL_UPDATED }
+export enum Timing { MODERN, MECHANICAL_ORIGINAL, MECHANICAL_UPDATED, CONSTRAINED_SUN }
 
 export interface SettingsHolder {
   additionalPlanets: boolean;
@@ -23,10 +23,6 @@ export interface SettingsHolder {
   styleUrls: ['./advanced-options.component.scss']
 })
 export class AdvancedOptionsComponent {
-  MODERN = Timing.MODERN;
-  MECHANICAL_ORIGINAL = Timing.MECHANICAL_ORIGINAL;
-  MECHANICAL_UPDATED = Timing.MECHANICAL_UPDATED;
-
   private shown = false;
 
   appearanceOptions = [
@@ -34,6 +30,13 @@ export class AdvancedOptionsComponent {
     { label: $localize`Post-2018 colors, no map`, value: Appearance.CURRENT_NO_MAP },
     { label: $localize`Pre-2018 colors`, value: Appearance.PRE_2018 },
     { label: $localize`Original 1410 look?`, value: Appearance.ORIGINAL_1410 }
+  ];
+
+  timingOptions = [
+    { label: $localize`Astronomically-accurate, non-mechanical timing`, value: Timing.MODERN },
+    { label: $localize`Sun constrained by hour hand`, value: Timing.CONSTRAINED_SUN },
+    { label: $localize`Pre-1866 mechanical timing, recalibrated quarterly`, value: Timing.MECHANICAL_ORIGINAL },
+    { label: $localize`Updated mechanical timing, recalibrated yearly`, value: Timing.MECHANICAL_UPDATED }
   ];
 
   settingsHolder: SettingsHolder;
@@ -59,6 +62,9 @@ export class AdvancedOptionsComponent {
   }
 
   clicker = (evt: MouseEvent): void => {
+    if (!(evt.target as HTMLElement)?.classList?.contains('svg-overlay'))
+      return;
+
     const r = this.elementRef.nativeElement?.getBoundingClientRect();
 
     if (r && (evt.pageX < r.left || evt.pageX > r.right || evt.pageY < r.top || evt.pageY > r.bottom))

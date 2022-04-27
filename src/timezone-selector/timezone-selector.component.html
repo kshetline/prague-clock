@@ -34,7 +34,9 @@
     <div i18n class="caption" [style.opacity]="disabled ? 0.33 : 1">Timezone region/category</div>
 
     <p-dropdown tzeDropdownFix [autoDisplayFirst]="false"
-         [options]="subzones" [(ngModel)]="subzone" [disabled]="disabled || selectByOffset" (focus)="onDropdownFocus($event)"
+         [options]="subzones" [(ngModel)]="subzone"
+         [disabled]="disabled || selectByOffset || subzones.length === 0"
+         (focus)="onDropdownFocus($event)"
          appendTo="body" (blur)="onDropdownBlur($event)"></p-dropdown>
     <div i18n class="caption" [style.opacity]="disabled ? 0.33 : 1">Specific timezone</div>
   </div>

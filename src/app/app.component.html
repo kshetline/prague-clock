@@ -17,10 +17,10 @@
       <span i18n>Moon rise/set:</span>
       <span class="num">{{ moonrise }} • {{ moonset }}</span>
     </div>
-    <div *ngIf="showErrors" class="recalibration">
+    <div *ngIf="showRecalibration" class="recalibration">
       <span i18n>Last virtual recalibration:</span>&nbsp;<span class="num">{{ lastRecalibration }}</span>
     </div>
-    <table [style.margin-top]="showErrors ? '0' : '1em'">
+    <table [style.margin-top]="showRecalibration ? '0' : '1em'">
       <ng-container *ngIf="showErrors">
         <tr>
           <th>&nbsp;</th>
@@ -41,7 +41,7 @@
       <tr>
         <td i18n>Moon λ</td>
         <td class="num">{{ true_moonAngle.orig | number: '1.0-0' }}° {{ toZodiac(true_moonAngle.orig) }}</td>
-        <ng-container *ngIf="showErrors">
+        <ng-container *ngIf="showAllErrors">
           <td class="num">{{ moonAngle.orig | number: '1.0-0' }}°</td>
           <td class="diff wide">{{ errorMoon | number: '1.1-1' }}°, {{ errorMoonDays | number: '1.1-1' }}
             <span i18n>days</span></td>
@@ -50,7 +50,7 @@
       <tr>
         <td i18n>Moon phase</td>
         <td class="num">{{ true_moonPhase | number: '1.0-0' }}°</td>
-        <ng-container *ngIf="showErrors">
+        <ng-container *ngIf="showAllErrors">
           <td class="num">{{ moonPhase | number: '1.0-0' }}°</td>
           <td class="diff wide">{{ errorPhase | number: '1.1-1' }}°, {{ errorPhaseDays | number: '1.1-1' }}
             <span i18n>days</span></td>
@@ -93,7 +93,7 @@
       [tooltipDisabled]="!trackTime"
       [options]="isoFormat ? ISO_OPTS : LOCAL_OPTS"
       [viewOnly]="trackTime"
-      [timezone]="zone"
+      [timezone]="getZone()"
       [disableMobileKeyboard]="suppressOsKeyboard"
       [(ngModel)]="time"></tbw-time-editor>
     <i class="pi pi-caret-right" (click)="skipToEvent()"></i>
@@ -101,7 +101,7 @@
   <div class="button-row">
     <p-checkbox [(ngModel)]="isoFormat" [binary]="true"
         i18n-label label="ISO time format"></p-checkbox>
-    <p-checkbox [(ngModel)]="disableDst" [binary]="true" [disabled]="timing !== MODERN" id="disable-dst"
+    <p-checkbox [(ngModel)]="disableDst" [binary]="true" [disabled]="!dstChangeAllowed" id="disable-dst"
         i18n-label label="Disable DST on clock" (onChange)="updateTime(true)"></p-checkbox>
   </div>
   <tze-zone-selector [(ngModel)]="zone" [recents]="recentLocations" (clearItem)='clearLocationItem($event)' (clearRecents)="clearRecents()"
@@ -450,16 +450,16 @@
                   <g transform="rotate(255.5) translate(0,-76.5)">
                     <text class="eclipticSymbol">♎&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(225.5) translate(0,-58)">
+                  <g transform="rotate(225) translate(0,-58)">
                     <text class="eclipticSymbol">♏&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(195.5) translate(0,-46.3)">
+                  <g transform="rotate(195.5) translate(0,-48) scale(0.93)">
                     <text class="eclipticSymbol">♐&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(163.7) translate(0,-46.3)">
+                  <g transform="rotate(164.3) translate(0,-46.3)">
                     <text class="eclipticSymbol">♑&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(132.5) translate(0,-58) rotate(5)">
+                  <g transform="rotate(132.5) translate(0,-58.5) rotate(5) scale(0.93)">
                     <text class="eclipticSymbol">♒&#xFE0E;</text>
                   </g>
                   <g transform="rotate(104.5) translate(0,-79)">
@@ -467,22 +467,22 @@
                   </g>
                 </g>
                 <g *ngIf="self.southern" id="symbols" transform="translate(0, 71.1)">
-                  <g transform="rotate(-63) translate(0,-131) rotate(-62)">
+                  <g transform="rotate(-63) translate(0,-133) rotate(-66)">
                     <text class="eclipticSymbol">♈&#xFE0E;</text>
                   </g>
                   <g transform="rotate(-39) translate(0,-164) rotate(-42)">
                     <text class="eclipticSymbol">♉&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(-16) translate(0,-183.5) scale(-1, 1)">
+                  <g transform="rotate(-15.5) translate(0,-183.5) scale(-1, 1) rotate(-2)">
                     <text class="eclipticSymbol">♊&#xFE0E;</text>
                   </g>
                   <g transform="rotate(13.5) translate(0,-185) rotate(10)">
                     <text class="eclipticSymbol">♋&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(41) translate(0,-161) rotate(43)">
+                  <g transform="rotate(41.5) translate(0,-160) rotate(47)">
                     <text class="eclipticSymbol">♌&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(64) translate(0,-129) rotate(65)">
+                  <g transform="rotate(65) translate(0,-128) rotate(65)">
                     <text class="eclipticSymbol">♍&#xFE0E;</text>
                   </g>
                   <g transform="rotate(-255.5) translate(0,-76.5) scale(-1, 1)">
@@ -491,13 +491,13 @@
                   <g transform="rotate(-235) translate(0,-61) rotate(43)">
                     <text class="eclipticSymbol">♏&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(-195.5) translate(0,-46.3) scale(-1, 1)">
+                  <g transform="rotate(-195.5) translate(0,-48) scale(-0.93, 0.93)">
                     <text class="eclipticSymbol">♐&#xFE0E;</text>
                   </g>
                   <g transform="rotate(-167) translate(0,-45.2) rotate(5)">
                     <text class="eclipticSymbol">♑&#xFE0E;</text>
                   </g>
-                  <g transform="rotate(-133.5) translate(0,-58) scale(-1, 1)">
+                  <g transform="rotate(-134) translate(0,-58.5) scale(-0.93, 0.93)">
                     <text class="eclipticSymbol">♒&#xFE0E;</text>
                   </g>
                   <g transform="rotate(-104.5) translate(0,-79) scale(-1, 1)">
@@ -514,7 +514,7 @@
               <g [attr.filter]="filterRelief">
                 <g id="sun-guide" [attr.transform]="rotate(handAngle * rotateSign)">
                   <rect x="-2.5" y="-250" width="5" height="20" class="sun-moon-guides"/>
-                  <rect x="-1.5" y="-230" width="3" height="150" class="sun-moon-guides"/>
+                  <rect x="-1.3" y="-230" width="2.6" height="150" class="sun-moon-guides"/>
                 </g>
               </g>
             </g>
@@ -575,7 +575,7 @@
             <g [attr.filter]="filterRelief">
               <g id="moon-guide" [attr.transform]="rotate(moonHandAngle * rotateSign)">
                 <rect x="-2.5" y="-270" width="5" height="20" class="sun-moon-guides"/>
-                <rect x="-1.5" y="-250" width="3" height="170" class="sun-moon-guides"/>
+                <rect x="-1.3" y="-250" width="2.6" height="170" class="sun-moon-guides"/>
               </g>
             </g>
           </g>

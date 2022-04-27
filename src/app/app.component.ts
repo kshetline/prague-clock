@@ -7,8 +7,8 @@ import {
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import {
   AstroEvent, EventFinder, FALL_EQUINOX, FIRST_QUARTER, FULL_MOON, JUPITER, LAST_QUARTER, MARS, MERCURY, MOON,
-  NEW_MOON, RISE_EVENT, SATURN, SET_EVENT, SkyObserver, SPRING_EQUINOX, SUMMER_SOLSTICE, SUN,
-  TRANSIT_EVENT, VENUS, WINTER_SOLSTICE
+  NEW_MOON, RISE_EVENT, SATURN, SET_EVENT, SkyObserver, SPRING_EQUINOX, SUMMER_SOLSTICE, SUN, TRANSIT_EVENT, VENUS,
+  WINTER_SOLSTICE
 } from '@tubular/astronomy';
 import ttime, { DateAndTime, DateTime, Timezone } from '@tubular/time';
 import { TzsLocation } from '../timezone-selector/timezone-selector.component';
@@ -112,7 +112,8 @@ const smallMobile = isLikelyMobile() && (screen.width < 460 || screen.height < 4
 
 menuLanguageList.push({ label: $localize`Default`, url: basePath, target: '_self' });
 menuLanguageList.push({ separator: true });
-languageList.forEach(language => menuLanguageList.push({ label: language.name, url: basePath + language.directory, target: '_self' }));
+languageList.forEach(language =>
+  menuLanguageList.push({ label: language.name, url: basePath + language.directory, target: '_self' }));
 
 @Component({
   selector: 'app-root',
@@ -124,6 +125,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   faPlay = faPlay;
   faStop = faStop;
 
+  CONSTRAINED_SUN = Timing.CONSTRAINED_SUN;
   CURRENT = Appearance.CURRENT;
   CURRENT_NO_MAP = Appearance.CURRENT_NO_MAP;
   DD = AngleStyle.DD;
@@ -203,7 +205,8 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
     { separator : true },
     { label: $localize`Code on GitHub`, icon: 'pi pi-github', url: 'https://github.com/kshetline/prague-clock',
       target: '_blank' },
-    { label: $localize`Czech Horological Society site`, icon: 'pi pi-home', url: 'https://www.orloj.eu/', target: '_blank' },
+    { label: $localize`Czech Horological Society site`, icon: 'pi pi-home', url: 'https://www.orloj.eu/',
+      target: '_blank' },
     { label: $localize`About the real clock`, icon: 'pi pi-info-circle',
       url: $localize`:Language-specific Wikipedia URL:https://en.wikipedia.org/wiki/Prague_astronomical_clock`,
       target: '_blank' },
@@ -222,6 +225,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   dawnTextOffset: number;
   detailedMechanism = false;
   disableDst = true;
+  dstChangeAllowed = true;
   emptyCenter = false;
   errorMoon = 0;
   errorMoonDays = 0;
@@ -254,9 +258,11 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   recentLocations: TzsLocation[] = [];
   rotateSign = 1;
   saturnAngle = ZeroAngles;
+  showAllErrors = false;
   showErrors = false;
   showInfoPanel = false;
   showLanguageMenu = false;
+  showRecalibration = false;
   siderealAngle = 0;
   siderealTime = '';
   siderealTimeOrloj = '';
@@ -484,13 +490,26 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
     if (this._timing !== value) {
       this._timing = value;
 
-      if (value !== Timing.MODERN) {
+      if (value === Timing.MODERN) {
+        this.showErrors = false;
+        this.showAllErrors = false;
+        this.showRecalibration = false;
+        this.dstChangeAllowed = true;
+        this.timingReference = undefined;
+      }
+      else if (value === Timing.CONSTRAINED_SUN) {
         this.showErrors = true;
-        this.timingReference = RECOMPUTED_WHEN_NEEDED;
+        this.showAllErrors = false;
+        this.showRecalibration = false;
+        this.dstChangeAllowed = true;
+        this.timingReference = undefined;
       }
       else {
-        this.showErrors = false;
-        this.timingReference = undefined;
+        this.showErrors = true;
+        this.showAllErrors = true;
+        this.showRecalibration = true;
+        this.dstChangeAllowed = false;
+        this.timingReference = RECOMPUTED_WHEN_NEEDED;
       }
 
       this.updateTime(true);
@@ -508,21 +527,21 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
       return;
     }
 
-    const date = new DateTime(this.time, this.zone);
+    const date = new DateTime(this.time, this.getZone());
     const wt = date.wallTime;
     let refTime: DateTime;
     let endTime: DateTime;
 
     if (this.timing === Timing.MECHANICAL_UPDATED) {
-      refTime = new DateTime([wt.y, 1, 1], this.zone);
-      endTime = new DateTime([wt.y + 1, 1, 1], this.zone);
+      refTime = new DateTime([wt.y, 1, 1], this.getZone());
+      endTime = new DateTime([wt.y + 1, 1, 1], this.getZone());
     }
     else {
-      refTime = new DateTime([wt.y, wt.m - (wt.m % 3), 1], this.zone);
-      endTime = new DateTime([wt.y, wt.m - (wt.m % 3), 1], this.zone).add('months', 3);
+      refTime = new DateTime([wt.y, wt.m - (wt.m % 3), 1], this.getZone());
+      endTime = new DateTime([wt.y, wt.m - (wt.m % 3), 1], this.getZone()).add('months', 3);
     }
 
-    this.timingReference = calculateBasicPositions(refTime.utcMillis, this.zone, this.observer,
+    this.timingReference = calculateBasicPositions(refTime.utcMillis, this.getZone(), this.observer,
       this.rotateSign, this.disableDst, this.timing);
     this.lastWallTime = this.timingReference._date?.wallTime;
     this.timingReference._referenceTime = refTime.utcMillis;
@@ -594,7 +613,8 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
     else
       this.time = this.playTimeBase + floor(elapsed / 100) * MILLIS_PER_DAY;
 
-    if (this.lastWallTime && this.lastWallTime.y === this.MAX_YEAR && this.lastWallTime.m === 12 && this.lastWallTime.d === 31)
+    if (this.lastWallTime && this.lastWallTime.y === this.MAX_YEAR &&
+        this.lastWallTime.m === 12 && this.lastWallTime.d === 31)
       this.stop();
     else
       requestAnimationFrame(this.playStep);
@@ -672,12 +692,24 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
       this._zone = newValue;
 
       if (this.initDone) {
-        this.placeName = '';
-        this.updateObserver();
-        this.clearTimingReferenceIfNeeded();
-        this.updateTime(true);
+        if (newValue === 'LMT') {
+          const lon = this._longitude;
+
+          this._longitude = undefined;
+          this.longitude = lon;
+        }
+        else {
+          this.placeName = '';
+          this.updateObserver();
+          this.clearTimingReferenceIfNeeded();
+          this.updateTime(true);
+        }
       }
     }
+  }
+
+  getZone(): string | Timezone {
+    return (this.zone === 'LMT' ? this.localTimezone : this.zone);
   }
 
   get time(): number { return this._time; }
@@ -831,13 +863,14 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
     // Finding sunset events can be slow at high latitudes, so use cached values when possible.
     if (forceUpdate || !this.sunsetA || !this.sunsetB || jdu <= this.sunsetA.ut || jdu > this.sunsetB.ut) {
       this.sunsetA = this.eventFinder.findEvent(SUN, SET_EVENT, jdu, this.observer, undefined, undefined, true);
-      this.sunsetB = this.eventFinder.findEvent(SUN, SET_EVENT, this.sunsetA.ut, this.observer, undefined, undefined, false);
+      this.sunsetB = this.eventFinder.findEvent(SUN, SET_EVENT, this.sunsetA.ut, this.observer,
+        undefined, undefined, false);
     }
 
     const dayLength = this.sunsetB.ut - this.sunsetA.ut;
     const bohemianHour = (jdu - this.sunsetA.ut) / dayLength * 24;
     const basicPositions =
-      calculateBasicPositions(this.time, this.zone, this.observer, this.rotateSign, this.disableDst, this.timing);
+      calculateBasicPositions(this.time, this.getZone(), this.observer, this.rotateSign, this.disableDst, this.timing);
     const date = basicPositions._date;
     const wt = date.wallTime;
     const dateLocal = new DateTime(this.time, this.localTimezone);
@@ -852,7 +885,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
     this.jupiterAngle = adjustForEclipticWheel(solarSystem.getEclipticPosition(JUPITER, jde).longitude.degrees);
     this.saturnAngle = adjustForEclipticWheel(solarSystem.getEclipticPosition(SATURN, jde).longitude.degrees);
 
-    if (this.timing !== Timing.MODERN) {
+    if (this.timing !== Timing.MODERN && this.timing !== Timing.CONSTRAINED_SUN) {
       if (!this.timingReference || this.time < this.timingReference._referenceTime ||
           this.time >= this.timingReference._endTime)
         this.adjustMechanicalTimingReference();
@@ -860,8 +893,12 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
       forEach(calculateMechanicalPositions(this.time, this.timing, this.timingReference) as any,
         (key, value) => basicPosKey(key) && ((this as any)[key] = value));
     }
-    else
+    else {
       forEach(basicPositions as any, (key, value) => basicPosKey(key) && ((this as any)[key] = value));
+
+      if (this.timing === Timing.CONSTRAINED_SUN)
+        this.sunAngle = basicPositions._constrainedSunAngle;
+    }
 
     const format = this.isoFormat ? DATETIME_LOCAL : 'ISS{year:numeric,month:2-digit,day:2-digit,hour:2-digit}';
 
@@ -914,7 +951,8 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
 
   private checkPlanetOverlaps(): void {
     const angles =
-      [this.mercuryAngle.oe, this.venusAngle.oe, this.marsAngle.oe, this.jupiterAngle.oe, this.saturnAngle.oe, -999, -999];
+      [this.mercuryAngle.oe, this.venusAngle.oe, this.marsAngle.oe, this.jupiterAngle.oe,
+       this.saturnAngle.oe, -999, -999];
 
     if (this.realPositionMarkers) {
       angles[5] = this.true_sunAngle.oe;
