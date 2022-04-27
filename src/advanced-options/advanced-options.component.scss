@@ -38,10 +38,6 @@
   width: 100%;
 }
 
-.spacer {
-  height: 0.33em;
-}
-
 .background-input-wrapper {
   position: relative;
 
@@ -62,5 +58,14 @@
       position: relative;
       top: 0.33em;
     }
+  }
+}
+
+p-dropdown.timing {
+  width: 100%;
+  max-width: 100%;
+
+  ::ng-deep .p-dropdown-label {
+    font-size: 13px;
   }
 }

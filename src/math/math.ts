@@ -1,6 +1,6 @@
 import { MOON, SkyObserver, SolarSystem, SUN } from '@tubular/astronomy';
 import { abs, atan2_deg, cos_deg, max, mod, Point, sin_deg, sqrt } from '@tubular/math';
-import ttime, { DateTime, utToTdt } from '@tubular/time';
+import ttime, { DateTime, Timezone, utToTdt } from '@tubular/time';
 import { Timing } from 'src/advanced-options/advanced-options.component';
 
 const { julianDay } = ttime;
@@ -90,6 +90,7 @@ export interface AngleTriplet {
 
 export interface BasicPositions {
   _date?: DateTime;
+  _constrainedSunAngle?: AngleTriplet;
   _endTime?: number;
   _hourOfDay?: number;
   _jde?: number;
@@ -130,14 +131,14 @@ export function calculateEclipticAnglesFromHandAngle(handAngle: number, sidereal
   };
 }
 
-export function calculateBasicPositions(time: number, zone: string, observer: SkyObserver, rotateSign: number,
-                                        disableDst: boolean, timing: Timing): BasicPositions {
+export function calculateBasicPositions(time: number, zone: string | Timezone, observer: SkyObserver,
+                                        rotateSign: number, disableDst: boolean, timing: Timing): BasicPositions {
   const _jdu = julianDay(time);
   const _jde = utToTdt(_jdu);
   const _date = new DateTime(time, zone);
   const wt = _date.wallTime;
   const _hourOfDay = wt.hour + wt.minute / 60 -
-    (disableDst || timing !== Timing.MODERN ? wt.dstOffset / 3600 : 0);
+    (disableDst || (timing !== Timing.MODERN && timing !== Timing.CONSTRAINED_SUN) ? wt.dstOffset / 3600 : 0);
   const handAngle = _hourOfDay * 15 - 180;
   const baseSunAngle = solarSystem.getEclipticPosition(SUN, _jde).longitude.degrees;
   const baseMoonAngle = solarSystem.getEclipticPosition(MOON, _jde).longitude.degrees;
@@ -146,8 +147,10 @@ export function calculateBasicPositions(time: number, zone: string, observer: Sk
   const siderealAngle = observer.getLocalHourAngle(_jdu, true).degrees - 90;
   const moonPhase = mod((baseMoonAngle - baseSunAngle) * rotateSign, 360);
   const moonHandAngle = calculateMoonHandAngle(moonAngle.ie, siderealAngle);
+  const _constrainedSunAngle = calculateEclipticAnglesFromHandAngle(handAngle, siderealAngle);
 
-  return { _jde, _jdu, _hourOfDay, _date, handAngle, moonAngle, moonHandAngle, moonPhase, siderealAngle, sunAngle };
+  return { _jde, _jdu, _hourOfDay, _date, handAngle, moonAngle, moonHandAngle, moonPhase, siderealAngle, sunAngle,
+           _constrainedSunAngle };
 }
 
 export function calculateMechanicalPositions(time: number, timing: Timing, ref: BasicPositions): BasicPositions {

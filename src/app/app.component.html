@@ -17,10 +17,10 @@
       <span i18n>Moon rise/set:</span>
       <span class="num">{{ moonrise }} • {{ moonset }}</span>
     </div>
-    <div *ngIf="showErrors" class="recalibration">
+    <div *ngIf="showRecalibration" class="recalibration">
       <span i18n>Last virtual recalibration:</span>&nbsp;<span class="num">{{ lastRecalibration }}</span>
     </div>
-    <table [style.margin-top]="showErrors ? '0' : '1em'">
+    <table [style.margin-top]="showRecalibration ? '0' : '1em'">
       <ng-container *ngIf="showErrors">
         <tr>
           <th>&nbsp;</th>
@@ -41,7 +41,7 @@
       <tr>
         <td i18n>Moon λ</td>
         <td class="num">{{ true_moonAngle.orig | number: '1.0-0' }}° {{ toZodiac(true_moonAngle.orig) }}</td>
-        <ng-container *ngIf="showErrors">
+        <ng-container *ngIf="showAllErrors">
           <td class="num">{{ moonAngle.orig | number: '1.0-0' }}°</td>
           <td class="diff wide">{{ errorMoon | number: '1.1-1' }}°, {{ errorMoonDays | number: '1.1-1' }}
             <span i18n>days</span></td>
@@ -50,7 +50,7 @@
       <tr>
         <td i18n>Moon phase</td>
         <td class="num">{{ true_moonPhase | number: '1.0-0' }}°</td>
-        <ng-container *ngIf="showErrors">
+        <ng-container *ngIf="showAllErrors">
           <td class="num">{{ moonPhase | number: '1.0-0' }}°</td>
           <td class="diff wide">{{ errorPhase | number: '1.1-1' }}°, {{ errorPhaseDays | number: '1.1-1' }}
             <span i18n>days</span></td>
@@ -101,7 +101,7 @@
   <div class="button-row">
     <p-checkbox [(ngModel)]="isoFormat" [binary]="true"
         i18n-label label="ISO time format"></p-checkbox>
-    <p-checkbox [(ngModel)]="disableDst" [binary]="true" [disabled]="timing !== MODERN" id="disable-dst"
+    <p-checkbox [(ngModel)]="disableDst" [binary]="true" [disabled]="!dstChangeAllowed" id="disable-dst"
         i18n-label label="Disable DST on clock" (onChange)="updateTime(true)"></p-checkbox>
   </div>
   <tze-zone-selector [(ngModel)]="zone" [recents]="recentLocations" (clearItem)='clearLocationItem($event)' (clearRecents)="clearRecents()"
