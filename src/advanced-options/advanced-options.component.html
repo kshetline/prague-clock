@@ -31,5 +31,5 @@
 <p-checkbox [(ngModel)]="settingsHolder.showInfoPanel" [binary]="true"
     i18n-label label="Show info panel"></p-checkbox>
 
-<p-dropdown tzeDropdownFix [autoDisplayFirst]="false" class="timing"
+<p-dropdown tzeDropdownFix [autoDisplayFirst]="false" class="timing" [panelStyle]="{ 'font-size': '13px' }"
    [options]="timingOptions" [(ngModel)]="settingsHolder.timing" appendTo="body"></p-dropdown>
