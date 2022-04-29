@@ -1,3 +1,7 @@
+## 1.6.0
+
+* Add option for sun/moon hour angle markers.
+
 ## 1.5.0
 
 * Add new "Sun constrained by hour hand".

@@ -99,9 +99,11 @@ export interface BasicPositions {
   handAngle: number;
   moonAngle: AngleTriplet;
   moonHandAngle: number;
+  moonHourAngle?: number;
   moonPhase: number;
   siderealAngle: number;
   sunAngle: AngleTriplet;
+  sunHourAngle?: number;
 }
 
 export const ZeroAngles: AngleTriplet = { ie: 0, oe: 0, orig: 0 };
@@ -143,14 +145,16 @@ export function calculateBasicPositions(time: number, zone: string | Timezone, o
   const baseSunAngle = solarSystem.getEclipticPosition(SUN, _jde).longitude.degrees;
   const baseMoonAngle = solarSystem.getEclipticPosition(MOON, _jde).longitude.degrees;
   const sunAngle = adjustForEclipticWheel(baseSunAngle);
+  const sunHourAngle = solarSystem.getHourAngle(SUN, _jdu, observer).degrees;
   const moonAngle = adjustForEclipticWheel(baseMoonAngle);
   const siderealAngle = observer.getLocalHourAngle(_jdu, true).degrees - 90;
   const moonPhase = mod((baseMoonAngle - baseSunAngle) * rotateSign, 360);
   const moonHandAngle = calculateMoonHandAngle(moonAngle.ie, siderealAngle);
+  const moonHourAngle = solarSystem.getHourAngle(MOON, _jdu, observer).degrees;
   const _constrainedSunAngle = calculateEclipticAnglesFromHandAngle(handAngle, siderealAngle);
 
-  return { _jde, _jdu, _hourOfDay, _date, handAngle, moonAngle, moonHandAngle, moonPhase, siderealAngle, sunAngle,
-           _constrainedSunAngle };
+  return { _jde, _jdu, _hourOfDay, _date, handAngle, moonAngle, moonHandAngle, moonHourAngle, moonPhase, siderealAngle,
+           sunAngle, sunHourAngle, _constrainedSunAngle };
 }
 
 export function calculateMechanicalPositions(time: number, timing: Timing, ref: BasicPositions): BasicPositions {

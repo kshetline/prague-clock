@@ -266,6 +266,30 @@ span.p-menuitem-text {
   fill: $gold-trim;
 }
 
+#moon-hour-angle, #sun-hour-angle {
+  stroke-width: 0.5;
+  stroke: dodgerblue;
+
+  path {
+    fill: none;
+    stroke: $gold-trim;
+    stroke-width: 3px;
+
+    &.glow {
+      filter: url("#blue-glow");
+      stroke: dodgerblue;
+      stroke-width: 6px;
+    }
+  }
+
+  text {
+    fill: #37F;
+    font: 9px Arial, sans-serif;
+    stroke: #37F;
+    text-anchor: middle;
+  }
+}
+
 .post-2018 {
   .timeText, .outerRingText {
     fill: $gold-trim-2018;
@@ -273,6 +297,12 @@ span.p-menuitem-text {
 
   .eclipticCircle, .eclipticDial {
     stroke: $gold-trim-2018;
+  }
+
+  #moon-hour-angle, #sun-hour-angle {
+    path:not(.glow) {
+      stroke: $gold-trim-2018;
+    }
   }
 }
 
@@ -283,6 +313,12 @@ span.p-menuitem-text {
 
   .eclipticCircle, .eclipticDial {
     stroke: $gold-trim-1410;
+  }
+
+  #moon-hour-angle, #sun-hour-angle {
+    path:not(.glow) {
+      stroke: $gold-trim-1410;
+    }
   }
 }
 
