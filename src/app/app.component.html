@@ -123,10 +123,6 @@
   <div class="time-text" [class.collapsed]="collapsed" [class.track-time]="trackTime">{{timeText}}</div>
 
   <app-advanced-options #advancedOptions></app-advanced-options>
-
-  <div *ngIf="showInfoPanel && !collapsed" class="below-control-panel">
-    <ng-container *ngTemplateOutlet="infoErrorPanel"></ng-container>
-  </div>
 </div>
 
 <div *ngIf="smallMobile" id="alt-language-menu" [style.display]="showLanguageMenu ? 'block' : 'none'">
@@ -137,7 +133,7 @@
 <div id="svg-wrapper"
     [class.post-2018]="appearance === CURRENT || appearance === CURRENT_NO_MAP"
     [class.orig-1410]="appearance === ORIGINAL_1410">
-  <svg viewBox="0 0 600 600" xml:space="preserve" [class.controls-collapsed]="collapsed">
+  <svg viewBox="0 0 600 600" [class.controls-collapsed]="collapsed" [class.show-info-panel]="showInfoPanel">
     <defs>
       <filter id="filterHand" x="0" y="0" width="200%" height="200%">
         <feOffset result="offOut" in="SourceAlpha" dx="8" dy="8"/>
@@ -369,7 +365,8 @@
        consistent across browsers, with Safari and Chrome on Android having particular problems. -->
   <div id="globe-host" [style.opacity]="emptyCenter ? '0' : '1'"></div>
 
-  <svg viewBox="0 0 600 600" xml:space="preserve" class="svg-overlay" [class.controls-collapsed]="collapsed">
+  <svg viewBox="0 0 600 600" class="svg-overlay" [class.controls-collapsed]="collapsed"
+      [class.show-info-panel]="showInfoPanel">
     <defs>
       <radialGradient id="sphere-effect" cx="25%" cy="25%" r="65%">
         <stop offset="0%" stop-color="rgba(255, 255, 255, 0.5)"/>
@@ -661,10 +658,11 @@
       </g>
     </g>
   </svg>
+</div>
 
-  <div *ngIf="showInfoPanel" class="svg-info-overlay" [style.display]="showInfoPanel && collapsed ? 'block' : null">
-    <ng-container *ngTemplateOutlet="infoErrorPanel"></ng-container>
-  </div>
+<div *ngIf="showInfoPanel" class="info-overlay" [style.display]="showInfoPanel && collapsed ? 'block' : null"
+    [class.expanded]="!collapsed">
+  <ng-container *ngTemplateOutlet="infoErrorPanel"></ng-container>
 </div>
 
 <div i18n id="graphics-credit">Original SVG clock graphics by Jan Tošovský</div>

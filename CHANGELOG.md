@@ -1,3 +1,8 @@
+## 1.6.1
+
+* Added ability to open info display from collapsed control panel.
+* Remove feature for displaying equatorial position - confusing, and not as useful as I thought.
+
 ## 1.6.0
 
 * Add option for sun/moon hour angle markers.

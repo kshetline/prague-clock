@@ -134,17 +134,40 @@ p-toast, p-confirmDialog {
   }
 
   i.pi-info-circle {
+    background: inherit;
     bottom: 0;
     cursor: pointer;
+    display: block;
     padding: 0.5em;
     position: absolute;
     right: 0;
-    opacity: 1;
-    transition: opacity 0.5s ease-in-out;
 
     &.collapsed {
-      opacity: 0;
-      pointer-events: none;
+      padding: 0.5em 0 0.5em 0.5em;
+      right: 1.5em;
+      top: 0;
+      width: 2em;
+    }
+  }
+
+  .time-text {
+    background: inherit;
+    bottom: 0;
+    display: none;
+    font: 14px Verdana, sans-serif;
+    font-variant-numeric: tabular-nums;
+    padding: 0.5em 0 0.5em 0.5em;
+    position: absolute;
+    right: 4em;
+    top: 0;
+    white-space: nowrap;
+
+    &.collapsed {
+      display: block;
+    }
+
+    &.track-time {
+      color: #0A0;
     }
   }
 
@@ -174,27 +197,6 @@ p-toast, p-confirmDialog {
 
   tze-zone-selector {
     margin: 0.5em 0;
-  }
-
-  .time-text {
-    background: inherit;
-    bottom: 0;
-    display: none;
-    font: 14px Verdana, sans-serif;
-    font-variant-numeric: tabular-nums;
-    padding: 0.5em 0 0.5em 0.5em;
-    position: absolute;
-    right: 2em;
-    top: 0;
-    white-space: nowrap;
-
-    &.collapsed {
-      display: block;
-    }
-
-    &.track-time {
-      color: #0A0;
-    }
   }
 
   #now {
@@ -308,10 +310,18 @@ svg {
   }
 }
 
-.svg-info-overlay {
-  bottom: 8px;
-  position: fixed;
-  right: 8px;
+.info-overlay {
+  position: static;
+
+  &.expanded {
+    bottom: 0.5em;
+    position: fixed;
+    right: 0.5em;
+  }
+
+  .info-panel {
+    position: static;
+  }
 }
 
 .below-control-panel {
@@ -347,6 +357,11 @@ svg {
     margin: -20px 13px;
     transform: scale(0.9);
   }
+
+  .info-overlay {
+    margin-bottom: 8px;
+    margin-right: -30px;
+  }
 }
 
 @media screen and (max-height: 820px) {
@@ -373,12 +388,17 @@ svg {
     margin: -40px 26px;
     transform: scale(0.8);
   }
+
+  .info-overlay {
+    margin-bottom: 16px;
+    margin-right: -60px;
+  }
 }
 
 @media screen and (orientation: portrait) {
   :host {
     grid-template-columns: auto;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto 1fr auto;
     overflow: auto;
   }
 
@@ -405,8 +425,8 @@ svg {
 
   svg {
     grid-area: unset;
-    height: calc(min(calc(100vw - 16px), calc(var(--mfvh) - 428px)));
-    width: calc(min(calc(100vw - 16px), calc(var(--mfvh) - 428px)));
+    height: calc(min(calc(100vw - 16px), calc(var(--mfvh) - 440px)));
+    width: calc(min(calc(100vw - 16px), calc(var(--mfvh) - 440px)));
 
     &.controls-collapsed {
       height: calc(max(min(var(--mfvh) - 28px - 2.25em, 100vw - 16px), 320px));
@@ -420,8 +440,15 @@ svg {
 }
 
 @media screen and (orientation: landscape) {
-  .svg-info-overlay {
-    display: none;
+  .info-overlay {
+    bottom: 0;
+    position: fixed;
+    right: 0.5em;
+
+    &.expanded {
+      margin-bottom: 0;
+      margin-right: 0;
+    }
   }
 }
 

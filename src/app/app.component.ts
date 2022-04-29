@@ -176,6 +176,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   private playTimeBase: number;
   private playTimeProcessBase: number;
   private _realPositionMarkers = false;
+  private _showInfoPanel = false;
   private sunsetA: AstroEvent = null;
   private sunsetB: AstroEvent = null;
   private _suppressOsKeyboard = false;
@@ -260,7 +261,6 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   saturnAngle = ZeroAngles;
   showAllErrors = false;
   showErrors = false;
-  showInfoPanel = false;
   showLanguageMenu = false;
   showRecalibration = false;
   siderealAngle = 0;
@@ -468,6 +468,18 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
       else {
         this.collapsed = false;
         this.delayedCollapse = true;
+      }
+    }
+  }
+
+  get showInfoPanel(): boolean { return this._showInfoPanel; }
+  set showInfoPanel(value: boolean) {
+    if (this._showInfoPanel !== value) {
+      this._showInfoPanel = value;
+
+      if (this.initDone && this.collapsed && window.innerWidth < window.innerHeight) {
+        this.graphicsRateChangeCheck(true);
+        this.saveSettings();
       }
     }
   }
