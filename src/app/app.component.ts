@@ -113,7 +113,7 @@ function formatHourAngle(degrees: number): string {
   const hour = floor(minutes / 60);
   const minute = minutes % 60;
 
-  return `${hour}h${minute.toString().padStart(2, '0')}m`;
+  return `${hour}ʰ${minute.toString().padStart(2, '0')}ᵐ`;
 }
 
 const menuLanguageList: MenuItem[] = [];

@@ -50,12 +50,20 @@
           <context context-type="linenumber">27</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="1302960648342833900" datatype="html">
+        <source>Sun/moon equatorial position markers</source>
+        <target>Značky rovníkové polohy Slunce/měsíc</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="5705294303388560916" datatype="html">
         <source>Additional planet markers</source>
         <target>Další ukazatele planet</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="linenumber">33</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7916151852478572756" datatype="html">
@@ -63,7 +71,7 @@
         <target>Zobrazit informační panel</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.html</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">35</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8878423859870707732" datatype="html">
@@ -71,7 +79,7 @@
         <target>Barvy po roce 2018</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.ts</context>
-          <context context-type="linenumber">29</context>
+          <context context-type="linenumber">30</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4047805937999581180" datatype="html">
@@ -79,7 +87,7 @@
         <target>Barvy po roce 2018, bez mapy</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.ts</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="linenumber">31</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6570307737686849942" datatype="html">
@@ -87,7 +95,7 @@
         <target>Barvy před rokem 2018</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.ts</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">32</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2749282813926463743" datatype="html">
@@ -95,7 +103,7 @@
         <target>Původní vzhled 1410?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.ts</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">33</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4007552823040341727" datatype="html">
@@ -103,7 +111,7 @@
         <target>Astronomicky přesné, nemechanické načasování</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.ts</context>
-          <context context-type="linenumber">36</context>
+          <context context-type="linenumber">37</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1198659951326428075" datatype="html">
@@ -111,7 +119,7 @@
         <target>Slunce omezeno hodinovou ručičkou</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.ts</context>
-          <context context-type="linenumber">37</context>
+          <context context-type="linenumber">38</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7560881997360709341" datatype="html">
@@ -119,7 +127,7 @@
         <target>Mech. časování před rokem 1866, rekal. čtvrtletně</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.ts</context>
-          <context context-type="linenumber">38</context>
+          <context context-type="linenumber">39</context>
         </context-group>
       </trans-unit>
       <trans-unit id="669874847217859055" datatype="html">
@@ -127,7 +135,7 @@
         <target>Aktualizované mech. časování, rekal. ročně</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/advanced-options/advanced-options.component.ts</context>
-          <context context-type="linenumber">39</context>
+          <context context-type="linenumber">40</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2682762672767208455" datatype="html">
@@ -291,7 +299,7 @@
         <target>Originální grafika orloje SVG od Jana Tošovského</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
-          <context context-type="linenumber">663</context>
+          <context context-type="linenumber">701</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7419523574846171274" datatype="html">
@@ -299,7 +307,7 @@
         <target>Změňte čas</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
-          <context context-type="linenumber">666</context>
+          <context context-type="linenumber">704</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5441122631150042416" datatype="html">
@@ -315,7 +323,7 @@
         <target>Výchozí</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">113</context>
+          <context context-type="linenumber">122</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8682509701325907552" datatype="html">
@@ -323,7 +331,7 @@
         <target>↔ Rovnodennost/slunovrat</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">191</context>
+          <context context-type="linenumber">201</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3762481572658671790" datatype="html">
@@ -331,7 +339,7 @@
         <target>↔ Fáze Měsíce</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">193</context>
+          <context context-type="linenumber">203</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7956486165830795688" datatype="html">
@@ -339,7 +347,7 @@
         <target>↔ Východ/kulminace/západ slunce</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">195</context>
+          <context context-type="linenumber">205</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1281087965480534519" datatype="html">
@@ -347,7 +355,7 @@
         <target>Pokročilé možnosti...</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">198</context>
+          <context context-type="linenumber">208</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2826581353496868063" datatype="html">
@@ -355,7 +363,7 @@
         <target>Jazyk / Language</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">202</context>
+          <context context-type="linenumber">212</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6195195247247362503" datatype="html">
@@ -363,7 +371,7 @@
         <target>Kód na GitHubu</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">206</context>
+          <context context-type="linenumber">216</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3825322612214091906" datatype="html">
@@ -371,7 +379,7 @@
         <target>Stránky Českého spolku horologického</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">208</context>
+          <context context-type="linenumber">218</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1316081974854732948" datatype="html">
@@ -379,7 +387,7 @@
         <target>O skutečném orloji</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">210</context>
+          <context context-type="linenumber">220</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6726437050434882980" datatype="html">
@@ -387,7 +395,7 @@
         <target>https://cs.wikipedia.org/wiki/Staroměstský_orloj</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">211</context>
+          <context context-type="linenumber">221</context>
         </context-group>
         <note priority="1" from="description">Language-specific Wikipedia URL</note>
       </trans-unit>
@@ -396,7 +404,7 @@
         <target>O tomto simulátoru</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">213</context>
+          <context context-type="linenumber">223</context>
         </context-group>
       </trans-unit>
       <trans-unit id="399827913225042410" datatype="html">
@@ -404,7 +412,7 @@
         <target>Potlačit klávesnici na obrazovce</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">309</context>
+          <context context-type="linenumber">322</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2807800733729323332" datatype="html">
@@ -412,7 +420,7 @@
         <target>Ano</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">345</context>
+          <context context-type="linenumber">358</context>
         </context-group>
         <note priority="1" from="description">for dialog button</note>
       </trans-unit>
@@ -421,7 +429,7 @@
         <target>Ne</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">346</context>
+          <context context-type="linenumber">359</context>
         </context-group>
         <note priority="1" from="description">for dialog button</note>
       </trans-unit>
@@ -430,7 +438,7 @@
         <target>Vypnout "Sledujte aktuální čas", abyste mohli upravovat čas?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">990</context>
+          <context context-type="linenumber">1007</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1653085740327060302" datatype="html">
@@ -438,7 +446,7 @@
         <target>Vypnout "Sledujte aktuální čas" a změnit čas?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1065</context>
+          <context context-type="linenumber">1082</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3304972143698843178" datatype="html">
@@ -446,11 +454,11 @@
         <target>Událos</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1106</context>
+          <context context-type="linenumber">1123</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1110</context>
+          <context context-type="linenumber">1127</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5379240220330466138" datatype="html">
@@ -458,7 +466,7 @@
         <target>Událost mimo rozsah let <x id="PH" equiv-text="this.MIN_YEAR"/>-<x id="PH_1" equiv-text="this.MAX_YEAR"/>.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1107</context>
+          <context context-type="linenumber">1124</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7225188300874994693" datatype="html">
@@ -466,7 +474,7 @@
         <target>Východ slunce</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1117</context>
+          <context context-type="linenumber">1134</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6447558907113574235" datatype="html">
@@ -474,7 +482,7 @@
         <target>Západ slunce</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1119</context>
+          <context context-type="linenumber">1136</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6054510843574670830" datatype="html">
@@ -482,7 +490,7 @@
         <target>Kulminace</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1121</context>
+          <context context-type="linenumber">1138</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5740316636928173013" datatype="html">
@@ -490,7 +498,7 @@
         <target>Jarní rovnodennost</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1123</context>
+          <context context-type="linenumber">1140</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2020422354780153562" datatype="html">
@@ -498,7 +506,7 @@
         <target>Letní slunovrat</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1125</context>
+          <context context-type="linenumber">1142</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7383670398589052638" datatype="html">
@@ -506,7 +514,7 @@
         <target>Podzimní rovnodennost</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1127</context>
+          <context context-type="linenumber">1144</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3382598256887949674" datatype="html">
@@ -514,7 +522,7 @@
         <target>Zimní slunovrat</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1129</context>
+          <context context-type="linenumber">1146</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5087039501580395567" datatype="html">
@@ -522,7 +530,7 @@
         <target>Nový měsíc</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1131</context>
+          <context context-type="linenumber">1148</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5246077877231873167" datatype="html">
@@ -530,7 +538,7 @@
         <target>První čtvrt měsíc*</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1133</context>
+          <context context-type="linenumber">1150</context>
         </context-group>
       </trans-unit>
       <trans-unit id="315285506816329608" datatype="html">
@@ -538,7 +546,7 @@
         <target>Úplněk</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1135</context>
+          <context context-type="linenumber">1152</context>
         </context-group>
       </trans-unit>
       <trans-unit id="409860942378561532" datatype="html">
@@ -546,7 +554,7 @@
         <target>Třetí čtvrt měsíce</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.ts</context>
-          <context context-type="linenumber">1137</context>
+          <context context-type="linenumber">1154</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3251116876185403930" datatype="html">
