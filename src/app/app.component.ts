@@ -47,7 +47,6 @@ const defaultSettings = {
   detailedMechanism: false,
   disableDst: true,
   eventType: EventType.EQUISOLSTICE,
-  equatorialPositionMarkers: false,
   fasterGraphics: true,
   isoFormat: false,
   latitude: pragueLat,
@@ -108,14 +107,6 @@ function formatTimeOfDay(hours: number | DateTime | DateAndTime, force24 = false
   return time;
 }
 
-function formatHourAngle(degrees: number): string {
-  const minutes = min(floor(mod(degrees, 360) * 4 + 0.001), 1439);
-  const hour = floor(minutes / 60);
-  const minute = minutes % 60;
-
-  return `${hour}ʰ${minute.toString().padStart(2, '0')}ᵐ`;
-}
-
 const menuLanguageList: MenuItem[] = [];
 const smallMobile = isLikelyMobile() && (screen.width < 460 || screen.height < 460);
 
@@ -140,7 +131,6 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   DD = AngleStyle.DD;
   DDD = AngleStyle.DDD;
   FAST = PlaySpeed.FAST;
-  formatHourAngle = formatHourAngle;
   MODERN = Timing.MODERN;
   MAX_YEAR = 2399;
   menuLanguageList = menuLanguageList;
@@ -243,7 +233,6 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   errorPhaseDays = 0;
   errorSun = 0;
   errorSunMinutes = 0;
-  equatorialPositionMarkers = false;
   fasterGraphics = true;
   handAngle = 0;
   inputLength = 0;
@@ -258,7 +247,6 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   mercuryAngle = ZeroAngles;
   moonAngle = ZeroAngles;
   moonHandAngle = 0;
-  moonHourAngle = 0;
   moonPhase = 0;
   moonrise = '';
   moonset = '';
@@ -279,7 +267,6 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   siderealTime = '';
   siderealTimeOrloj = '';
   sunAngle = ZeroAngles;
-  sunHourAngle = 0;
   sunrise: string;
   sunset: string;
   svgFilteringOn = true;
@@ -339,6 +326,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
       }
 
       delete settings.hideMap;
+      delete settings.equatorialPositionMarkers;
     }
     catch {
       settings = null;
@@ -1124,7 +1112,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
                                   detail: $localize`Event outside of ${this.MIN_YEAR}-${this.MAX_YEAR} year range.` });
       else {
         this.time = evt.eventTime.utcMillis;
-        this.messageService.add({ severity: 'info', summary: $localize`Event`, detail: eventText });
+        this.messageService.add({ severity: 'info', summary: $localize`Event`, detail: eventText, life: 1000 });
       }
     }
   }

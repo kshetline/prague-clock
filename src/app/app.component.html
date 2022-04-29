@@ -336,7 +336,7 @@
         <g id="unequalHourBorders" mask="url('#dayArea')" [attr.stroke-width]="self.hourStroke + 'px'">
           <path *ngFor='let item of [].constructor(11); let i = index'
               [attr.d]="self.hourArcs[i + 1]" class="unequalHourBorder" [attr.filter]="filterRelief"/>
-          <path d="M1 0L0 -400" class="unequalHourBorder" [attr.filter]="filterRelief"/>
+          <path d="M0 0L0 -400" class="unequalHourBorder" [attr.filter]="filterRelief"/>
         </g>
         <g id="horizonBorder" [attr.mask]="emptyCenter ? 'url(&quot;#baseArea-center-hole&quot;)': 'url(&quot;#baseArea&quot;)'"
             [attr.filter]="filterRelief">
@@ -376,18 +376,6 @@
         <stop offset="40%" stop-color="rgba(255, 255, 255, 0)"/>
         <stop offset="100%" stop-color="rgba(0, 0, 0, 0.25)"/>
       </radialGradient>
-      <filter id="blue-glow" x="-50" y="-20" width="100" height="40">
-        <feColorMatrix type="matrix" values=
-            "0.1 0.1 0.1 0   0
-             0.3 0.3 0.3 0   0
-             1   1   1   0   0
-             0   0   0   1   0"/>
-        <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
-        <feMerge>
-            <feMergeNode in="coloredBlur"/>
-            <feMergeNode in="SourceGraphic"/>
-        </feMerge>
-      </filter>
     </defs>
     <g transform="translate(300, 300)" class="content">
       <g id="frontPart">
@@ -669,25 +657,6 @@
               </g>
             </g>
           </g>
-        </g>
-      </g>
-
-      <g *ngIf="equatorialPositionMarkers" id="equatorial">
-        <g id="sun-hour-angle" [attr.transform]="rotate(180 + sunHourAngle)">
-          <path d="M-45.2 157.7A164.1 164.1 0 0 0 45.2 157.7" class="glow"/>
-          <path d="M-42.5 158.5A164.1 164.1 0 0 0 42.5 158.5"/>
-          <title>{{ formatHourAngle(sunHourAngle) }}</title>
-          <circle cx="0" cy="164.1" r="7" fill="yellow"/>
-          <circle cx="0" cy="164.1" r="7" fill="url('#sphere-effect')"/>
-          <text x="0" y="166.8" width="7" height="7">☉</text>
-        </g>
-        <g id="moon-hour-angle" [attr.transform]="rotate(180 + moonHourAngle)">
-          <path d="M-45.2 157.7A164.1 164.1 0 0 0 45.2 157.7" class="glow"/>
-          <path d="M-42.5 158.5A164.1 164.1 0 0 0 42.5 158.5"/>
-          <title>{{ formatHourAngle(moonHourAngle) }}</title>
-          <circle cx="0" cy="164.1" r="7" fill="white"/>
-          <circle cx="0" cy="164.1" r="7" fill="url('#sphere-effect')"/>
-          <text x="0" y="166.5" width="7" height="7">☾</text>
         </g>
       </g>
     </g>

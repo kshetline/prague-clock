@@ -8,7 +8,6 @@ export interface SettingsHolder {
   appearance: Appearance;
   background: string;
   detailedMechanism: boolean;
-  equatorialPositionMarkers: boolean;
   fasterGraphics: boolean;
   hideMap?: boolean;
   post2018?: boolean;
