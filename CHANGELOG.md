@@ -2,6 +2,7 @@
 
 * Added ability to open info display from collapsed control panel.
 * Remove feature for displaying equatorial position - confusing, and not as useful as I thought.
+* Fix iOS keyboard input bug.
 
 ## 1.6.0
 

@@ -28,9 +28,9 @@ import { sizeChanges } from '../main';
 const { DATE, DATETIME_LOCAL, julianDay, TIME } = ttime;
 
 const RESUME_FILTERING_DELAY = 1000;
-const START_FILTERING_DELAY = 500;
 const SIMPLE_FILTER_IS_SLOW_TOO = isAndroid() || (isSafari() && isMacOS());
 const STOP_FILTERING_DELAY = SIMPLE_FILTER_IS_SLOW_TOO ? 1000 : 3000;
+const START_FILTERING_DELAY = SIMPLE_FILTER_IS_SLOW_TOO ? 1000 : 500;
 const RECOMPUTED_WHEN_NEEDED: null = null;
 
 enum EventType { EQUISOLSTICE, MOON_PHASE, RISE_SET }
@@ -995,7 +995,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   }
 
   reorient(angle: AngleTriplet): string {
-    return `rotate(${(90 - angle.orig - angle.oe) * this.rotateSign})`;
+    return isSafari() ? null : `rotate(${(90 - angle.orig - angle.oe) * this.rotateSign})`;
   }
 
   sunlitMoonPath(): string {
