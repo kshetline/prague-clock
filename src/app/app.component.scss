@@ -1,14 +1,18 @@
 @import "../colors";
 
-:host {
+.wrapper {
   box-sizing: border-box;
   display: grid;
   font-family: Horologium, NoEmojiAstronomy, sans-serif;
   gap: 12px;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr 180px;
   min-height: var(--mfvh);
   place-items: center;
   padding: 8px;
+
+  &.narrow {
+    grid-template-columns: 1fr auto;
+  }
 }
 
 p-toast, p-confirmDialog {
@@ -25,6 +29,7 @@ p-toast, p-confirmDialog {
   font: 14px Arial, sans-serif;
   gap: 4px;
   grid-area: 1 / 2;
+  justify-self: end;
   min-height: 400px;
   min-width: 400px;
   padding: 1em 0.5em;
@@ -237,11 +242,23 @@ svg {
   &.controls-collapsed {
     height: calc(max(var(--mfvh) - 16px, 320px));
     width: calc(min(max(var(--mfvh) - 16px, 320px), calc(100vw - 28px)));
+
+    &.show-info-panel {
+      height: calc(min(max(var(--mfvh) - 16px, 320px), calc(100vw - 200px)));
+      width: calc(min(max(var(--mfvh) - 16px, 320px), calc(100vw - 200px)));
+    }
   }
 }
 
 #svg-wrapper {
+  align-self: start;
+  justify-self: start;
   position: relative;
+
+  &.wide {
+    align-self: center;
+    justify-self: center;
+  }
 }
 
 .svg-overlay {
@@ -252,12 +269,24 @@ svg {
   top: 0;
 }
 
+.info-panel-overlay {
+  font-size: calc(14px * var(--font-scaler));
+  position: static;
+
+  &.expanded {
+    bottom: 0.5em;
+    position: fixed;
+    right: 0.5em;
+  }
+}
+
 .info-panel {
   background-color: $controls-background;
   border: 1px solid #999;
   box-sizing: border-box;
   color: $controls-text;
-  font: 14px NoEmojiAstronomy, Arial, sans-serif;
+  font-size: 1em;
+  font-family: NoEmojiAstronomy, Arial, sans-serif;
   max-width: 400px;
   padding: 0.5em 2.5em 0.5em 0.5em;
   position: relative;
@@ -276,19 +305,19 @@ svg {
 
   .num {
     color: #64B5F6;
-    font: 12.5px NoEmojiAstronomy, Verdana, sans-serif;
-    min-width: 52px;
+    font: 0.9em NoEmojiAstronomy, Verdana, sans-serif;
+    min-width: 3.7em;
     white-space: nowrap;
   }
 
   .diff {
     color: #F63;
-    font: 12.5px Verdana, sans-serif;
+    font: 0.9em Verdana, sans-serif;
     white-space: nowrap;
   }
 
   .wide {
-    min-width: 125px;
+    min-width: 9em;
   }
 
   .recalibration {
@@ -307,20 +336,6 @@ svg {
     border-spacing: 1em 0;
     margin-left: -1em;
     margin-right: -2.5em;
-  }
-}
-
-.info-overlay {
-  position: static;
-
-  &.expanded {
-    bottom: 0.5em;
-    position: fixed;
-    right: 0.5em;
-  }
-
-  .info-panel {
-    position: static;
   }
 }
 
@@ -352,19 +367,9 @@ svg {
       margin: -2px;
     }
   }
-
-  .info-panel {
-    margin: -20px 13px;
-    transform: scale(0.9);
-  }
-
-  .info-overlay {
-    margin-bottom: 8px;
-    margin-right: -30px;
-  }
 }
 
-@media screen and (max-height: 820px) {
+@media screen and (max-height: 600px) {
   .info-panel {
     bottom: 8px;
     left: unset;
@@ -383,27 +388,23 @@ svg {
       margin: -4px -40px;
     }
   }
-
-  .info-panel {
-    margin: -40px 26px;
-    transform: scale(0.8);
-  }
-
-  .info-overlay {
-    margin-bottom: 16px;
-    margin-right: -60px;
-  }
 }
 
 @media screen and (orientation: portrait) {
-  :host {
+  .wrapper {
     grid-template-columns: auto;
     grid-template-rows: auto 1fr auto;
     overflow: auto;
   }
 
+  #svg-wrapper {
+    align-self: center;
+    justify-self: center;
+  }
+
   .controls {
     grid-area: unset;
+    justify-self: center;
 
     &.collapsed {
       margin-left: 0;
@@ -431,6 +432,11 @@ svg {
     &.controls-collapsed {
       height: calc(max(min(var(--mfvh) - 28px - 2.25em, 100vw - 16px), 320px));
       width: calc(max(min(var(--mfvh) - 28px - 2.25em, 100vw - 16px), 320px));
+
+      &.show-info-panel {
+        height: calc(max(min(var(--mfvh) - 40px - calc(260px * var(--font-scaler)) - 2.25em, 100vw - 16px), 320px));
+        width: calc(max(min(var(--mfvh) - 40px - calc(260px * var(--font-scaler)) - 2.25em, 100vw - 16px), 320px));
+      }
     }
   }
 
@@ -440,15 +446,10 @@ svg {
 }
 
 @media screen and (orientation: landscape) {
-  .info-overlay {
+  .info-panel-overlay {
     bottom: 0;
     position: fixed;
     right: 0.5em;
-
-    &.expanded {
-      margin-bottom: 0;
-      margin-right: 0;
-    }
   }
 }
 
