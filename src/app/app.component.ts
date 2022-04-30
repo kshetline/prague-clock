@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService, PrimeNGConfig } from 'primeng/api';
 import { abs, floor, max, min, mod, mod2 } from '@tubular/math';
 import {
-  clone, extendDelimited, forEach, getCssValue, isAndroid, isEqual, isLikelyMobile, isMacOS, isObject, isSafari,
+  clone, extendDelimited, forEach, getCssValue, isAndroid, isEqual, isIOS, isLikelyMobile, isMacOS, isObject, isSafari,
   processMillis
 } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
@@ -308,7 +308,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
 
     let settings: any;
 
-    if (isLikelyMobile()) {
+    if (isLikelyMobile() || isIOS()) {
       this.menuItems.push({ separator: true });
       this.menuItems.push({ label: $localize`Suppress onscreen keyboard`, icon: 'pi pi-circle', id: 'sok',
                             command: (): boolean => this.suppressOsKeyboard = !this.suppressOsKeyboard });
