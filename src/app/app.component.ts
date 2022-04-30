@@ -466,7 +466,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
     if (this._showInfoPanel !== value) {
       this._showInfoPanel = value;
 
-      if (this.initDone && this.collapsed && window.innerWidth < window.innerHeight) {
+      if (this.initDone && this.collapsed) {
         this.adjustFontScaling();
         this.graphicsRateChangeCheck(true);
         this.saveSettings();
