@@ -2,13 +2,13 @@
 
 @font-face {
   font-family: NoEmojiAstronomy;
-  src: local("Apple Symbol"), local("Segoe UI Symbol"), local("Arial Unicode MS"), local("Menlo"), local("sans-serif");
+  src: url("assets/AppleZodiac.ttf") format("truetype");
   unicode-range: U+263C-2653;
 }
 
 @font-face {
   font-family: Horologium;
-  src: url("assets/Horologium.ttf");
+  src: url("assets/Horologium.ttf") format("truetype");
 }
 
 :root {
