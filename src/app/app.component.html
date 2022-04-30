@@ -1,666 +1,672 @@
-<ng-template #infoErrorPanel>
-  <div class="info-panel">
-    <i class="pi pi-times closer" (click)="showInfoPanel = false"></i>
-    <div class="time-grid">
-      <span>{{ zoneOffset }}</span>
-      <span class="num">{{ localTime }}</span>
-      <span i18n>Local mean time:</span>
-      <span class="num">{{ localMeanTime }}</span>
-      <span i18n>Local solar time:</span>
-      <span class="num">{{ localSolarTime }}</span>
-      <span i18n>Sidereal time:</span>
-      <span class="num">{{ siderealTime }}</span>
-      <span i18n>Bohemian time:</span>
-      <span class="num">{{ bohemianTime }}</span>
-      <span i18n>Sun rise/set:</span>
-      <span class="num">{{ sunrise }} • {{ sunset }}</span>
-      <span i18n>Moon rise/set:</span>
-      <span class="num">{{ moonrise }} • {{ moonset }}</span>
+<div class="wrapper" [class.collapsed]="collapsed && showInfoPanel" [class.narrow]="collapsed && !showInfoPanel">
+  <div class="controls tbw-dark-mode"
+      [class.short]="lastHeight <= 420 && lastHeight > 380"
+      [class.extra-short]="lastHeight <= 380"
+      [class.collapsed]="collapsed">
+    <p-tieredMenu #menu [popup]="true" [model]="menuItems" appendTo="body"></p-tieredMenu>
+    <i class="pi pi-bars" (click)="menu.toggle($event)" [class.collapsed]="collapsed"></i>
+    <i class="pi pi-plus" (click)="advancedOptions.show()" [class.collapsed]="collapsed"></i>
+    <i class="pi pi-info-circle" (click)="showInfoPanel = !showInfoPanel" [class.collapsed]="collapsed"></i>
+    <i class="pi pi-chevron-down" (click)="collapsed = !collapsed" [class.collapsed]="collapsed"></i>
+    <div class="place-name-group" [class.collapsed]="collapsed">
+      <span *ngIf="!canSaveName && placeName" class="place-name">{{placeName}}</span>
+      <span i18n *ngIf="!canSaveName && !placeName" class="no-name">No name provided</span>
+      <input *ngIf="canSaveName" id="name-input" class="name-input" [value]="inputName"
+          (input)="inputChanged($event)" (keydown.enter)="saveName()">
+      <span *ngIf="canSaveName" class="height-holder">&nbsp;</span>
+      <i *ngIf="canEditName" class="pi pi-pencil" (click)="editName()"></i>
+      <i *ngIf="canSaveName" class="pi pi-save"
+          [class.icon-disabled]="inputLength === 0" (click)="saveName()"></i>
+      <i *ngIf="canSaveName" class="pi pi-undo" (click)="cancelEdit()"></i>
     </div>
-    <div *ngIf="showRecalibration" class="recalibration">
-      <span i18n>Last virtual recalibration:</span>&nbsp;<span class="num">{{ lastRecalibration }}</span>
+    <div class="time-row">
+      <i class="pi pi-caret-left" (click)="skipToEvent(true)"></i>
+      <tbw-time-editor
+        [max]="MAX_YEAR + '-12-31'"
+        [min]="MIN_YEAR + '-01-01'"
+        wideSpinner
+        (click)="checkIfTimeIsEditable()"
+        i18n-pTooltip
+        pTooltip='Uncheck "Track current time" to modify the time'
+        tooltipPosition="bottom"
+        [tooltipDisabled]="!trackTime"
+        [options]="isoFormat ? ISO_OPTS : LOCAL_OPTS"
+        [viewOnly]="trackTime"
+        [timezone]="getZone()"
+        [disableMobileKeyboard]="suppressOsKeyboard"
+        [(ngModel)]="time"></tbw-time-editor>
+      <i class="pi pi-caret-right" (click)="skipToEvent()"></i>
     </div>
-    <table [style.margin-top]="showRecalibration ? '0' : '1em'">
-      <ng-container *ngIf="showErrors">
-        <tr>
-          <th>&nbsp;</th>
-          <th i18n>Actual</th>
-          <th>Orloj</th>
-          <th>Δ</th>
-        </tr>
-      </ng-container>
-      <tr>
-        <td i18n>Sun λ</td>
-        <td class="num">{{ true_sunAngle.orig | number: '1.0-0' }}° {{ toZodiac(true_sunAngle.orig) }}</td>
-        <ng-container *ngIf="showErrors">
-          <td class="num">{{ sunAngle.orig | number: '1.0-0' }}°</td>
-          <td class="diff wide">{{ errorSun | number: '1.1-1' }}°, {{ errorSunMinutes | number: '1.1-1' }}
-            <span i18n>mins</span></td>
-        </ng-container>
-      </tr>
-      <tr>
-        <td i18n>Moon λ</td>
-        <td class="num">{{ true_moonAngle.orig | number: '1.0-0' }}° {{ toZodiac(true_moonAngle.orig) }}</td>
-        <ng-container *ngIf="showAllErrors">
-          <td class="num">{{ moonAngle.orig | number: '1.0-0' }}°</td>
-          <td class="diff wide">{{ errorMoon | number: '1.1-1' }}°, {{ errorMoonDays | number: '1.1-1' }}
-            <span i18n>days</span></td>
-        </ng-container>
-      </tr>
-      <tr>
-        <td i18n>Moon phase</td>
-        <td class="num">{{ true_moonPhase | number: '1.0-0' }}°</td>
-        <ng-container *ngIf="showAllErrors">
-          <td class="num">{{ moonPhase | number: '1.0-0' }}°</td>
-          <td class="diff wide">{{ errorPhase | number: '1.1-1' }}°, {{ errorPhaseDays | number: '1.1-1' }}
-            <span i18n>days</span></td>
-        </ng-container>
-      </tr>
-    </table>
-  </div>
-</ng-template>
+    <div class="button-row">
+      <p-checkbox [(ngModel)]="isoFormat" [binary]="true"
+          i18n-label label="ISO time format"></p-checkbox>
+      <p-checkbox [(ngModel)]="disableDst" [binary]="true" [disabled]="!dstChangeAllowed" id="disable-dst"
+          i18n-label label="Disable DST on clock" (onChange)="updateTime(true)"></p-checkbox>
+    </div>
+    <tze-zone-selector [(ngModel)]="zone" [recents]="recentLocations" (clearItem)='clearLocationItem($event)' (clearRecents)="clearRecents()"
+        [autofocus]="false" [disabled]="canSaveName" (location)="changeLocation($event)"></tze-zone-selector>
+    <div class="button-row time-row">
+      <p-checkbox [(ngModel)]="trackTime" [binary]="true" [disabled]="playing" id="track-time"
+          i18n-label label="Track current time"></p-checkbox><span>&nbsp;&nbsp;</span>
+      <button i18n type="button" pButton (click)="setNow()" class="now" [disabled]="trackTime" id="now">Now</button>
+      <fa-icon [icon]="faPlay" class="fa-xl" [class.disabled]="playing && playSpeed === NORMAL" (click)="play()"></fa-icon>
+      <fa-icon [icon]="faForward" class="fa-xl" [class.disabled]="playing && playSpeed === FAST" (click)="playFast()"></fa-icon>
+      <fa-icon [icon]="faStop" class="fa-xl" [class.disabled]="!playing" (click)="stop()"></fa-icon>
+    </div>
+    <div class="button-row">
+      <tbw-angle-editor wideSpinner [(ngModel)]="latitude" [disableMobileKeyboard]="suppressOsKeyboard" [disabled]="canSaveName"
+          [options]="{ angleStyle: DD, compass: SOUTH_NORTH, decimalPrecision: 1, locale: specificLocale }"></tbw-angle-editor>
+      <tbw-angle-editor wideSpinner [(ngModel)]="longitude" [disableMobileKeyboard]="suppressOsKeyboard" [disabled]="canSaveName"
+          [options]="{ angleStyle: DDD, compass: WEST_EAST, decimalPrecision: 1, locale: specificLocale }"></tbw-angle-editor>
+    </div>
+    <div class="time-text" [class.collapsed]="collapsed" [class.track-time]="trackTime">{{timeText}}</div>
 
-<div class="controls tbw-dark-mode"
-    [class.short]="lastHeight <= 420 && lastHeight > 380"
-    [class.extra-short]="lastHeight <= 380"
-    [class.collapsed]="collapsed">
-  <p-tieredMenu #menu [popup]="true" [model]="menuItems" appendTo="body"></p-tieredMenu>
-  <i class="pi pi-bars" (click)="menu.toggle($event)" [class.collapsed]="collapsed"></i>
-  <i class="pi pi-plus" (click)="advancedOptions.show()" [class.collapsed]="collapsed"></i>
-  <i class="pi pi-info-circle" (click)="showInfoPanel = !showInfoPanel" [class.collapsed]="collapsed"></i>
-  <i class="pi pi-chevron-down" (click)="collapsed = !collapsed" [class.collapsed]="collapsed"></i>
-  <div class="place-name-group" [class.collapsed]="collapsed">
-    <span *ngIf="!canSaveName && placeName" class="place-name">{{placeName}}</span>
-    <span i18n *ngIf="!canSaveName && !placeName" class="no-name">No name provided</span>
-    <input *ngIf="canSaveName" id="name-input" class="name-input" [value]="inputName"
-        (input)="inputChanged($event)" (keydown.enter)="saveName()">
-    <span *ngIf="canSaveName" class="height-holder">&nbsp;</span>
-    <i *ngIf="canEditName" class="pi pi-pencil" (click)="editName()"></i>
-    <i *ngIf="canSaveName" class="pi pi-save"
-        [class.icon-disabled]="inputLength === 0" (click)="saveName()"></i>
-    <i *ngIf="canSaveName" class="pi pi-undo" (click)="cancelEdit()"></i>
+    <app-advanced-options #advancedOptions></app-advanced-options>
   </div>
-  <div class="time-row">
-    <i class="pi pi-caret-left" (click)="skipToEvent(true)"></i>
-    <tbw-time-editor
-      [max]="MAX_YEAR + '-12-31'"
-      [min]="MIN_YEAR + '-01-01'"
-      wideSpinner
-      (click)="checkIfTimeIsEditable()"
-      i18n-pTooltip
-      pTooltip='Uncheck "Track current time" to modify the time'
-      tooltipPosition="bottom"
-      [tooltipDisabled]="!trackTime"
-      [options]="isoFormat ? ISO_OPTS : LOCAL_OPTS"
-      [viewOnly]="trackTime"
-      [timezone]="getZone()"
-      [disableMobileKeyboard]="suppressOsKeyboard"
-      [(ngModel)]="time"></tbw-time-editor>
-    <i class="pi pi-caret-right" (click)="skipToEvent()"></i>
-  </div>
-  <div class="button-row">
-    <p-checkbox [(ngModel)]="isoFormat" [binary]="true"
-        i18n-label label="ISO time format"></p-checkbox>
-    <p-checkbox [(ngModel)]="disableDst" [binary]="true" [disabled]="!dstChangeAllowed" id="disable-dst"
-        i18n-label label="Disable DST on clock" (onChange)="updateTime(true)"></p-checkbox>
-  </div>
-  <tze-zone-selector [(ngModel)]="zone" [recents]="recentLocations" (clearItem)='clearLocationItem($event)' (clearRecents)="clearRecents()"
-      [autofocus]="false" [disabled]="canSaveName" (location)="changeLocation($event)"></tze-zone-selector>
-  <div class="button-row time-row">
-    <p-checkbox [(ngModel)]="trackTime" [binary]="true" [disabled]="playing" id="track-time"
-        i18n-label label="Track current time"></p-checkbox><span>&nbsp;&nbsp;</span>
-    <button i18n type="button" pButton (click)="setNow()" class="now" [disabled]="trackTime" id="now">Now</button>
-    <fa-icon [icon]="faPlay" class="fa-xl" [class.disabled]="playing && playSpeed === NORMAL" (click)="play()"></fa-icon>
-    <fa-icon [icon]="faForward" class="fa-xl" [class.disabled]="playing && playSpeed === FAST" (click)="playFast()"></fa-icon>
-    <fa-icon [icon]="faStop" class="fa-xl" [class.disabled]="!playing" (click)="stop()"></fa-icon>
-  </div>
-  <div class="button-row">
-    <tbw-angle-editor wideSpinner [(ngModel)]="latitude" [disableMobileKeyboard]="suppressOsKeyboard" [disabled]="canSaveName"
-        [options]="{ angleStyle: DD, compass: SOUTH_NORTH, decimalPrecision: 1, locale: specificLocale }"></tbw-angle-editor>
-    <tbw-angle-editor wideSpinner [(ngModel)]="longitude" [disableMobileKeyboard]="suppressOsKeyboard" [disabled]="canSaveName"
-        [options]="{ angleStyle: DDD, compass: WEST_EAST, decimalPrecision: 1, locale: specificLocale }"></tbw-angle-editor>
-  </div>
-  <div class="time-text" [class.collapsed]="collapsed" [class.track-time]="trackTime">{{timeText}}</div>
 
-  <app-advanced-options #advancedOptions></app-advanced-options>
-
-  <div *ngIf="showInfoPanel && !collapsed" class="below-control-panel">
-    <ng-container *ngTemplateOutlet="infoErrorPanel"></ng-container>
+  <div *ngIf="smallMobile" id="alt-language-menu" [style.display]="showLanguageMenu ? 'block' : 'none'">
+    <i class="pi pi-times closer" (click)="showLanguageMenu = false"></i>
+    <p-menu [model]="menuLanguageList"></p-menu>
   </div>
-</div>
 
-<div *ngIf="smallMobile" id="alt-language-menu" [style.display]="showLanguageMenu ? 'block' : 'none'">
-  <i class="pi pi-times closer" (click)="showLanguageMenu = false"></i>
-  <p-menu [model]="menuLanguageList"></p-menu>
-</div>
+  <div id="svg-wrapper" [class.wide]="collapsed && !showInfoPanel"
+      [class.post-2018]="appearance === CURRENT || appearance === CURRENT_NO_MAP"
+      [class.orig-1410]="appearance === ORIGINAL_1410">
+    <svg viewBox="0 0 600 600" [class.controls-collapsed]="collapsed" [class.show-info-panel]="showInfoPanel">
+      <defs>
+        <filter id="filterHand" x="0" y="0" width="200%" height="200%">
+          <feOffset result="offOut" in="SourceAlpha" dx="8" dy="8"/>
+          <feGaussianBlur result="blurOut" in="offOut" stdDeviation="4"/>
+          <feComponentTransfer result="fadeOut" in="blurOut">
+            <feFuncA type="linear" slope="0.85"/>
+          </feComponentTransfer>
+          <feBlend in="SourceGraphic" in2="fadeOut" mode="normal"/>
+        </filter>
+        <filter id="filterEcliptic" x="0" y="0" width="200%" height="200%">
+          <feOffset result="offOut" in="SourceAlpha" dx="15" dy="15"/>
+          <feGaussianBlur result="blurOut" in="offOut" stdDeviation="3"/>
+          <feComponentTransfer result="fadeOut" in="blurOut">
+            <feFuncA type="linear" slope="0.55"/>
+          </feComponentTransfer>
+          <feBlend in="SourceGraphic" in2="fadeOut" mode="normal"/>
+        </filter>
+        <filter id="filterRelief" filterUnits="userSpaceOnUse" x="-60%" y="-60%">
+          <feOffset result="shadow" in="SourceAlpha" dx="1" dy="1"/>
+          <feGaussianBlur result="blurOut" in="shadow" stdDeviation="1"/>
+          <feBlend in="SourceGraphic" in2="blurOut" mode="normal"/>
+        </filter>
+        <filter id="filterReliefSimple" filterUnits="userSpaceOnUse" x="-60%" y="-60%">
+          <feOffset in="SourceAlpha" result="shadow" dx="1" dy="1"/>
+          <feBlend in="SourceGraphic" in2="shadow" mode="normal"/>
+        </filter>
+        <symbol id="handData" overflow="visible">
+          <path d="M-4 57C-4 57-6 45-6 42C-8 38-27 18-28 9C-29-2-33-7-33-15C-33-18-30-18-29-18C-21-17-19 2-18 2C-18 2-20-23-16-37C-15-40-11-40-10-37C-8-34-11-5-10-5C-9-5-9-36-7-40C-6-44-1-44 0-41C3-37-1-0 0 0C1 1-1-11 3-16C6-20 11-18 11-13C11-10 8 5 9 5C10 5 11-8 14-12C16-15 21-15 22-10C23-7 19 7 18 11C17 15 13 28 13 32C13 40 21 49 21 49L-4 57z"/>
+        </symbol>
+        <symbol id="handSymbol" overflow="visible">
+          <g transform="scale(0.4)">
+            <use href="#handData" class="handSymbol"/>
+          </g>
+        </symbol>
+        <symbol id="sunBeamData" overflow="visible">
+          <path d="M47 8C55 10 58 4 68 5 S81 1 88 3 S100 -3 100 -3 S96 -2 89 -4 S80 -2 70 -3 S62 -7 47 -8 C55 -9 56 -16 66 -19 S76 -27 84 -27 S93 -37 93 -37 S90 -35 82 -34 S74 -29 65 -27 S56 -28 41 -24 C49 -28 47 -34 55 -40 S63 -51 69 -54 S75 -67 75 -67 S72 -63 66 -60 S60 -53 52 -47 S43 -45 31 -36 C36 -43 32 -48 38 -56 S41 -70 47 -75 S47 -88 47 -88 S46 -84 41 -79 S38 -70 32 -62 S25 -57 17 -45 C19 -52 14 -56 17 -66 S15 -80 18 -86 S14 -99 14 -99 S15 -95 12 -88 S12 -79 9 -69 S4 -62 0 -48 C0 -56 -6 -58 -7 -68 S-13 -80 -12 -87 S-20 -98 -20 -98 S-19 -94 -19 -87 S-16 -78 -15 -68 S-18 -60 -16 -45 C-19 -53 -26 -52 -30 -61 S-40 -71 -41 -78 S-53 -85 -53 -85 S-50 -82 -48 -75 S-42 -68 -38 -59 S-37 -50 -30 -37 C-36 -43 -42 -40 -49 -48 S-61 -53 -65 -59 S-79 -62 -79 -62 S-75 -60 -71 -54 S-63 -50 -56 -43 S-52 -34 -41 -24 C-48 -28 -53 -24 -62 -28 S-76 -29 -82 -33 S-95 -31 -95 -31 S-91 -31 -85 -27 S-76 -25 -67 -21 S-61 -15 -47 -9 C-55 -10 -58 -4 -68 -5 S-81 -1 -88 -3 S-100 3 -100 3 S-96 2 -89 4 S-80 2 -70 3 S-62 7 -47 8 C-55 9 -56 16 -66 19 S-76 27 -84 27 S-93 37 -93 37 S-90 35 -82 34 S-74 29 -65 27 S-56 28 -41 24 C-49 28 -47 34 -55 40 S-63 51 -69 54 S-75 67 -75 67 S-72 63 -66 60 S-60 53 -52 47 S-43 45 -31 36 C-36 43 -32 48 -38 56 S-41 70 -47 75 S-47 88 -47 88 S-46 84 -41 79 S-38 70 -32 62 S-25 57 -17 45 C-19 52 -14 56 -17 66 S-15 80 -18 86 S-14 99 -14 99 S-15 95 -12 88 S-12 79 -9 69 S-4 62 0 48 C0 56 6 58 7 68 S13 80 12 87 S20 98 20 98 S19 94 19 87 S16 78 15 68 S18 60 16 45 C19 53 26 52 30 61 S40 71 41 78 S53 85 53 85 S50 82 48 75 S42 68 38 59 S37 50 30 37 C36 43 42 40 49 48 S61 53 65 59 S79 62 79 62 S75 60 71 54 S63 50 56 43 S52 34 41 24 C48 28 53 24 62 28 S76 29 82 33 S95 31 95 31 S91 31 85 27 S76 25 67 21 S61 15 47 9 "/>
+        </symbol>
+        <symbol id="sunBeamLargeSymbol" overflow="visible">
+          <g transform="scale(0.28)">
+            <use href="#sunBeamData" class="sunBeamLargeSymbol"/>
+          </g>
+        </symbol>
+        <symbol id="sunBeamSmallSymbol" overflow="visible">
+          <g transform="scale(0.23) rotate(10)">
+            <use href="#sunBeamData" class="sunBeamSmallSymbol"/>
+          </g>
+        </symbol>
+        <symbol id="leverRafieData" overflow="visible">
+          <path d="M2.0 -250.0V195.0A5.0 5.0 0 0 1 5.0 200.0v5.0A5.0 5.0 0 0 0 10.0 210.0h0.0A5.0 5.0 0 0 1 15.0 215.0H-15.0A5.0 5.0 0 0 1 -10.0 210.0h0.0A5.0 5.0 0 0 0 -5.0 205.0v-5.0A5.0 5.0 0 0 1 -2.0 195.0V-250.0"/>
+        </symbol>
+        <symbol id="leverRafieSymbol" overflow="visible">
+          <use href="#leverRafieData" class="leverRafieSymbol"/>
+        </symbol>
+        <symbol id="leverData" overflow="visible">
+          <path d="M2.0 -200.0L2.0 -11.313708498984761A4.0 4.0 0 0 0 4.0 -6.928203230275509A8.0 8.0 0 0 1 6.928203230275509 -4.0A4.0 4.0 0 0 0 11.313708498984761 -2.0L100.0 -2.0L100.0 -1.25L200.0 -1.25L200.0 1.25L100.0 1.25L100.0 2.0L11.313708498984761 2.0A4.0 4.0 0 0 0 6.928203230275509 4.0A8.0 8.0 0 0 1 4.0 6.928203230275509A4.0 4.0 0 0 0 2.0 11.313708498984761L2.0 80.0L-2.0 80.0L-2.0 11.313708498984761A4.0 4.0 0 0 0 -4.0 6.928203230275509A8.0 8.0 0 0 1 -6.928203230275509 4.0A4.0 4.0 0 0 0 -11.313708498984761 2.0L-100.0 2.0L-100.0 -2.0L-11.313708498984761 -2.0A4.0 4.0 0 0 0 -6.928203230275509 -4.0A8.0 8.0 0 0 1 -4.0 -6.928203230275509A4.0 4.0 0 0 0 -2.0 -11.313708498984761L-2.0 -200.0"/>
+        </symbol>
+        <symbol id="leverData-1410" overflow="visible">
+          <path d="M2.0 -200.0L2.0 -11.313708498984761A4.0 4.0 0 0 0 4.0 -6.928203230275509A8.0 8.0 0 0 1 6.928203230275509 -4.0A4.0 4.0 0 0 0 11.313708498984761 -2.0L100.0 -2.0L100.0 -1.25L150.0 -1.25L150.0 1.25L100.0 1.25L100.0 2.0L11.313708498984761 2.0A4.0 4.0 0 0 0 6.928203230275509 4.0A8.0 8.0 0 0 1 4.0 6.928203230275509A4.0 4.0 0 0 0 2.0 11.313708498984761L2.0 80.0L-2.0 80.0L-2.0 11.313708498984761A4.0 4.0 0 0 0 -4.0 6.928203230275509A8.0 8.0 0 0 1 -6.928203230275509 4.0A4.0 4.0 0 0 0 -11.313708498984761 2.0L-100.0 2.0L-100.0 -2.0L-11.313708498984761 -2.0A4.0 4.0 0 0 0 -6.928203230275509 -4.0A8.0 8.0 0 0 1 -4.0 -6.928203230275509A4.0 4.0 0 0 0 -2.0 -11.313708498984761L-2.0 -200.0"/>
+        </symbol>
+        <symbol id="leverSymbol" overflow="visible">
+          <use [attr.href]="appearance === ORIGINAL_1410 ? '#leverData-1410' : '#leverData'" class="leverSymbol"/>
+        </symbol>
+        <symbol id="hourAngleStarData" overflow="visible">
+          <path d="M193.0 5.0L197.5 7.8L197.3 2.5L202.0 0.0L197.3 -2.5L197.5 -7.8L193.0 -5.0L188.5 -7.8L188.7 -2.5L184.0 -0.0L188.7 2.5L188.5 7.8"/>
+        </symbol>
+        <symbol id="hourAngleStarSymbol" overflow="visible">
+          <use href="#hourAngleStarData" class="hourAngleStarSymbol"/>
+        </symbol>
+        <radialGradient id="gradient_01" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+          <stop offset="0" style="stop-color:#C8DEE8"/>
+          <stop offset="1" style="stop-color:#14648C"/>
+        </radialGradient>
+        <radialGradient id="gradient_02" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+          <stop offset="0" style="stop-color:#14648C"/>
+          <stop offset="1" style="stop-color:#C8DEE8"/>
+        </radialGradient>
+        <radialGradient id="gradientSunSphere" cx="50%" cy="50%" r="65%" fx="30%" fy="30%">
+          <stop offset="0%" style="stop-color: rgb(255, 255, 255); stop-opacity: 0"/>
+          <stop offset="100%" style="stop-color: rgb(99, 99, 99); stop-opacity: 1"/>
+        </radialGradient>
+        <radialGradient id="gradientMoonSphere" cx="50%" cy="50%" r="55%" fx="30%" fy="30%">
+          <stop offset="0%" style="stop-color: white; stop-opacity: 0.6"/>
+          <stop offset="100%" style="stop-color: #888; stop-opacity: 0.4"/>
+        </radialGradient>
+        <radialGradient id="gradientMoonSphereDark" cx="50%" cy="50%" r="55%" fx="30%" fy="30%">
+          <stop offset="0%" style="stop-color: #AAA; stop-opacity: 1"/>
+          <stop offset="100%" style="stop-color: black; stop-opacity: 0.2"/>
+        </radialGradient>
+        <mask id="baseArea">
+          <g class="maskWhite">
+            <circle cx="0" cy="0" r="250"/>
+          </g>
+        </mask>
+        <mask id="baseArea-center-hole">
+          <g class="maskWhite">
+            <circle cx="0" cy="0" r="250"/>
+            <circle cx="0" cy="0" r="107.7" class="hole"/>
+          </g>
+        </mask>
+        <mask id="dayArea">
+          <g class="maskWhite">
+            <path [attr.d]="self.dayAreaMask"/>
+          </g>
+        </mask>
+        <clipPath id="backgroundArea">
+          <rect x="521.317" y="233.188" width="1024" height="768"/>
+        </clipPath>
+        <radialGradient id="dawn-dusk-gradient">
+          <stop offset="0%" stop-color="#4A374F"/>
+          <stop [attr.offset]="self.duskGradientAdjustment + '%'" stop-color="#4A374F"/>
+          <stop [attr.offset]="((100 + self.duskGradientAdjustment) / 2) + '%'" stop-color="#A92237"/>
+          <stop offset="100%" stop-color="#C81B2F"/>
+        </radialGradient>
+      </defs>
 
-<div id="svg-wrapper"
-    [class.post-2018]="appearance === CURRENT || appearance === CURRENT_NO_MAP"
-    [class.orig-1410]="appearance === ORIGINAL_1410">
-  <svg viewBox="0 0 600 600" xml:space="preserve" [class.controls-collapsed]="collapsed">
-    <defs>
-      <filter id="filterHand" x="0" y="0" width="200%" height="200%">
-        <feOffset result="offOut" in="SourceAlpha" dx="8" dy="8"/>
-        <feGaussianBlur result="blurOut" in="offOut" stdDeviation="4"/>
-        <feComponentTransfer result="fadeOut" in="blurOut">
-          <feFuncA type="linear" slope="0.85"/>
-        </feComponentTransfer>
-        <feBlend in="SourceGraphic" in2="fadeOut" mode="normal"/>
-      </filter>
-      <filter id="filterEcliptic" x="0" y="0" width="200%" height="200%">
-        <feOffset result="offOut" in="SourceAlpha" dx="15" dy="15"/>
-        <feGaussianBlur result="blurOut" in="offOut" stdDeviation="3"/>
-        <feComponentTransfer result="fadeOut" in="blurOut">
-          <feFuncA type="linear" slope="0.55"/>
-        </feComponentTransfer>
-        <feBlend in="SourceGraphic" in2="fadeOut" mode="normal"/>
-      </filter>
-      <filter id="filterRelief" filterUnits="userSpaceOnUse" x="-60%" y="-60%">
-        <feOffset result="offOut" in="SourceAlpha" dx="1" dy="1"/>
-        <feGaussianBlur result="blurOut" in="offOut" stdDeviation="1"/>
-        <feBlend in="SourceGraphic" in2="blurOut" mode="normal"/>
-      </filter>
-      <symbol id="handData" overflow="visible">
-        <path d="M-4 57C-4 57-6 45-6 42C-8 38-27 18-28 9C-29-2-33-7-33-15C-33-18-30-18-29-18C-21-17-19 2-18 2C-18 2-20-23-16-37C-15-40-11-40-10-37C-8-34-11-5-10-5C-9-5-9-36-7-40C-6-44-1-44 0-41C3-37-1-0 0 0C1 1-1-11 3-16C6-20 11-18 11-13C11-10 8 5 9 5C10 5 11-8 14-12C16-15 21-15 22-10C23-7 19 7 18 11C17 15 13 28 13 32C13 40 21 49 21 49L-4 57z"/>
-      </symbol>
-      <symbol id="handSymbol" overflow="visible">
-        <g transform="scale(0.4)">
-          <use href="#handData" class="handSymbol"/>
-        </g>
-      </symbol>
-      <symbol id="sunBeamData" overflow="visible">
-        <path d="M47 8C55 10 58 4 68 5 S81 1 88 3 S100 -3 100 -3 S96 -2 89 -4 S80 -2 70 -3 S62 -7 47 -8 C55 -9 56 -16 66 -19 S76 -27 84 -27 S93 -37 93 -37 S90 -35 82 -34 S74 -29 65 -27 S56 -28 41 -24 C49 -28 47 -34 55 -40 S63 -51 69 -54 S75 -67 75 -67 S72 -63 66 -60 S60 -53 52 -47 S43 -45 31 -36 C36 -43 32 -48 38 -56 S41 -70 47 -75 S47 -88 47 -88 S46 -84 41 -79 S38 -70 32 -62 S25 -57 17 -45 C19 -52 14 -56 17 -66 S15 -80 18 -86 S14 -99 14 -99 S15 -95 12 -88 S12 -79 9 -69 S4 -62 0 -48 C0 -56 -6 -58 -7 -68 S-13 -80 -12 -87 S-20 -98 -20 -98 S-19 -94 -19 -87 S-16 -78 -15 -68 S-18 -60 -16 -45 C-19 -53 -26 -52 -30 -61 S-40 -71 -41 -78 S-53 -85 -53 -85 S-50 -82 -48 -75 S-42 -68 -38 -59 S-37 -50 -30 -37 C-36 -43 -42 -40 -49 -48 S-61 -53 -65 -59 S-79 -62 -79 -62 S-75 -60 -71 -54 S-63 -50 -56 -43 S-52 -34 -41 -24 C-48 -28 -53 -24 -62 -28 S-76 -29 -82 -33 S-95 -31 -95 -31 S-91 -31 -85 -27 S-76 -25 -67 -21 S-61 -15 -47 -9 C-55 -10 -58 -4 -68 -5 S-81 -1 -88 -3 S-100 3 -100 3 S-96 2 -89 4 S-80 2 -70 3 S-62 7 -47 8 C-55 9 -56 16 -66 19 S-76 27 -84 27 S-93 37 -93 37 S-90 35 -82 34 S-74 29 -65 27 S-56 28 -41 24 C-49 28 -47 34 -55 40 S-63 51 -69 54 S-75 67 -75 67 S-72 63 -66 60 S-60 53 -52 47 S-43 45 -31 36 C-36 43 -32 48 -38 56 S-41 70 -47 75 S-47 88 -47 88 S-46 84 -41 79 S-38 70 -32 62 S-25 57 -17 45 C-19 52 -14 56 -17 66 S-15 80 -18 86 S-14 99 -14 99 S-15 95 -12 88 S-12 79 -9 69 S-4 62 0 48 C0 56 6 58 7 68 S13 80 12 87 S20 98 20 98 S19 94 19 87 S16 78 15 68 S18 60 16 45 C19 53 26 52 30 61 S40 71 41 78 S53 85 53 85 S50 82 48 75 S42 68 38 59 S37 50 30 37 C36 43 42 40 49 48 S61 53 65 59 S79 62 79 62 S75 60 71 54 S63 50 56 43 S52 34 41 24 C48 28 53 24 62 28 S76 29 82 33 S95 31 95 31 S91 31 85 27 S76 25 67 21 S61 15 47 9 "/>
-      </symbol>
-      <symbol id="sunBeamLargeSymbol" overflow="visible">
-        <g transform="scale(0.28)">
-          <use href="#sunBeamData" class="sunBeamLargeSymbol"/>
-        </g>
-      </symbol>
-      <symbol id="sunBeamSmallSymbol" overflow="visible">
-        <g transform="scale(0.23) rotate(10)">
-          <use href="#sunBeamData" class="sunBeamSmallSymbol"/>
-        </g>
-      </symbol>
-      <symbol id="leverRafieData" overflow="visible">
-        <path d="M2.0 -250.0V195.0A5.0 5.0 0 0 1 5.0 200.0v5.0A5.0 5.0 0 0 0 10.0 210.0h0.0A5.0 5.0 0 0 1 15.0 215.0H-15.0A5.0 5.0 0 0 1 -10.0 210.0h0.0A5.0 5.0 0 0 0 -5.0 205.0v-5.0A5.0 5.0 0 0 1 -2.0 195.0V-250.0"/>
-      </symbol>
-      <symbol id="leverRafieSymbol" overflow="visible">
-        <use href="#leverRafieData" class="leverRafieSymbol"/>
-      </symbol>
-      <symbol id="leverData" overflow="visible">
-        <path d="M2.0 -200.0L2.0 -11.313708498984761A4.0 4.0 0 0 0 4.0 -6.928203230275509A8.0 8.0 0 0 1 6.928203230275509 -4.0A4.0 4.0 0 0 0 11.313708498984761 -2.0L100.0 -2.0L100.0 -1.25L200.0 -1.25L200.0 1.25L100.0 1.25L100.0 2.0L11.313708498984761 2.0A4.0 4.0 0 0 0 6.928203230275509 4.0A8.0 8.0 0 0 1 4.0 6.928203230275509A4.0 4.0 0 0 0 2.0 11.313708498984761L2.0 80.0L-2.0 80.0L-2.0 11.313708498984761A4.0 4.0 0 0 0 -4.0 6.928203230275509A8.0 8.0 0 0 1 -6.928203230275509 4.0A4.0 4.0 0 0 0 -11.313708498984761 2.0L-100.0 2.0L-100.0 -2.0L-11.313708498984761 -2.0A4.0 4.0 0 0 0 -6.928203230275509 -4.0A8.0 8.0 0 0 1 -4.0 -6.928203230275509A4.0 4.0 0 0 0 -2.0 -11.313708498984761L-2.0 -200.0"/>
-      </symbol>
-      <symbol id="leverData-1410" overflow="visible">
-        <path d="M2.0 -200.0L2.0 -11.313708498984761A4.0 4.0 0 0 0 4.0 -6.928203230275509A8.0 8.0 0 0 1 6.928203230275509 -4.0A4.0 4.0 0 0 0 11.313708498984761 -2.0L100.0 -2.0L100.0 -1.25L150.0 -1.25L150.0 1.25L100.0 1.25L100.0 2.0L11.313708498984761 2.0A4.0 4.0 0 0 0 6.928203230275509 4.0A8.0 8.0 0 0 1 4.0 6.928203230275509A4.0 4.0 0 0 0 2.0 11.313708498984761L2.0 80.0L-2.0 80.0L-2.0 11.313708498984761A4.0 4.0 0 0 0 -4.0 6.928203230275509A8.0 8.0 0 0 1 -6.928203230275509 4.0A4.0 4.0 0 0 0 -11.313708498984761 2.0L-100.0 2.0L-100.0 -2.0L-11.313708498984761 -2.0A4.0 4.0 0 0 0 -6.928203230275509 -4.0A8.0 8.0 0 0 1 -4.0 -6.928203230275509A4.0 4.0 0 0 0 -2.0 -11.313708498984761L-2.0 -200.0"/>
-      </symbol>
-      <symbol id="leverSymbol" overflow="visible">
-        <use [attr.href]="appearance === ORIGINAL_1410 ? '#leverData-1410' : '#leverData'" class="leverSymbol"/>
-      </symbol>
-      <symbol id="hourAngleStarData" overflow="visible">
-        <path d="M193.0 5.0L197.5 7.8L197.3 2.5L202.0 0.0L197.3 -2.5L197.5 -7.8L193.0 -5.0L188.5 -7.8L188.7 -2.5L184.0 -0.0L188.7 2.5L188.5 7.8"/>
-      </symbol>
-      <symbol id="hourAngleStarSymbol" overflow="visible">
-        <use href="#hourAngleStarData" class="hourAngleStarSymbol"/>
-      </symbol>
-      <radialGradient id="gradient_01" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-        <stop offset="0" style="stop-color:#C8DEE8"/>
-        <stop offset="1" style="stop-color:#14648C"/>
-      </radialGradient>
-      <radialGradient id="gradient_02" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-        <stop offset="0" style="stop-color:#14648C"/>
-        <stop offset="1" style="stop-color:#C8DEE8"/>
-      </radialGradient>
-      <radialGradient id="gradientSunSphere" cx="50%" cy="50%" r="65%" fx="30%" fy="30%">
-        <stop offset="0%" style="stop-color: rgb(255, 255, 255); stop-opacity: 0"/>
-        <stop offset="100%" style="stop-color: rgb(99, 99, 99); stop-opacity: 1"/>
-      </radialGradient>
-      <radialGradient id="gradientMoonSphere" cx="50%" cy="50%" r="55%" fx="30%" fy="30%">
-        <stop offset="0%" style="stop-color: white; stop-opacity: 0.6"/>
-        <stop offset="100%" style="stop-color: #888; stop-opacity: 0.4"/>
-      </radialGradient>
-      <radialGradient id="gradientMoonSphereDark" cx="50%" cy="50%" r="55%" fx="30%" fy="30%">
-        <stop offset="0%" style="stop-color: #AAA; stop-opacity: 1"/>
-        <stop offset="100%" style="stop-color: black; stop-opacity: 0.2"/>
-      </radialGradient>
-      <mask id="baseArea">
-        <g class="maskWhite">
-          <circle cx="0" cy="0" r="250"/>
-        </g>
-      </mask>
-      <mask id="baseArea-center-hole">
-        <g class="maskWhite">
-          <circle cx="0" cy="0" r="250"/>
-          <circle cx="0" cy="0" r="107.7" class="hole"/>
-        </g>
-      </mask>
-      <mask id="dayArea">
-        <g class="maskWhite">
-          <path [attr.d]="self.dayAreaMask"/>
-        </g>
-      </mask>
-      <clipPath id="backgroundArea">
-        <rect x="521.317" y="233.188" width="1024" height="768"/>
-      </clipPath>
-      <radialGradient id="dawn-dusk-gradient">
-        <stop offset="0%" stop-color="#4A374F"/>
-        <stop [attr.offset]="self.duskGradientAdjustment + '%'" stop-color="#4A374F"/>
-        <stop [attr.offset]="((100 + self.duskGradientAdjustment) / 2) + '%'" stop-color="#A92237"/>
-        <stop offset="100%" stop-color="#C81B2F"/>
-      </radialGradient>
-    </defs>
-
-    <g transform="translate(300, 300)" class="content">
-      <g id="base">
-        <g id="unequalHourAreas" mask="url('#baseArea')">
-          <circle *ngIf="self.midnightSunR" cx="0" cy="0" r="250" class="midnightSunColor"/>
-          <circle cx="0" cy="0" [attr.r]="self.midnightSunR ? self.midnightSunR : 250" class="unequalHour6"/>
-          <path *ngFor='let item of [].constructor(11); let i = index'
-              [attr.d]="self.hourWedges[i + 1]" class="unequalHourArea unequalHour{{i < 5 ? i + 1 : 11 - i }}"/>
-          <circle id="horizonArea" [attr.r]="self.horizonR" cx="0" [attr.cy]="self.horizonCy" class="horizonArea"/>
-          <circle id="darkArea" [attr.r]="self.darkR" cx="0" [attr.cy]="self.darkCy" class="darkArea"/>
-        </g>
-        <g id="unequalHourLabels"/>
-        <g id="eventLabels">
-          <path id="dawnPath" [attr.d]="self.dawnLabelPath" class="textPath"/>
-          <path id="duskPath" [attr.d]="self.duskLabelPath" class="textPath"/>
-          <path id="sunrisePath" [attr.d]="self.sunriseLabelPath" class="textPath"/>
-          <path id="sunsetPath" [attr.d]="self.sunsetLabelPath" class="textPath"/>
-          <path id="solNoctis" [attr.d]="self.solNoctisPath" class="textPath"/>
-          <path id="c-capricorni-path" d="M -49.5 85.7 A 99 99 0 0 0 49.5 85.7" class="textPath"/>
-          <path id="equator-path" d="M -78 135 A 156 156 0 0 0 78 135" class="textPath"/>
-          <path id="c-cancri-path" d="M -62.3 232.8 A 241 241 0 0 0 62.3 232.8" class="textPath"/>
-          <!-- cspell:disable -->
-          <text>
-            <textPath href="#sunrisePath" [attr.startOffset]="self.southern ? '40%' : '54%'" class="eventText">
-              <tspan [style.font-size]="self.riseSetFontSize">ɐɑɒɓɔ</tspan><!-- ORTUS -->
-            </textPath>
-          </text>
-          <text>
-            <textPath href="#dawnPath" [attr.startOffset]="dawnTextOffset" class="eventText">
-              <tspan dy="1" [style.font-size]="dawnDuskFontSize">ɜɝɞɟɠɡ</tspan><!-- AURORA -->
-            </textPath>
-          </text>
-          <text>
-            <textPath href="#sunsetPath" [attr.startOffset]="self.southern ? '59%' : '41%'" class="eventText">
-              <tspan [style.font-size]="self.riseSetFontSize">ɕɖɗɘəɚɛ</tspan><!-- OCCASUS -->
-            </textPath>
-          </text>
-          <text>
-            <textPath href="#duskPath" [attr.startOffset]="self.duskTextOffset" class="eventText">
-              <tspan dy="1" [style.font-size]="dawnDuskFontSize">ɢɣɤɥɦɧɨɩɪɫɬ</tspan><!-- CREPUSCULUM -->
-            </textPath>
-          </text>
-          <text *ngIf="self.midnightSunR">
-            <textPath href="#solNoctis" startOffset="54%" class="eventText sol-noctis">
-              <tspan dy="-2">SOL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NOCTIS</tspan>
-            </textPath>
-          </text>
-          <ng-container *ngIf="appearance === ORIGINAL_1410">
-            <text *ngIf="latitude > -80 && latitude < 80">
-              <textPath href="#equator-path" startOffset="50%" class="latitude-text">
-                <tspan dy="-2">CIRCVLVS&nbsp;AEQVINOCTII</tspan>
+      <g transform="translate(300, 300)" class="content">
+        <g id="base">
+          <g id="unequalHourAreas" mask="url('#baseArea')">
+            <circle *ngIf="self.midnightSunR" cx="0" cy="0" r="250" class="midnightSunColor"/>
+            <circle cx="0" cy="0" [attr.r]="self.midnightSunR ? self.midnightSunR : 250" class="unequalHour6"/>
+            <path *ngFor='let item of [].constructor(11); let i = index'
+                [attr.d]="self.hourWedges[i + 1]" class="unequalHourArea unequalHour{{i < 5 ? i + 1 : 11 - i }}"/>
+            <circle id="horizonArea" [attr.r]="self.horizonR" cx="0" [attr.cy]="self.horizonCy" class="horizonArea"/>
+            <circle id="darkArea" [attr.r]="self.darkR" cx="0" [attr.cy]="self.darkCy" class="darkArea"/>
+          </g>
+          <g id="unequalHourLabels"/>
+          <g id="eventLabels">
+            <path id="dawnPath" [attr.d]="self.dawnLabelPath" class="textPath"/>
+            <path id="duskPath" [attr.d]="self.duskLabelPath" class="textPath"/>
+            <path id="sunrisePath" [attr.d]="self.sunriseLabelPath" class="textPath"/>
+            <path id="sunsetPath" [attr.d]="self.sunsetLabelPath" class="textPath"/>
+            <path id="solNoctis" [attr.d]="self.solNoctisPath" class="textPath"/>
+            <path id="c-capricorni-path" d="M -49.5 85.7 A 99 99 0 0 0 49.5 85.7" class="textPath"/>
+            <path id="equator-path" d="M -78 135 A 156 156 0 0 0 78 135" class="textPath"/>
+            <path id="c-cancri-path" d="M -62.3 232.8 A 241 241 0 0 0 62.3 232.8" class="textPath"/>
+            <!-- cspell:disable -->
+            <text>
+              <textPath href="#sunrisePath" [attr.startOffset]="self.southern ? '40%' : '54%'" class="eventText">
+                <tspan [style.font-size]="self.riseSetFontSize">ɐɑɒɓɔ</tspan><!-- ORTUS -->
               </textPath>
             </text>
-            <ng-container *ngIf="!self.southern">
-              <text *ngIf="latitude < 56">
-                <textPath href="#c-cancri-path" startOffset="46%" class="latitude-text">
-                  <tspan dy="-2">CIRCVLVS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CANCRI</tspan>
+            <text>
+              <textPath href="#dawnPath" [attr.startOffset]="dawnTextOffset" class="eventText">
+                <tspan dy="1" [style.font-size]="dawnDuskFontSize">ɜɝɞɟɠɡ</tspan><!-- AURORA -->
+              </textPath>
+            </text>
+            <text>
+              <textPath href="#sunsetPath" [attr.startOffset]="self.southern ? '59%' : '41%'" class="eventText">
+                <tspan [style.font-size]="self.riseSetFontSize">ɕɖɗɘəɚɛ</tspan><!-- OCCASUS -->
+              </textPath>
+            </text>
+            <text>
+              <textPath href="#duskPath" [attr.startOffset]="self.duskTextOffset" class="eventText">
+                <tspan dy="1" [style.font-size]="dawnDuskFontSize">ɢɣɤɥɦɧɨɩɪɫɬ</tspan><!-- CREPUSCULUM -->
+              </textPath>
+            </text>
+            <text *ngIf="self.midnightSunR">
+              <textPath href="#solNoctis" startOffset="54%" class="eventText sol-noctis">
+                <tspan dy="-2">SOL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NOCTIS</tspan>
+              </textPath>
+            </text>
+            <ng-container *ngIf="appearance === ORIGINAL_1410">
+              <text *ngIf="latitude > -80 && latitude < 80">
+                <textPath href="#equator-path" startOffset="50%" class="latitude-text">
+                  <tspan dy="-2">CIRCVLVS&nbsp;AEQVINOCTII</tspan>
                 </textPath>
               </text>
-              <text>
-                <textPath href="#c-capricorni-path" startOffset="50%" class="latitude-text">
-                  <tspan dy="-2">CIRCVLVS&nbsp;CAPRICORNI</tspan>
-                </textPath>
-              </text>
+              <ng-container *ngIf="!self.southern">
+                <text *ngIf="latitude < 56">
+                  <textPath href="#c-cancri-path" startOffset="46%" class="latitude-text">
+                    <tspan dy="-2">CIRCVLVS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CANCRI</tspan>
+                  </textPath>
+                </text>
+                <text>
+                  <textPath href="#c-capricorni-path" startOffset="50%" class="latitude-text">
+                    <tspan dy="-2">CIRCVLVS&nbsp;CAPRICORNI</tspan>
+                  </textPath>
+                </text>
+              </ng-container>
+              <ng-container *ngIf="self.southern">
+                <text *ngIf="latitude > -56">
+                  <textPath href="#c-cancri-path" startOffset="52%" class="latitude-text smaller">
+                    <tspan dy="-2">CIRCVLVS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CAPRICORNI</tspan>
+                  </textPath>
+                </text>
+                <text>
+                  <textPath href="#c-capricorni-path" startOffset="50%" class="latitude-text">
+                    <tspan dy="-2">CIRCVLVS&nbsp;CANCRI</tspan>
+                  </textPath>
+                </text>
+              </ng-container>
             </ng-container>
-            <ng-container *ngIf="self.southern">
-              <text *ngIf="latitude > -56">
-                <textPath href="#c-cancri-path" startOffset="52%" class="latitude-text smaller">
-                  <tspan dy="-2">CIRCVLVS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CAPRICORNI</tspan>
-                </textPath>
-              </text>
-              <text>
-                <textPath href="#c-capricorni-path" startOffset="50%" class="latitude-text">
-                  <tspan dy="-2">CIRCVLVS&nbsp;CANCRI</tspan>
-                </textPath>
-              </text>
-            </ng-container>
-          </ng-container>
-          <!-- cspell:enable -->
+            <!-- cspell:enable -->
+          </g>
+          <g id="time" [class.four-as-iiii]="altFour">
+            <path id="timeTextPath" d="M0.0 -221.0C122.0 -221.0 221.0 -122.0 221.0 0.0C221.0 122.0 122.0 221.0 0.0 221.0C-122.0 221.0 -221.0 122.0 -221.0 0.0C-221.0 -122.0 -122.0 -221.0 0.0 -221.0" class="textPath"/>
+            <g *ngIf="!self.southern" [attr.filter]="filterRelief" [innerHTML]="self.romanHours | safe"/>
+            <g *ngIf="self.southern" [attr.filter]="filterRelief" [innerHTML]="self.romanHoursSouth | safe"/>
+          </g>
+          <g id="unequalHourBorders" mask="url('#dayArea')" [attr.stroke-width]="self.hourStroke + 'px'">
+            <path *ngFor='let item of [].constructor(11); let i = index'
+                [attr.d]="self.hourArcs[i + 1]" class="unequalHourBorder" [attr.filter]="filterRelief"/>
+            <path d="M0 0L0 -400" class="unequalHourBorder" [attr.filter]="filterRelief"/>
+          </g>
+          <g id="horizonBorder" [attr.mask]="emptyCenter ? 'url(&quot;#baseArea-center-hole&quot;)': 'url(&quot;#baseArea&quot;)'"
+              [attr.filter]="filterRelief">
+            <circle *ngIf="self.midnightSunR" [attr.r]="self.midnightSunR" cx="0" cy="0" class="midnightSunCircle"/>
+            <circle id="horizonBorder" [attr.r]="self.horizonR" cx="0" [attr.cy]="self.horizonCy" class="baseCircle"/>
+          </g>
+          <g id="baseCircles" [attr.filter]="filterRelief">
+            <circle cx="0" cy="0" r="107.7" class="baseCircle innerCircle" [style.fill]="emptyCenter ? 'none' : null"/>
+            <circle cx="0" cy="0" r="164.1" class="baseCircle"/>
+            <circle cx="0" cy="0" r="253" class="ring-gap"/>
+            <circle cx="0" cy="0" r="250" class="baseCircle"/>
+          </g>
         </g>
-        <g id="time" [class.four-as-iiii]="altFour">
-          <path id="timeTextPath" d="M0.0 -221.0C122.0 -221.0 221.0 -122.0 221.0 0.0C221.0 122.0 122.0 221.0 0.0 221.0C-122.0 221.0 -221.0 122.0 -221.0 0.0C-221.0 -122.0 -122.0 -221.0 0.0 -221.0" class="textPath"/>
-          <g *ngIf="!self.southern" [attr.filter]="filterRelief" [innerHTML]="self.romanHours | safe"/>
-          <g *ngIf="self.southern" [attr.filter]="filterRelief" [innerHTML]="self.romanHoursSouth | safe"/>
-        </g>
-        <g id="unequalHourBorders" mask="url('#dayArea')" [attr.stroke-width]="self.hourStroke + 'px'">
-          <path *ngFor='let item of [].constructor(11); let i = index'
-              [attr.d]="self.hourArcs[i + 1]" class="unequalHourBorder" [attr.filter]="filterRelief"/>
-          <path d="M0 0L0 -400" class="unequalHourBorder" [attr.filter]="filterRelief"/>
-        </g>
-        <g id="horizonBorder" [attr.mask]="emptyCenter ? 'url(&quot;#baseArea-center-hole&quot;)': 'url(&quot;#baseArea&quot;)'"
-            [attr.filter]="filterRelief">
-          <circle *ngIf="self.midnightSunR" [attr.r]="self.midnightSunR" cx="0" cy="0" class="midnightSunCircle"/>
-          <circle id="horizonBorder" [attr.r]="self.horizonR" cx="0" [attr.cy]="self.horizonCy" class="baseCircle"/>
-        </g>
-        <g id="baseCircles" [attr.filter]="filterRelief">
-          <circle cx="0" cy="0" r="107.7" class="baseCircle innerCircle" [style.fill]="emptyCenter ? 'none' : null"/>
-          <circle cx="0" cy="0" r="164.1" class="baseCircle"/>
-          <circle cx="0" cy="0" r="253" class="ring-gap"/>
-          <circle cx="0" cy="0" r="250" class="baseCircle"/>
-        </g>
-      </g>
-      <g id="outerRing">
-        <path id="outerRingBackground" d="M0.0 -291.5C-161.0 -291.5 -291.5 -161.0 -291.5 0.0C-291.5 161.0 -161.0 291.5 0.0 291.5C161.0 291.5 291.5 161.0 291.5 0.0C291.5 -161.0 161.0 -291.5 0.0 -291.5M0.0 -258.8C142.9 -258.8 258.8 -142.9 258.8 0.0C258.8 142.9 142.9 258.8 0.0 258.8C-142.9 258.8 -258.8 142.9 -258.8 0.0C-258.8 -142.9 -142.9 -258.8 0.0 -258.8" class="outerRingBackground"/>
-        <path id="outerRingTextPath" d="M0.0 -258.8C142.9 -258.8 258.8 -142.9 258.8 0.0C258.8 142.9 142.9 258.8 0.0 258.8C-142.9 258.8 -258.8 142.9 -258.8 0.0C-258.8 -142.9 -142.9 -258.8 0.0 -258.8" class="textPath"/>
-        <g [attr.filter]="filterRelief">
-          <path id="outerCircle" d="M0.0 -291.5C-161.0 -291.5 -291.5 -161.0 -291.5 0.0C-291.5 161.0 -161.0 291.5 0.0 291.5C161.0 291.5 291.5 161.0 291.5 0.0C291.5 -161.0 161.0 -291.5 0.0 -291.5" class="outerRingBorder"/>
-          <path id="innerCircle" d="M0.0 -258.8C142.9 -258.8 258.8 -142.9 258.8 0.0C258.8 142.9 142.9 258.8 0.0 258.8C-142.9 258.8 -258.8 142.9 -258.8 0.0C-258.8 -142.9 -142.9 -258.8 0.0 -258.8" class="outerRingBorder"/>
-          <g *ngIf="!self.southern" id="outerRingNumbers" [attr.transform]="rotate(outerRingAngle)"
-             [innerHTML]="self.bohemianHours | safe"/>
-          <g *ngIf="self.southern" id="outerRingNumbers" [attr.transform]="rotate(-outerRingAngle)"
-             [innerHTML]="self.bohemianHoursSouth | safe"/>
-        </g>
-      </g>
-    </g>
-  </svg>
-
-  <!-- I would have used <foreignObject> to host the map canvas, but the positioning and layering behavior weren't
-       consistent across browsers, with Safari and Chrome on Android having particular problems. -->
-  <div id="globe-host" [style.opacity]="emptyCenter ? '0' : '1'"></div>
-
-  <svg viewBox="0 0 600 600" xml:space="preserve" class="svg-overlay" [class.controls-collapsed]="collapsed">
-    <defs>
-      <radialGradient cx="25%" cy="25%" r="65%" id="sphere-effect">
-        <stop offset="0%" stop-color="rgba(255, 255, 255, 0.5)"/>
-        <stop offset="40%" stop-color="rgba(255, 255, 255, 0)"/>
-        <stop offset="100%" stop-color="rgba(0, 0, 0, 0.25)"/>
-      </radialGradient>
-    </defs>
-    <g transform="translate(300, 300)" class="content">
-      <g id="frontPart">
-        <g [attr.filter]="filterHand">
+        <g id="outerRing">
+          <path id="outerRingBackground" d="M0.0 -291.5C-161.0 -291.5 -291.5 -161.0 -291.5 0.0C-291.5 161.0 -161.0 291.5 0.0 291.5C161.0 291.5 291.5 161.0 291.5 0.0C291.5 -161.0 161.0 -291.5 0.0 -291.5M0.0 -258.8C142.9 -258.8 258.8 -142.9 258.8 0.0C258.8 142.9 142.9 258.8 0.0 258.8C-142.9 258.8 -258.8 142.9 -258.8 0.0C-258.8 -142.9 -142.9 -258.8 0.0 -258.8" class="outerRingBackground"/>
+          <path id="outerRingTextPath" d="M0.0 -258.8C142.9 -258.8 258.8 -142.9 258.8 0.0C258.8 142.9 142.9 258.8 0.0 258.8C-142.9 258.8 -258.8 142.9 -258.8 0.0C-258.8 -142.9 -142.9 -258.8 0.0 -258.8" class="textPath"/>
           <g [attr.filter]="filterRelief">
-            <g *ngIf="detailedMechanism" id="moon-hand" [attr.transform]="rotate(moonHandAngle * rotateSign)"
-                [style.opacity]="translucentEcliptic ? '0.4' : '1'">
-              <use href="#leverRafieSymbol" class="leverRafieSymbol"/>
-              <path d="M0 0L0 -250.0" class="leverRafieSymbol"/>
-            </g>
-            <g id="hand" [attr.transform]="rotate(handAngle * rotateSign)">
-              <use href="#leverRafieSymbol" class="leverRafieSymbol"/>
-              <path d="M0 0L0 -250.0" class="leverRafieGolden"/>
-              <g transform="translate(0,-250.0)">
-                <use href="#handSymbol"/>
+            <path id="outerCircle" d="M0.0 -291.5C-161.0 -291.5 -291.5 -161.0 -291.5 0.0C-291.5 161.0 -161.0 291.5 0.0 291.5C161.0 291.5 291.5 161.0 291.5 0.0C291.5 -161.0 161.0 -291.5 0.0 -291.5" class="outerRingBorder"/>
+            <path id="innerCircle" d="M0.0 -258.8C142.9 -258.8 258.8 -142.9 258.8 0.0C258.8 142.9 142.9 258.8 0.0 258.8C-142.9 258.8 -258.8 142.9 -258.8 0.0C-258.8 -142.9 -142.9 -258.8 0.0 -258.8" class="outerRingBorder"/>
+            <g *ngIf="!self.southern" id="outerRingNumbers" [attr.transform]="rotate(outerRingAngle)"
+               [innerHTML]="self.bohemianHours | safe"/>
+            <g *ngIf="self.southern" id="outerRingNumbers" [attr.transform]="rotate(outerRingAngle)"
+               [innerHTML]="self.bohemianHoursSouth | safe"/>
+          </g>
+        </g>
+      </g>
+    </svg>
+
+    <!-- I would have used <foreignObject> to host the map canvas, but the positioning and layering behavior weren't
+         consistent across browsers, with Safari and Chrome on Android having particular problems. -->
+    <div id="globe-host" [style.opacity]="emptyCenter ? '0' : '1'"></div>
+
+    <svg viewBox="0 0 600 600" class="svg-overlay" [class.controls-collapsed]="collapsed"
+        [class.show-info-panel]="showInfoPanel">
+      <defs>
+        <radialGradient id="sphere-effect" cx="25%" cy="25%" r="65%">
+          <stop offset="0%" stop-color="rgba(255, 255, 255, 0.5)"/>
+          <stop offset="40%" stop-color="rgba(255, 255, 255, 0)"/>
+          <stop offset="100%" stop-color="rgba(0, 0, 0, 0.25)"/>
+        </radialGradient>
+      </defs>
+      <g transform="translate(300, 300)" class="content">
+        <g id="frontPart">
+          <g [attr.filter]="filterHand">
+            <g [attr.filter]="filterRelief">
+              <g *ngIf="detailedMechanism" id="moon-hand" [attr.transform]="rotate(moonHandAngle)"
+                  [style.opacity]="translucentEcliptic ? '0.4' : '1'">
+                <use href="#leverRafieSymbol" class="leverRafieSymbol"/>
+                <path d="M0 0L0 -250.0" class="leverRafieSymbol"/>
+              </g>
+              <g id="hand" [attr.transform]="rotate(handAngle)">
+                <use href="#leverRafieSymbol" class="leverRafieSymbol"/>
+                <path d="M0 0L0 -250.0" class="leverRafieGolden"/>
+                <g transform="translate(0,-250.0)">
+                  <use href="#handSymbol"/>
+                </g>
               </g>
             </g>
           </g>
-        </g>
-        <g [attr.filter]="filterEcliptic"
-            [style.opacity]="translucentEcliptic ? '0.33' : '1'">
-          <g [attr.filter]="filterRelief">
-            <g id="ecliptic_positive_levers" [attr.transform]="rotate(siderealAngle * rotateSign)">
-              <use href="#leverSymbol" class="leverSymbol"/>
+          <g [attr.filter]="filterEcliptic"
+              [style.opacity]="translucentEcliptic ? '0.33' : '1'">
+            <g [attr.filter]="filterRelief">
+              <g id="ecliptic_positive_levers" [attr.transform]="rotate(siderealAngle)">
+                <use href="#leverSymbol" class="leverSymbol"/>
+              </g>
             </g>
-          </g>
-          <g *ngIf="appearance !== ORIGINAL_1410" [attr.filter]="filterRelief">
-            <g id="ecliptic_positive_hourAngleStar" [attr.transform]="rotate(siderealAngle * rotateSign)">
-              <use href="#hourAngleStarSymbol" class="hourAngleStarSymbol"/>
+            <g *ngIf="appearance !== ORIGINAL_1410" [attr.filter]="filterRelief">
+              <g id="ecliptic_positive_hourAngleStar" [attr.transform]="rotate(siderealAngle)">
+                <use href="#hourAngleStarSymbol" class="hourAngleStarSymbol"/>
+              </g>
             </g>
-          </g>
-          <g id="ecliptic_positive_signsArea" [attr.transform]="rotate(siderealAngle * rotateSign)">
-            <g transform="translate(0, -71.1)">
-              <path d="M0.0 -161.0C88.9 -161.0 161.0 -88.9 161.0 0.0C161.0 88.9 88.9 161.0 0.0 161.0C-88.9 161.0 -161.0 88.9 -161.0 0.0C-161.0 -88.9 -88.9 -161.0 0.0 -161.0M0.0 -116.3C-64.2 -116.3 -116.3 -64.2 -116.3 0.0C-116.3 64.2 -64.2 116.3 0.0 116.3C64.2 116.3 116.3 64.2 116.3 0.0C116.3 -64.2 64.2 -116.3 0.0 -116.3" class="signsArea"/>
-            </g>
-          </g>
-          <g [attr.filter]="filterRelief">
-            <g id="ecliptic_positive_ecliptic" [attr.transform]="rotate(siderealAngle * rotateSign)">
+            <g id="ecliptic_positive_signsArea" [attr.transform]="rotate(siderealAngle)">
               <g transform="translate(0, -71.1)">
-                <g id="disc">
-                  <circle cx="0" cy="0" r="178.9" class="eclipticCircle"/>
-                  <circle cx="0" cy="0" r="161.0" class="eclipticCircle"/>
-                  <circle cx="0" cy="0" r="116.3" class="eclipticCircle"/>
-                  <mask id="maskSmall">
-                    <path d="M0.0 -178.9C98.8 -178.9 178.9 -98.8 178.9 0.0C178.9 98.8 98.8 178.9 0.0 178.9C-98.8 178.9 -178.9 98.8 -178.9 0.0C-178.9 -98.8 -98.8 -178.9 0.0 -178.9M0.0 -161.0C-88.9 -161.0 -161.0 -88.9 -161.0 0.0C-161.0 88.9 -88.9 161.0 0.0 161.0C88.9 161.0 161.0 88.9 161.0 0.0C161.0 -88.9 88.9 -161.0 0.0 -161.0" class="maskWhite"/>
-                  </mask>
-                  <mask id="maskLarge">
-                    <path d="M0.0 -178.9C98.8 -178.9 178.9 -98.8 178.9 0.0C178.9 98.8 98.8 178.9 0.0 178.9C-98.8 178.9 -178.9 98.8 -178.9 0.0C-178.9 -98.8 -98.8 -178.9 0.0 -178.9M0.0 -116.3C-64.2 -116.3 -116.3 -64.2 -116.3 0.0C-116.3 64.2 -64.2 116.3 0.0 116.3C64.2 116.3 116.3 64.2 116.3 0.0C116.3 -64.2 64.2 -116.3 0.0 -116.3" class="maskWhite"/>
-                  </mask>
-                  <g mask="url('#maskSmall')" [innerHTML]="self.eclipticMinorTicks | safe"/>
-                  <g mask="url('#maskLarge')" [innerHTML]="self.eclipticMajorTicks | safe"/>
-                </g>
-                <g *ngIf="!self.southern" id="symbols" transform="translate(0, 71.1)">
-                  <g transform="rotate(74) translate(0,-117)">
-                    <text class="eclipticSymbol">♈&#xFE0E;</text>
+                <path d="M0.0 -161.0C88.9 -161.0 161.0 -88.9 161.0 0.0C161.0 88.9 88.9 161.0 0.0 161.0C-88.9 161.0 -161.0 88.9 -161.0 0.0C-161.0 -88.9 -88.9 -161.0 0.0 -161.0M0.0 -116.3C-64.2 -116.3 -116.3 -64.2 -116.3 0.0C-116.3 64.2 -64.2 116.3 0.0 116.3C64.2 116.3 116.3 64.2 116.3 0.0C116.3 -64.2 64.2 -116.3 0.0 -116.3" class="signsArea"/>
+              </g>
+            </g>
+            <g [attr.filter]="filterRelief">
+              <g id="ecliptic_positive_ecliptic" [attr.transform]="rotate(siderealAngle)">
+                <g transform="translate(0, -71.1)">
+                  <g id="disc">
+                    <circle cx="0" cy="0" r="178.9" class="eclipticCircle"/>
+                    <circle cx="0" cy="0" r="161.0" class="eclipticCircle"/>
+                    <circle cx="0" cy="0" r="116.3" class="eclipticCircle"/>
+                    <mask id="maskSmall">
+                      <path d="M0.0 -178.9C98.8 -178.9 178.9 -98.8 178.9 0.0C178.9 98.8 98.8 178.9 0.0 178.9C-98.8 178.9 -178.9 98.8 -178.9 0.0C-178.9 -98.8 -98.8 -178.9 0.0 -178.9M0.0 -161.0C-88.9 -161.0 -161.0 -88.9 -161.0 0.0C-161.0 88.9 -88.9 161.0 0.0 161.0C88.9 161.0 161.0 88.9 161.0 0.0C161.0 -88.9 88.9 -161.0 0.0 -161.0" class="maskWhite"/>
+                    </mask>
+                    <mask id="maskLarge">
+                      <path d="M0.0 -178.9C98.8 -178.9 178.9 -98.8 178.9 0.0C178.9 98.8 98.8 178.9 0.0 178.9C-98.8 178.9 -178.9 98.8 -178.9 0.0C-178.9 -98.8 -98.8 -178.9 0.0 -178.9M0.0 -116.3C-64.2 -116.3 -116.3 -64.2 -116.3 0.0C-116.3 64.2 -64.2 116.3 0.0 116.3C64.2 116.3 116.3 64.2 116.3 0.0C116.3 -64.2 64.2 -116.3 0.0 -116.3" class="maskWhite"/>
+                    </mask>
+                    <g mask="url('#maskSmall')" [innerHTML]="self.eclipticMinorTicks | safe"/>
+                    <g mask="url('#maskLarge')" [innerHTML]="self.eclipticMajorTicks | safe"/>
                   </g>
-                  <g transform="rotate(45) translate(0,-157)">
-                    <text class="eclipticSymbol">♉&#xFE0E;</text>
+                  <g *ngIf="!self.southern" id="symbols" transform="translate(0, 71.1)">
+                    <g transform="rotate(74) translate(0,-117)">
+                      <text class="eclipticSymbol">♈&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(45) translate(0,-157)">
+                      <text class="eclipticSymbol">♉&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(16) translate(0,-183.5) rotate(-1)">
+                      <text class="eclipticSymbol">♊&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(-15) translate(0,-184.5)">
+                      <text class="eclipticSymbol">♋&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(-44) translate(0,-156.5)">
+                      <text class="eclipticSymbol">♌&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(-74) translate(0,-115)">
+                      <text class="eclipticSymbol">♍&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(255.5) translate(0,-76.5)">
+                      <text class="eclipticSymbol">♎&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(225) translate(0,-58)">
+                      <text class="eclipticSymbol">♏&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(195.5) translate(0,-48) scale(0.93)">
+                      <text class="eclipticSymbol">♐&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(164.3) translate(0,-46.3)">
+                      <text class="eclipticSymbol">♑&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(132.5) translate(0,-58.5) rotate(5) scale(0.93)">
+                      <text class="eclipticSymbol">♒&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(104.5) translate(0,-79)">
+                      <text class="eclipticSymbol">♓&#xFE0E;</text>
+                    </g>
                   </g>
-                  <g transform="rotate(16) translate(0,-183.5) rotate(-1)">
-                    <text class="eclipticSymbol">♊&#xFE0E;</text>
-                  </g>
-                  <g transform="rotate(-15) translate(0,-184.5)">
-                    <text class="eclipticSymbol">♋&#xFE0E;</text>
-                  </g>
-                  <g transform="rotate(-44) translate(0,-156.5)">
-                    <text class="eclipticSymbol">♌&#xFE0E;</text>
-                  </g>
-                  <g transform="rotate(-74) translate(0,-115)">
-                    <text class="eclipticSymbol">♍&#xFE0E;</text>
-                  </g>
-                  <g transform="rotate(255.5) translate(0,-76.5)">
-                    <text class="eclipticSymbol">♎&#xFE0E;</text>
-                  </g>
-                  <g transform="rotate(225) translate(0,-58)">
-                    <text class="eclipticSymbol">♏&#xFE0E;</text>
-                  </g>
-                  <g transform="rotate(195.5) translate(0,-48) scale(0.93)">
-                    <text class="eclipticSymbol">♐&#xFE0E;</text>
-                  </g>
-                  <g transform="rotate(164.3) translate(0,-46.3)">
-                    <text class="eclipticSymbol">♑&#xFE0E;</text>
-                  </g>
-                  <g transform="rotate(132.5) translate(0,-58.5) rotate(5) scale(0.93)">
-                    <text class="eclipticSymbol">♒&#xFE0E;</text>
-                  </g>
-                  <g transform="rotate(104.5) translate(0,-79)">
-                    <text class="eclipticSymbol">♓&#xFE0E;</text>
-                  </g>
-                </g>
-                <g *ngIf="self.southern" id="symbols" transform="translate(0, 71.1)">
-                  <g transform="rotate(-63) translate(0,-133) rotate(-66)">
-                    <text class="eclipticSymbol">♈&#xFE0E;</text>
-                  </g>
-                  <g transform="rotate(-39) translate(0,-164) rotate(-42)">
-                    <text class="eclipticSymbol">♉&#xFE0E;</text>
-                  </g>
-                  <g transform="rotate(-15.5) translate(0,-183.5) scale(-1, 1) rotate(-2)">
-                    <text class="eclipticSymbol">♊&#xFE0E;</text>
-                  </g>
-                  <g transform="rotate(13.5) translate(0,-185) rotate(10)">
-                    <text class="eclipticSymbol">♋&#xFE0E;</text>
-                  </g>
-                  <g transform="rotate(41.5) translate(0,-160) rotate(47)">
-                    <text class="eclipticSymbol">♌&#xFE0E;</text>
-                  </g>
-                  <g transform="rotate(65) translate(0,-128) rotate(65)">
-                    <text class="eclipticSymbol">♍&#xFE0E;</text>
-                  </g>
-                  <g transform="rotate(-255.5) translate(0,-76.5) scale(-1, 1)">
-                    <text class="eclipticSymbol">♎&#xFE0E;</text>
-                  </g>
-                  <g transform="rotate(-235) translate(0,-61) rotate(43)">
-                    <text class="eclipticSymbol">♏&#xFE0E;</text>
-                  </g>
-                  <g transform="rotate(-195.5) translate(0,-48) scale(-0.93, 0.93)">
-                    <text class="eclipticSymbol">♐&#xFE0E;</text>
-                  </g>
-                  <g transform="rotate(-167) translate(0,-45.2) rotate(5)">
-                    <text class="eclipticSymbol">♑&#xFE0E;</text>
-                  </g>
-                  <g transform="rotate(-134) translate(0,-58.5) scale(-0.93, 0.93)">
-                    <text class="eclipticSymbol">♒&#xFE0E;</text>
-                  </g>
-                  <g transform="rotate(-104.5) translate(0,-79) scale(-1, 1)">
-                    <text class="eclipticSymbol">♓&#xFE0E;</text>
+                  <g *ngIf="self.southern" id="symbols" transform="translate(0, 71.1)">
+                    <g transform="rotate(-63) translate(0,-133) rotate(-66)">
+                      <text class="eclipticSymbol">♈&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(-39) translate(0,-164) rotate(-42)">
+                      <text class="eclipticSymbol">♉&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(-15.5) translate(0,-183.5) scale(-1, 1) rotate(-2)">
+                      <text class="eclipticSymbol">♊&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(13.5) translate(0,-185) rotate(10)">
+                      <text class="eclipticSymbol">♋&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(41.5) translate(0,-160) rotate(47)">
+                      <text class="eclipticSymbol">♌&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(65) translate(0,-128) rotate(65)">
+                      <text class="eclipticSymbol">♍&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(-255.5) translate(0,-76.5) scale(-1, 1)">
+                      <text class="eclipticSymbol">♎&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(-235) translate(0,-61) rotate(43)">
+                      <text class="eclipticSymbol">♏&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(-195.5) translate(0,-48) scale(-0.93, 0.93)">
+                      <text class="eclipticSymbol">♐&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(-167) translate(0,-45.2) rotate(5)">
+                      <text class="eclipticSymbol">♑&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(-134) translate(0,-58.5) scale(-0.93, 0.93)">
+                      <text class="eclipticSymbol">♒&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(-104.5) translate(0,-79) scale(-1, 1)">
+                      <text class="eclipticSymbol">♓&#xFE0E;</text>
+                    </g>
                   </g>
                 </g>
               </g>
             </g>
-          </g>
-          <circle cx="0" cy="0" r="4.5" class="pin"/>
-          <circle cx="0" cy="0" r="4.5" class="pinSphere"/>
-          <g id="sunGroup">
+            <circle cx="0" cy="0" r="4.5" class="pin"/>
+            <circle cx="0" cy="0" r="4.5" class="pinSphere"/>
+            <g id="sunGroup">
+              <g *ngIf="detailedMechanism" [attr.filter]="filterHand">
+                <g [attr.filter]="filterRelief">
+                  <g id="sun-guide" [attr.transform]="rotate(handAngle)">
+                    <rect x="-2.5" y="-250" width="5" height="20" class="sun-moon-guides"/>
+                    <rect x="-1.3" y="-230" width="2.6" height="150" class="sun-moon-guides"/>
+                  </g>
+                </g>
+              </g>
+              <g [attr.filter]="filterRelief">
+                <g id="ecliptic_positive_sunBeamLargeSymbol_A" [attr.transform]="rotate(siderealAngle)">
+                  <g transform="translate(0, -71.1)">
+                    <g id="sun_positive_sunBeamLargeSymbol_A" [attr.transform]="rotate(sunAngle.ie)">
+                      <g id="sun_translate_sunBeamLargeSymbol_A" transform="translate(0,-161.0)">
+                        <use href="#sunBeamLargeSymbol"/>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+              </g>
+              <g id="ecliptic_positive_sunBeamLargeSymbol_B0" [attr.transform]="rotate(siderealAngle)">
+                <g transform="translate(0, -71.1)">
+                  <g id="sun_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(sunAngle.ie)">
+                    <g id="sun_translate_sunBeamLargeSymbol_B" transform="translate(0,-161.0)">
+                      <rect *ngIf="detailedMechanism" x="-1" y="0" width="2" height="161"
+                          class="sun-moon-arms" [attr.filter]="filterRelief"/>
+                      <g id="sun_negative_sunBeamLargeSymbol_B" [attr.transform]="rotate(-sunAngle.ie)">
+                        <g id="ecliptic_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(-siderealAngle)">
+                          <path d="M0.0 -9.6C5.3 -9.6 9.6 -5.3 9.6 0.0C9.6 5.3 5.3 9.6 0.0 9.6C-5.3 9.6 -9.6 5.3 -9.6 0.0C-9.6 -5.3 -5.3 -9.6 0.0 -9.6" class="sunSphere"/>
+                        </g>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+              </g>
+              <g [attr.filter]="filterRelief">
+                <g id="ecliptic_positive_sunBeamSmallSymbol_A" [attr.transform]="rotate(siderealAngle)">
+                  <g transform="translate(0, -71.1)">
+                    <g id="sun_positive_sunBeamSmallSymbol_A" [attr.transform]="rotate(sunAngle.ie)">
+                      <g id="sun_translate_sunBeamSmallSymbol_A" transform="translate(0,-161.0)">
+                        <use href="#sunBeamSmallSymbol"/>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+              </g>
+              <g id="ecliptic_positive_sunBeamSmallSymbol_B0" [attr.transform]="rotate(siderealAngle)">
+                <g transform="translate(0, -71.1)">
+                  <g id="sun_positive_sunBeamSmallSymbol_B" [attr.transform]="rotate(sunAngle.ie)">
+                    <g id="sun_translate_sunBeamSmallSymbol_B" transform="translate(0,-161.0)">
+                      <g id="sun_negative_sunBeamSmallSymbol_B" [attr.transform]="rotate(sunAngle.ie)">
+                        <g id="ecliptic_positive_sunBeamSmallSymbol_B" [attr.transform]="rotate(-sunAngle.ie)">
+                          <path d="M0.0 -9.6C5.3 -9.6 9.6 -5.3 9.6 0.0C9.6 5.3 5.3 9.6 0.0 9.6C-5.3 9.6 -9.6 5.3 -9.6 0.0C-9.6 -5.3 -5.3 -9.6 0.0 -9.6" class="sunSphere">
+                            <title>{{ true_sunAngle.orig | number: '1.1-1' }}°</title>
+                          </path>
+                        </g>
+                      </g>
+                    </g>
+                  </g>
+               </g>
+              </g>
+            </g>
             <g *ngIf="detailedMechanism" [attr.filter]="filterHand">
               <g [attr.filter]="filterRelief">
-                <g id="sun-guide" [attr.transform]="rotate(handAngle * rotateSign)">
-                  <rect x="-2.5" y="-250" width="5" height="20" class="sun-moon-guides"/>
-                  <rect x="-1.3" y="-230" width="2.6" height="150" class="sun-moon-guides"/>
+                <g id="moon-guide" [attr.transform]="rotate(moonHandAngle)">
+                  <rect x="-2.5" y="-270" width="5" height="20" class="sun-moon-guides"/>
+                  <rect x="-1.3" y="-250" width="2.6" height="170" class="sun-moon-guides"/>
                 </g>
               </g>
             </g>
             <g [attr.filter]="filterRelief">
-              <g id="ecliptic_positive_sunBeamLargeSymbol_A" [attr.transform]="rotate(siderealAngle * rotateSign)">
+              <g id="ecliptic_positive_moonGroup" [attr.transform]="rotate(siderealAngle)">
                 <g transform="translate(0, -71.1)">
-                  <g id="sun_positive_sunBeamLargeSymbol_A" [attr.transform]="rotate(sunAngle.ie * rotateSign)">
-                    <g id="sun_translate_sunBeamLargeSymbol_A" transform="translate(0,-161.0)">
-                      <use href="#sunBeamLargeSymbol"/>
+                  <g id="moon_positive" [attr.transform]="rotate(moonAngle.ie)">
+                    <g transform="translate(0,-161.0)">
+                      <ng-container *ngIf="detailedMechanism">
+                        <rect x="-1" y="0" width="2" height="161" class="sun-moon-arms"/>
+                        <circle cx="0" cy="0" r="16" class="moon-ring-edge"/>
+                        <circle cx="0" cy="0" r="15" class="moon-ring"/>
+                      </ng-container>
+                      <circle cx="0" cy="0" r="12" fill="black"/>
+                      <circle cx="0" cy="0" r="12" class="moonDark"/>
+                      <path id="moonSunlit" [attr.d]="sunlitMoonPath()" class="moonSunlit"/>
                     </g>
-                  </g>
-                </g>
-              </g>
-            </g>
-            <g id="ecliptic_positive_sunBeamLargeSymbol_B0" [attr.transform]="rotate(siderealAngle * rotateSign)">
-              <g transform="translate(0, -71.1)">
-                <g id="sun_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(sunAngle.ie * rotateSign)">
-                  <g id="sun_translate_sunBeamLargeSymbol_B" transform="translate(0,-161.0)">
-                    <rect *ngIf="detailedMechanism" x="-1" y="0" width="2" height="161"
-                        class="sun-moon-arms" [attr.filter]="filterRelief"/>
-                    <g id="sun_negative_sunBeamLargeSymbol_B" [attr.transform]="rotate(-sunAngle.ie * rotateSign)">
-                      <g id="ecliptic_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(-siderealAngle * rotateSign)">
-                        <path d="M0.0 -9.6C5.3 -9.6 9.6 -5.3 9.6 0.0C9.6 5.3 5.3 9.6 0.0 9.6C-5.3 9.6 -9.6 5.3 -9.6 0.0C-9.6 -5.3 -5.3 -9.6 0.0 -9.6" class="sunSphere"/>
+                    <g transform="translate(0,-161.0)">
+                      <g id="moon_negative" [attr.transform]="rotate(moonAngle.ie)">
+                        <g id="ecliptic_negative_moon" [attr.transform]="rotate(-moonAngle.ie)">
+                          <circle cx="0" cy="0" r="12" class="moonSphere">
+                            <title>{{ true_moonAngle.orig | number: '1.1-1' }}°</title>
+                          </circle>
+                        </g>
                       </g>
                     </g>
                   </g>
-                </g>
-              </g>
-            </g>
-            <g [attr.filter]="filterRelief">
-              <g id="ecliptic_positive_sunBeamSmallSymbol_A" [attr.transform]="rotate(siderealAngle * rotateSign)">
-                <g transform="translate(0, -71.1)">
-                  <g id="sun_positive_sunBeamSmallSymbol_A" [attr.transform]="rotate(sunAngle.ie * rotateSign)">
-                    <g id="sun_translate_sunBeamSmallSymbol_A" transform="translate(0,-161.0)">
-                      <use href="#sunBeamSmallSymbol"/>
-                    </g>
+                  <circle *ngIf="detailedMechanism" cx="0" cy="0" r="3.5" class="pin"/>
+                  <circle *ngIf="detailedMechanism" cx="0" cy="0" r="3.5" class="pinSphere"/>
+                  <g *ngIf="additionalPlanets" id="mercury" [attr.transform]="rotate(mercuryAngle.oe)">
+                    <title>{{ mercuryAngle.orig | number: '1.1-1' }}°</title>
+                    <circle cx="0" [attr.cy]="-178.9 + overlapShift[0]" r="7" fill="#C0C0C0"/>
+                    <circle cx="0" [attr.cy]="-178.9 + overlapShift[0]" r="7" fill="url('#sphere-effect')"/>
+                    <text x="0" y="-176.5" [attr.dy]="overlapShift[0]" width="7" height="7" transform-origin="0 -178.9"
+                        [attr.transform]="reorient(mercuryAngle)">☿</text>
                   </g>
-                </g>
-              </g>
-            </g>
-            <g id="ecliptic_positive_sunBeamSmallSymbol_B0" [attr.transform]="rotate(siderealAngle * rotateSign)">
-              <g transform="translate(0, -71.1)">
-                <g id="sun_positive_sunBeamSmallSymbol_B" [attr.transform]="rotate(sunAngle.ie * rotateSign)">
-                  <g id="sun_translate_sunBeamSmallSymbol_B" transform="translate(0,-161.0)">
-                    <g id="sun_negative_sunBeamSmallSymbol_B" [attr.transform]="rotate(sunAngle.ie * rotateSign)">
-                      <g id="ecliptic_positive_sunBeamSmallSymbol_B" [attr.transform]="rotate(-sunAngle.ie * rotateSign)">
-                        <path d="M0.0 -9.6C5.3 -9.6 9.6 -5.3 9.6 0.0C9.6 5.3 5.3 9.6 0.0 9.6C-5.3 9.6 -9.6 5.3 -9.6 0.0C-9.6 -5.3 -5.3 -9.6 0.0 -9.6" class="sunSphere">
-                          <title>{{ true_sunAngle.orig | number: '1.1-1' }}°</title>
-                        </path>
-                      </g>
-                    </g>
+                  <g *ngIf="additionalPlanets" id="venus" [attr.transform]="rotate(venusAngle.oe)">
+                    <title>{{ venusAngle.orig | number: '1.1-1' }}°</title>
+                    <circle cx="0" [attr.cy]="-178.9 + overlapShift[1]" r="7" fill="#CCCCFF"/>
+                    <circle cx="0" [attr.cy]="-178.9 + overlapShift[1]" r="7" fill="url('#sphere-effect')"/>
+                    <text x="0" y="-176.5" [attr.dy]="overlapShift[1]" width="7" height="7" transform-origin="0 -178.9"
+                        [attr.transform]="reorient(venusAngle)">♀</text>
                   </g>
-                </g>
-             </g>
-            </g>
-          </g>
-          <g *ngIf="detailedMechanism" [attr.filter]="filterHand">
-            <g [attr.filter]="filterRelief">
-              <g id="moon-guide" [attr.transform]="rotate(moonHandAngle * rotateSign)">
-                <rect x="-2.5" y="-270" width="5" height="20" class="sun-moon-guides"/>
-                <rect x="-1.3" y="-250" width="2.6" height="170" class="sun-moon-guides"/>
-              </g>
-            </g>
-          </g>
-          <g [attr.filter]="filterRelief">
-            <g id="ecliptic_positive_moonGroup" [attr.transform]="rotate(siderealAngle * rotateSign)">
-              <g transform="translate(0, -71.1)">
-                <g id="moon_positive" [attr.transform]="rotate(moonAngle.ie * rotateSign)">
-                  <g transform="translate(0,-161.0)">
-                    <ng-container *ngIf="detailedMechanism">
-                      <rect x="-1" y="0" width="2" height="161" class="sun-moon-arms"/>
-                      <circle cx="0" cy="0" r="16" class="moon-ring-edge"/>
-                      <circle cx="0" cy="0" r="15" class="moon-ring"/>
-                    </ng-container>
-                    <circle cx="0" cy="0" r="12" fill="black"/>
-                    <circle cx="0" cy="0" r="12" class="moonDark"/>
-                    <path id="moonSunlit" [attr.d]="sunlitMoonPath()" class="moonSunlit"/>
+                  <g *ngIf="additionalPlanets" id="mars" [attr.transform]="rotate(marsAngle.oe)">
+                    <title>{{ marsAngle.orig | number: '1.1-1' }}°</title>
+                    <circle cx="0" [attr.cy]="-178.9 + overlapShift[2]" r="7" fill="red"/>
+                    <circle cx="0" [attr.cy]="-178.9 + overlapShift[2]" r="7" fill="url('#sphere-effect')"/>
+                    <text x="0" y="-176.5" [attr.dy]="overlapShift[2]" width="7" height="7" transform-origin="0 -178.9"
+                        [attr.transform]="reorient(marsAngle)">♂</text>
                   </g>
-                  <g transform="translate(0,-161.0)">
-                    <g id="moon_negative" [attr.transform]="rotate(moonAngle.ie * rotateSign)">
-                      <g id="ecliptic_negative_moon" [attr.transform]="rotate(-moonAngle.ie * rotateSign)">
-                        <circle cx="0" cy="0" r="12" class="moonSphere">
-                          <title>{{ true_moonAngle.orig | number: '1.1-1' }}°</title>
-                        </circle>
-                      </g>
-                    </g>
+                  <g *ngIf="additionalPlanets" id="jupiter" [attr.transform]="rotate(jupiterAngle.oe)">
+                    <title>{{ jupiterAngle.orig | number: '1.1-1' }}°</title>
+                    <circle cx="0" [attr.cy]="-178.9 + overlapShift[3]" r="7" fill="orange"/>
+                    <circle cx="0" [attr.cy]="-178.9 + overlapShift[3]" r="7" fill="url('#sphere-effect')"/>
+                    <text x="0" y="-176.5" [attr.dy]="overlapShift[3]" width="7" height="7" transform-origin="0 -178.9"
+                        [attr.transform]="reorient(jupiterAngle)">♃</text>
                   </g>
-                </g>
-                <circle *ngIf="detailedMechanism" cx="0" cy="0" r="3.5" class="pin"/>
-                <circle *ngIf="detailedMechanism" cx="0" cy="0" r="3.5" class="pinSphere"/>
-                <g *ngIf="additionalPlanets" id="mercury" [attr.transform]="rotate(mercuryAngle.oe * rotateSign)">
-                  <title>{{ mercuryAngle.orig | number: '1.1-1' }}°</title>
-                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[0]" r="7" fill="#C0C0C0"/>
-                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[0]" r="7" fill="url('#sphere-effect')"/>
-                  <text x="0" y="-176.5" [attr.dy]="overlapShift[0]" width="7" height="7">☿</text>
-                </g>
-                <g *ngIf="additionalPlanets" id="venus" [attr.transform]="rotate(venusAngle.oe * rotateSign)">
-                  <title>{{ venusAngle.orig | number: '1.1-1' }}°</title>
-                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[1]" r="7" fill="#CCCCFF"/>
-                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[1]" r="7" fill="url('#sphere-effect')"/>
-                  <text x="0" y="-176.5" [attr.dy]="overlapShift[1]" width="7" height="7">♀</text>
-                </g>
-                <g *ngIf="additionalPlanets" id="mars" [attr.transform]="rotate(marsAngle.oe * rotateSign)">
-                  <title>{{ marsAngle.orig | number: '1.1-1' }}°</title>
-                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[2]" r="7" fill="red"/>
-                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[2]" r="7" fill="url('#sphere-effect')"/>
-                  <text x="0" y="-176.5" [attr.dy]="overlapShift[2]" width="7" height="7">♂</text>
-                </g>
-                <g *ngIf="additionalPlanets" id="jupiter" [attr.transform]="rotate(jupiterAngle.oe * rotateSign)">
-                  <title>{{ jupiterAngle.orig | number: '1.1-1' }}°</title>
-                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[3]" r="7" fill="orange"/>
-                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[3]" r="7" fill="url('#sphere-effect')"/>
-                  <text x="0" y="-176.5" [attr.dy]="overlapShift[3]" width="7" height="7">♃</text>
-                </g>
-                <g *ngIf="additionalPlanets" id="saturn" [attr.transform]="rotate(saturnAngle.oe * rotateSign)">
-                  <title>{{ saturnAngle.orig | number: '1.1-1' }}°</title>
-                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[4]" r="7" fill="#FFFF99"/>
-                  <circle cx="0" [attr.cy]="-178.9 + overlapShift[4]" r="7" fill="url('#sphere-effect')"/>
-                  <text x="0" y="-176.5" [attr.dy]="overlapShift[4]" width="7" height="7">♄</text>
-                </g>
-                <g *ngIf="realPositionMarkers" id="sun-true" [attr.transform]="rotate(true_sunAngle.oe * rotateSign)">
-                  <title>{{ true_sunAngle.orig | number: '1.1-1' }}°</title>
-                  <circle cx="0" cy="-178.9" r="7" fill="yellow"/>
-                  <circle cx="0" cy="-178.9" r="7" fill="url('#sphere-effect')"/>
-                  <text x="0" y="-176.1" width="7" height="7">☉</text>
-                </g>
-                <g *ngIf="realPositionMarkers" id="moon-true" [attr.transform]="rotate(true_moonAngle.oe * rotateSign)">
-                  <title>{{ true_moonAngle.orig | number: '1.1-1' }}°</title>
-                  <circle cx="0" cy="-178.9" r="7" fill="white"/>
-                  <circle cx="0" cy="-178.9" r="7" fill="url('#sphere-effect')"/>
-                  <text x="0" y="-176.5" width="7" height="7">☽</text>
+                  <g *ngIf="additionalPlanets" id="saturn" [attr.transform]="rotate(saturnAngle.oe)">
+                    <title>{{ saturnAngle.orig | number: '1.1-1' }}°</title>
+                    <circle cx="0" [attr.cy]="-178.9 + overlapShift[4]" r="7" fill="#FFFF99"/>
+                    <circle cx="0" [attr.cy]="-178.9 + overlapShift[4]" r="7" fill="url('#sphere-effect')"/>
+                    <text x="0" y="-176.5" [attr.dy]="overlapShift[4]" width="7" height="7" transform-origin="0 -178.9"
+                        [attr.transform]="reorient(saturnAngle)">♄</text>
+                  </g>
+                  <g *ngIf="realPositionMarkers" id="sun-true" [attr.transform]="rotate(true_sunAngle.oe)">
+                    <title>{{ true_sunAngle.orig | number: '1.1-1' }}°</title>
+                    <circle cx="0" cy="-178.9" r="7" fill="yellow"/>
+                    <circle cx="0" cy="-178.9" r="7" fill="url('#sphere-effect')"/>
+                    <text x="0" y="-175.5" width="7" height="7" transform-origin="0 -178.9"
+                        [attr.transform]="reorient(true_sunAngle)">☉</text>
+                  </g>
+                  <g *ngIf="realPositionMarkers" id="moon-true" [attr.transform]="rotate(true_moonAngle.oe)">
+                    <title>{{ true_moonAngle.orig | number: '1.1-1' }}°</title>
+                    <circle cx="0" cy="-178.9" r="7" fill="white"/>
+                    <circle cx="0" cy="-178.9" r="7" fill="url('#sphere-effect')"/>
+                    <text x="0" y="-176.5" width="7" height="7" transform-origin="0 -178.9"
+                        [attr.transform]="reorient(true_moonAngle)">☽</text>
+                  </g>
                 </g>
               </g>
             </g>
           </g>
         </g>
       </g>
-    </g>
-  </svg>
-
-  <div *ngIf="showInfoPanel" class="svg-info-overlay" [style.display]="showInfoPanel && collapsed ? 'block' : null">
-    <ng-container *ngTemplateOutlet="infoErrorPanel"></ng-container>
+    </svg>
   </div>
+
+  <div *ngIf="showInfoPanel" class="info-panel-overlay" [style.display]="showInfoPanel" [class.expanded]="!collapsed">
+    <div class="info-panel">
+      <i class="pi pi-times closer" (click)="showInfoPanel = false"></i>
+      <div class="time-grid">
+        <span>{{ zoneOffset }}</span>
+        <span class="num">{{ localTime }}</span>
+        <span i18n>Local mean time:</span>
+        <span class="num">{{ localMeanTime }}</span>
+        <span i18n>Local solar time:</span>
+        <span class="num">{{ localSolarTime }}</span>
+        <span i18n>Sidereal time:</span>
+        <span class="num">{{ siderealTime }}</span>
+        <span i18n>Bohemian time:</span>
+        <span class="num">{{ bohemianTime }}</span>
+        <span i18n>Sun rise/set:</span>
+        <span class="num">{{ sunrise }} • {{ sunset }}</span>
+        <span i18n>Moon rise/set:</span>
+        <span class="num">{{ moonrise }} • {{ moonset }}</span>
+      </div>
+      <div *ngIf="showRecalibration" class="recalibration">
+        <span i18n>Last virtual recalibration:</span>&nbsp;<span class="num">{{ lastRecalibration }}</span>
+      </div>
+      <table [style.margin-top]="showRecalibration ? '0' : '1em'">
+        <ng-container *ngIf="showErrors">
+          <tr>
+            <th>&nbsp;</th>
+            <th i18n>Actual</th>
+            <th>Orloj</th>
+            <th>Δ</th>
+          </tr>
+        </ng-container>
+        <tr>
+          <td i18n>Sun λ</td>
+          <td class="num">{{ true_sunAngle.orig | number: '1.0-0' }}° {{ toZodiac(true_sunAngle.orig) }}</td>
+          <ng-container *ngIf="showErrors">
+            <td class="num">{{ sunAngle.orig | number: '1.0-0' }}°</td>
+            <td class="diff wide">{{ errorSun | number: '1.1-1' }}°, {{ errorSunMinutes | number: '1.1-1' }}
+              <span i18n>mins</span></td>
+          </ng-container>
+        </tr>
+        <tr>
+          <td i18n>Moon λ</td>
+          <td class="num">{{ true_moonAngle.orig | number: '1.0-0' }}° {{ toZodiac(true_moonAngle.orig) }}</td>
+          <ng-container *ngIf="showAllErrors">
+            <td class="num">{{ moonAngle.orig | number: '1.0-0' }}°</td>
+            <td class="diff wide">{{ errorMoon | number: '1.1-1' }}°, {{ errorMoonDays | number: '1.1-1' }}
+              <span i18n>days</span></td>
+          </ng-container>
+        </tr>
+        <tr>
+          <td i18n>Moon phase</td>
+          <td class="num">{{ true_moonPhase | number: '1.0-0' }}°</td>
+          <ng-container *ngIf="showAllErrors">
+            <td class="num">{{ moonPhase | number: '1.0-0' }}°</td>
+            <td class="diff wide">{{ errorPhase | number: '1.1-1' }}°, {{ errorPhaseDays | number: '1.1-1' }}
+              <span i18n>days</span></td>
+          </ng-container>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div i18n id="graphics-credit">Original SVG clock graphics by Jan Tošovský</div>
+
+  <p-toast position="center"></p-toast>
+  <p-confirmDialog i18n-header header="Change time"></p-confirmDialog>
 </div>
-
-<div i18n id="graphics-credit">Original SVG clock graphics by Jan Tošovský</div>
-
-<p-toast position="center"></p-toast>
-<p-confirmDialog i18n-header header="Change time"></p-confirmDialog>

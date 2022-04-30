@@ -3,6 +3,7 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { AppModule } from './app.module';
 import { environment } from './environments/environment';
+import { Subject, throttleTime } from 'rxjs';
 
 if (environment.production) {
   enableProdMode();
@@ -21,8 +22,18 @@ if (Math.min(width, height) < 428) {
 
 let screenOrientationSucceeded = false;
 let orientationChangeTimer: any;
+const docElem = document.documentElement;
+const rawSizeChanges = new Subject<void>();
+
+export const sizeChanges = rawSizeChanges.pipe(throttleTime<void>(100, undefined, { leading: true, trailing: true }));
+
+function sizeChange(): void {
+  rawSizeChanges.next();
+}
 
 function orientationChange(): void {
+  sizeChange();
+
   if (orientationChangeTimer)
     clearTimeout(orientationChangeTimer);
 
@@ -44,6 +55,12 @@ catch {}
 if (!screenOrientationSucceeded) {
   window.addEventListener('orientationchange', orientationChange);
 }
+
+window.addEventListener('resize', sizeChange);
+docElem.addEventListener('scroll', () => {
+  if (docElem.style.overflow === 'hidden' && (docElem.scrollTop !== 0 || docElem.scrollLeft !== 0))
+    sizeChange();
+});
 
 platformBrowserDynamic().bootstrapModule(AppModule)
   .catch(err => console.error(err));

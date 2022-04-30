@@ -1,3 +1,14 @@
+## 1.6.1
+
+* Added ability to open info display from collapsed control panel.
+* Remove feature for displaying equatorial position - confusing, and not as useful as I thought.
+* Fix iOS keyboard input bug.
+* Enable "Suppress onscreen keyboard" option even when iOS is requesting a desktop version of the website.
+
+## 1.6.0
+
+* Add option for sun/moon hour angle markers.
+
 ## 1.5.0
 
 * Add new "Sun constrained by hour hand".

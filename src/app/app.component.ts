@@ -2,7 +2,8 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService, PrimeNGConfig } from 'primeng/api';
 import { abs, floor, max, min, mod, mod2 } from '@tubular/math';
 import {
-  clone, extendDelimited, forEach, getCssValue, isEqual, isLikelyMobile, isObject, isSafari, processMillis
+  clone, extendDelimited, forEach, getCssValue, isAndroid, isEqual, isIOS, isLikelyMobile, isMacOS, isObject, isSafari,
+  processMillis
 } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import {
@@ -18,16 +19,18 @@ import { faForward, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 import { AdvancedOptionsComponent, Appearance, SettingsHolder, Timing }
   from '../advanced-options/advanced-options.component';
 import {
-  adjustForEclipticWheel, BasicPositions, calculateBasicPositions, calculateMechanicalPositions, MILLIS_PER_DAY,
+  adjustForEclipticWheel, AngleTriplet, BasicPositions, calculateBasicPositions, calculateMechanicalPositions, MILLIS_PER_DAY,
   solarSystem, ZeroAngles
 } from 'src/math/math';
 import { adjustGraphicsForLatitude, initSvgHost, sunlitMoonPath, SvgHost } from 'src/svg/svg';
+import { sizeChanges } from '../main';
 
 const { DATE, DATETIME_LOCAL, julianDay, TIME } = ttime;
 
 const RESUME_FILTERING_DELAY = 1000;
-const START_FILTERING_DELAY = 500;
-const STOP_FILTERING_DELAY = isSafari() ? 1000 : 3000;
+const SIMPLE_FILTER_IS_SLOW_TOO = isAndroid() || (isSafari() && isMacOS());
+const STOP_FILTERING_DELAY = SIMPLE_FILTER_IS_SLOW_TOO ? 1000 : 3000;
+const START_FILTERING_DELAY = SIMPLE_FILTER_IS_SLOW_TOO ? 1000 : 500;
 const RECOMPUTED_WHEN_NEEDED: null = null;
 
 enum EventType { EQUISOLSTICE, MOON_PHASE, RISE_SET }
@@ -176,6 +179,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   private playTimeBase: number;
   private playTimeProcessBase: number;
   private _realPositionMarkers = false;
+  private _showInfoPanel = false;
   private sunsetA: AstroEvent = null;
   private sunsetB: AstroEvent = null;
   private _suppressOsKeyboard = false;
@@ -260,7 +264,6 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   saturnAngle = ZeroAngles;
   showAllErrors = false;
   showErrors = false;
-  showInfoPanel = false;
   showLanguageMenu = false;
   showRecalibration = false;
   siderealAngle = 0;
@@ -292,7 +295,8 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   }
 
   get filterRelief(): string {
-    return this.fasterGraphics && (!this.svgFilteringOn || this.playing) ? null : 'url("#filterRelief")';
+    return this.fasterGraphics && (!this.svgFilteringOn || this.playing) ?
+      (SIMPLE_FILTER_IS_SLOW_TOO ? null : 'url("#filterReliefSimple")') : 'url("#filterRelief")';
   }
 
   constructor(
@@ -304,7 +308,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
 
     let settings: any;
 
-    if (isLikelyMobile()) {
+    if (isLikelyMobile() || isIOS()) {
       this.menuItems.push({ separator: true });
       this.menuItems.push({ label: $localize`Suppress onscreen keyboard`, icon: 'pi pi-circle', id: 'sok',
                             command: (): boolean => this.suppressOsKeyboard = !this.suppressOsKeyboard });
@@ -326,6 +330,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
       }
 
       delete settings.hideMap;
+      delete settings.equatorialPositionMarkers;
     }
     catch {
       settings = null;
@@ -369,6 +374,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
 
         docElem.style.setProperty('--mfvh', height + 'px');
         docElem.style.setProperty('--mvh', (height * 0.01) + 'px');
+        this.adjustFontScaling();
 
         if (disallowScroll && (docElem.scrollTop !== 0 || docElem.scrollLeft !== 0)) {
           docElem.scrollTo(0, 0);
@@ -382,24 +388,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
       });
     };
 
-    let lastW = window.innerWidth;
-    let lastH = window.innerHeight;
-
-    const poll = (): void => {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      const disallowScroll = docElem.style.overflow === 'hidden';
-
-      if (lastW !== w || lastH !== h || (disallowScroll && (docElem.scrollTop !== 0 || docElem.scrollLeft !== 0))) {
-        lastW = w;
-        lastH = h;
-        doResize();
-      }
-
-      setTimeout(poll, 100);
-    };
-
-    poll();
+    sizeChanges.subscribe(() => doResize());
     doResize();
 
     setTimeout(() => document.getElementById('graphics-credit').style.opacity = '0', 15000);
@@ -461,12 +450,26 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
         if ((document.activeElement as any)?.blur)
           (document.activeElement as any).blur();
 
+        this.adjustFontScaling();
         this.graphicsRateChangeCheck(true);
         this.saveSettings();
       }
       else {
         this.collapsed = false;
         this.delayedCollapse = true;
+      }
+    }
+  }
+
+  get showInfoPanel(): boolean { return this._showInfoPanel; }
+  set showInfoPanel(value: boolean) {
+    if (this._showInfoPanel !== value) {
+      this._showInfoPanel = value;
+
+      if (this.initDone && this.collapsed) {
+        this.adjustFontScaling();
+        this.graphicsRateChangeCheck(true);
+        this.saveSettings();
       }
     }
   }
@@ -514,6 +517,19 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
 
       this.updateTime(true);
     }
+  }
+
+  private adjustFontScaling(): void {
+    let fontScaler: number;
+
+    if (window.innerHeight > window.innerWidth)
+      fontScaler = max(min(window.innerHeight / 1100, 1), 0.75);
+    else if (this.collapsed && window.innerWidth > 1100)
+      fontScaler = max(min(window.innerWidth / 600, window.innerHeight / 500, 1), 0.75);
+    else
+      fontScaler = max(min((window.innerWidth - 500) / 600, (window.innerHeight - 400) / 400, 1), 0.75);
+
+    document.documentElement.style.setProperty('--font-scaler', fontScaler.toPrecision(3));
   }
 
   private clearTimingReferenceIfNeeded(): void {
@@ -975,7 +991,11 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   }
 
   rotate(angle: number): string {
-    return `rotate(${angle})`;
+    return `rotate(${angle * this.rotateSign})`;
+  }
+
+  reorient(angle: AngleTriplet): string {
+    return isSafari() ? null : `rotate(${(90 - angle.orig - angle.oe) * this.rotateSign})`;
   }
 
   sunlitMoonPath(): string {
@@ -1107,7 +1127,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
                                   detail: $localize`Event outside of ${this.MIN_YEAR}-${this.MAX_YEAR} year range.` });
       else {
         this.time = evt.eventTime.utcMillis;
-        this.messageService.add({ severity: 'info', summary: $localize`Event`, detail: eventText });
+        this.messageService.add({ severity: 'info', summary: $localize`Event`, detail: eventText, life: 1000 });
       }
     }
   }

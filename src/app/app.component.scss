@@ -1,14 +1,22 @@
 @import "../colors";
 
-:host {
+.wrapper {
   box-sizing: border-box;
   display: grid;
   font-family: Horologium, NoEmojiAstronomy, sans-serif;
   gap: 12px;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr 400px;
   min-height: var(--mfvh);
   place-items: center;
   padding: 8px;
+
+  &.collapsed {
+    grid-template-columns: 1fr 160px;
+  }
+
+  &.narrow {
+    grid-template-columns: 1fr auto;
+  }
 }
 
 p-toast, p-confirmDialog {
@@ -25,6 +33,7 @@ p-toast, p-confirmDialog {
   font: 14px Arial, sans-serif;
   gap: 4px;
   grid-area: 1 / 2;
+  justify-self: end;
   min-height: 400px;
   min-width: 400px;
   padding: 1em 0.5em;
@@ -134,17 +143,40 @@ p-toast, p-confirmDialog {
   }
 
   i.pi-info-circle {
+    background: inherit;
     bottom: 0;
     cursor: pointer;
+    display: block;
     padding: 0.5em;
     position: absolute;
     right: 0;
-    opacity: 1;
-    transition: opacity 0.5s ease-in-out;
 
     &.collapsed {
-      opacity: 0;
-      pointer-events: none;
+      padding: 0.5em 0 0.5em 0.5em;
+      right: 1.5em;
+      top: 0;
+      width: 2em;
+    }
+  }
+
+  .time-text {
+    background: inherit;
+    bottom: 0;
+    display: none;
+    font: 14px Verdana, sans-serif;
+    font-variant-numeric: tabular-nums;
+    padding: 0.5em 0 0.5em 0.5em;
+    position: absolute;
+    right: 4em;
+    top: 0;
+    white-space: nowrap;
+
+    &.collapsed {
+      display: block;
+    }
+
+    &.track-time {
+      color: #0A0;
     }
   }
 
@@ -174,27 +206,6 @@ p-toast, p-confirmDialog {
 
   tze-zone-selector {
     margin: 0.5em 0;
-  }
-
-  .time-text {
-    background: inherit;
-    bottom: 0;
-    display: none;
-    font: 14px Verdana, sans-serif;
-    font-variant-numeric: tabular-nums;
-    padding: 0.5em 0 0.5em 0.5em;
-    position: absolute;
-    right: 2em;
-    top: 0;
-    white-space: nowrap;
-
-    &.collapsed {
-      display: block;
-    }
-
-    &.track-time {
-      color: #0A0;
-    }
   }
 
   #now {
@@ -235,11 +246,23 @@ svg {
   &.controls-collapsed {
     height: calc(max(var(--mfvh) - 16px, 320px));
     width: calc(min(max(var(--mfvh) - 16px, 320px), calc(100vw - 28px)));
+
+    &.show-info-panel {
+      height: calc(min(max(var(--mfvh) - 16px, 320px), calc(100vw - 200px)));
+      width: calc(min(max(var(--mfvh) - 16px, 320px), calc(100vw - 200px)));
+    }
   }
 }
 
 #svg-wrapper {
+  align-self: start;
+  justify-self: start;
   position: relative;
+
+  &.wide {
+    align-self: center;
+    justify-self: center;
+  }
 }
 
 .svg-overlay {
@@ -250,12 +273,24 @@ svg {
   top: 0;
 }
 
+.info-panel-overlay {
+  font-size: calc(14px * var(--font-scaler));
+  position: static;
+
+  &.expanded {
+    bottom: 0.5em;
+    position: fixed;
+    right: 0.5em;
+  }
+}
+
 .info-panel {
   background-color: $controls-background;
   border: 1px solid #999;
   box-sizing: border-box;
   color: $controls-text;
-  font: 14px NoEmojiAstronomy, Arial, sans-serif;
+  font-size: 1em;
+  font-family: NoEmojiAstronomy, Arial, sans-serif;
   max-width: 400px;
   padding: 0.5em 2.5em 0.5em 0.5em;
   position: relative;
@@ -274,19 +309,19 @@ svg {
 
   .num {
     color: #64B5F6;
-    font: 12.5px NoEmojiAstronomy, Verdana, sans-serif;
-    min-width: 52px;
+    font: 0.9em NoEmojiAstronomy, Verdana, sans-serif;
+    min-width: 4.2em;
     white-space: nowrap;
   }
 
   .diff {
     color: #F63;
-    font: 12.5px Verdana, sans-serif;
+    font: 0.9em Verdana, sans-serif;
     white-space: nowrap;
   }
 
   .wide {
-    min-width: 125px;
+    min-width: 10.5em;
   }
 
   .recalibration {
@@ -306,12 +341,6 @@ svg {
     margin-left: -1em;
     margin-right: -2.5em;
   }
-}
-
-.svg-info-overlay {
-  bottom: 8px;
-  position: fixed;
-  right: 8px;
 }
 
 .below-control-panel {
@@ -342,14 +371,9 @@ svg {
       margin: -2px;
     }
   }
-
-  .info-panel {
-    margin: -20px 13px;
-    transform: scale(0.9);
-  }
 }
 
-@media screen and (max-height: 820px) {
+@media screen and (max-height: 600px) {
   .info-panel {
     bottom: 8px;
     left: unset;
@@ -368,22 +392,27 @@ svg {
       margin: -4px -40px;
     }
   }
-
-  .info-panel {
-    margin: -40px 26px;
-    transform: scale(0.8);
-  }
 }
 
 @media screen and (orientation: portrait) {
-  :host {
+  .wrapper {
     grid-template-columns: auto;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto 1fr auto;
     overflow: auto;
+
+    &.collapsed, &.narrow {
+      grid-template-columns: auto;
+    }
+  }
+
+  #svg-wrapper {
+    align-self: center;
+    justify-self: center;
   }
 
   .controls {
     grid-area: unset;
+    justify-self: center;
 
     &.collapsed {
       margin-left: 0;
@@ -405,12 +434,17 @@ svg {
 
   svg {
     grid-area: unset;
-    height: calc(min(calc(100vw - 16px), calc(var(--mfvh) - 428px)));
-    width: calc(min(calc(100vw - 16px), calc(var(--mfvh) - 428px)));
+    height: calc(min(calc(100vw - 16px), calc(var(--mfvh) - 440px)));
+    width: calc(min(calc(100vw - 16px), calc(var(--mfvh) - 440px)));
 
     &.controls-collapsed {
       height: calc(max(min(var(--mfvh) - 28px - 2.25em, 100vw - 16px), 320px));
       width: calc(max(min(var(--mfvh) - 28px - 2.25em, 100vw - 16px), 320px));
+
+      &.show-info-panel {
+        height: calc(max(min(var(--mfvh) - 40px - calc(260px * var(--font-scaler)) - 2.25em, 100vw - 16px), 320px));
+        width: calc(max(min(var(--mfvh) - 40px - calc(260px * var(--font-scaler)) - 2.25em, 100vw - 16px), 320px));
+      }
     }
   }
 
@@ -420,8 +454,17 @@ svg {
 }
 
 @media screen and (orientation: landscape) {
-  .svg-info-overlay {
-    display: none;
+  .info-panel-overlay {
+    bottom: 0.5em;
+    position: fixed;
+    right: 0.5em;
+  }
+}
+
+@media screen and (orientation: landscape) and (min-width: 740px) {
+  #svg-wrapper {
+    align-self: center;
+    justify-self: center;
   }
 }
 
@@ -808,7 +851,7 @@ svg {
   }
 
   .handSymbol {
-    fill: #DCC393;
+    fill: #D6BD90;
   }
 
   .eclipticSymbol,
@@ -820,7 +863,7 @@ svg {
 
   .sunBeamLargeSymbol,
   .sunBeamSmallSymbol {
-    fill: #DFC388;
+    fill: #D9BD88;
   }
 
   .baseCircle,
