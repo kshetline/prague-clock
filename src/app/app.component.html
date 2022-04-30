@@ -91,9 +91,13 @@
           <feBlend in="SourceGraphic" in2="fadeOut" mode="normal"/>
         </filter>
         <filter id="filterRelief" filterUnits="userSpaceOnUse" x="-60%" y="-60%">
-          <feOffset result="offOut" in="SourceAlpha" dx="1" dy="1"/>
-          <feGaussianBlur result="blurOut" in="offOut" stdDeviation="1"/>
+          <feOffset result="shadow" in="SourceAlpha" dx="1" dy="1"/>
+          <feGaussianBlur result="blurOut" in="shadow" stdDeviation="1"/>
           <feBlend in="SourceGraphic" in2="blurOut" mode="normal"/>
+        </filter>
+        <filter id="filterReliefSimple" filterUnits="userSpaceOnUse" x="-60%" y="-60%">
+          <feOffset in="SourceAlpha" result="shadow" dx="1" dy="1"/>
+          <feBlend in="SourceGraphic" in2="shadow" mode="normal"/>
         </filter>
         <symbol id="handData" overflow="visible">
           <path d="M-4 57C-4 57-6 45-6 42C-8 38-27 18-28 9C-29-2-33-7-33-15C-33-18-30-18-29-18C-21-17-19 2-18 2C-18 2-20-23-16-37C-15-40-11-40-10-37C-8-34-11-5-10-5C-9-5-9-36-7-40C-6-44-1-44 0-41C3-37-1-0 0 0C1 1-1-11 3-16C6-20 11-18 11-13C11-10 8 5 9 5C10 5 11-8 14-12C16-15 21-15 22-10C23-7 19 7 18 11C17 15 13 28 13 32C13 40 21 49 21 49L-4 57z"/>

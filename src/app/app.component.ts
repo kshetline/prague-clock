@@ -2,7 +2,8 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService, PrimeNGConfig } from 'primeng/api';
 import { abs, floor, max, min, mod, mod2 } from '@tubular/math';
 import {
-  clone, extendDelimited, forEach, getCssValue, isEqual, isLikelyMobile, isObject, isSafari, processMillis
+  clone, extendDelimited, forEach, getCssValue, isAndroid, isEqual, isLikelyMobile, isMacOS, isObject, isSafari,
+  processMillis
 } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import {
@@ -22,12 +23,14 @@ import {
   solarSystem, ZeroAngles
 } from 'src/math/math';
 import { adjustGraphicsForLatitude, initSvgHost, sunlitMoonPath, SvgHost } from 'src/svg/svg';
+import { sizeChanges } from '../main';
 
 const { DATE, DATETIME_LOCAL, julianDay, TIME } = ttime;
 
 const RESUME_FILTERING_DELAY = 1000;
 const START_FILTERING_DELAY = 500;
-const STOP_FILTERING_DELAY = isSafari() ? 1000 : 3000;
+const SIMPLE_FILTER_IS_SLOW_TOO = isAndroid() || (isSafari() && isMacOS());
+const STOP_FILTERING_DELAY = SIMPLE_FILTER_IS_SLOW_TOO ? 1000 : 3000;
 const RECOMPUTED_WHEN_NEEDED: null = null;
 
 enum EventType { EQUISOLSTICE, MOON_PHASE, RISE_SET }
@@ -292,7 +295,8 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   }
 
   get filterRelief(): string {
-    return this.fasterGraphics && (!this.svgFilteringOn || this.playing) ? null : 'url("#filterRelief")';
+    return this.fasterGraphics && (!this.svgFilteringOn || this.playing) ?
+      (SIMPLE_FILTER_IS_SLOW_TOO ? null : 'url("#filterReliefSimple")') : 'url("#filterRelief")';
   }
 
   constructor(
@@ -384,24 +388,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
       });
     };
 
-    let lastW = window.innerWidth;
-    let lastH = window.innerHeight;
-
-    const poll = (): void => {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      const disallowScroll = docElem.style.overflow === 'hidden';
-
-      if (lastW !== w || lastH !== h || (disallowScroll && (docElem.scrollTop !== 0 || docElem.scrollLeft !== 0))) {
-        lastW = w;
-        lastH = h;
-        doResize();
-      }
-
-      setTimeout(poll, 100);
-    };
-
-    poll();
+    sizeChanges.subscribe(() => doResize());
     doResize();
 
     setTimeout(() => document.getElementById('graphics-credit').style.opacity = '0', 15000);
