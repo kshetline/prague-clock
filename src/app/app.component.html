@@ -1,4 +1,4 @@
-<div class="wrapper" [class.narrow]="collapsed && !showInfoPanel">
+<div class="wrapper" [class.collapsed]="collapsed && showInfoPanel" [class.narrow]="collapsed && !showInfoPanel">
   <div class="controls tbw-dark-mode"
       [class.short]="lastHeight <= 420 && lastHeight > 380"
       [class.extra-short]="lastHeight <= 380"

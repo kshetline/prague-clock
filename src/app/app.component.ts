@@ -367,16 +367,10 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
       setTimeout(() => {
         const height = window.innerHeight;
         const disallowScroll = getCssValue(docElem, 'overflow') === 'hidden';
-        let fontScaler: number;
-
-        if (window.innerHeight > window.innerWidth)
-          fontScaler = max(min(window.innerHeight / 1100, 1), 0.75);
-        else
-          fontScaler = max(min(window.innerWidth / 600, window.innerHeight / 700, 1), 0.75);
 
         docElem.style.setProperty('--mfvh', height + 'px');
         docElem.style.setProperty('--mvh', (height * 0.01) + 'px');
-        docElem.style.setProperty('--font-scaler', fontScaler.toPrecision(3));
+        this.adjustFontScaling();
 
         if (disallowScroll && (docElem.scrollTop !== 0 || docElem.scrollLeft !== 0)) {
           docElem.scrollTo(0, 0);
@@ -469,6 +463,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
         if ((document.activeElement as any)?.blur)
           (document.activeElement as any).blur();
 
+        this.adjustFontScaling();
         this.graphicsRateChangeCheck(true);
         this.saveSettings();
       }
@@ -485,6 +480,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
       this._showInfoPanel = value;
 
       if (this.initDone && this.collapsed && window.innerWidth < window.innerHeight) {
+        this.adjustFontScaling();
         this.graphicsRateChangeCheck(true);
         this.saveSettings();
       }
@@ -534,6 +530,19 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
 
       this.updateTime(true);
     }
+  }
+
+  private adjustFontScaling(): void {
+    let fontScaler: number;
+
+    if (window.innerHeight > window.innerWidth)
+      fontScaler = max(min(window.innerHeight / 1100, 1), 0.75);
+    else if (this.collapsed && window.innerWidth > 1100)
+      fontScaler = max(min(window.innerWidth / 600, window.innerHeight / 500, 1), 0.75);
+    else
+      fontScaler = max(min((window.innerWidth - 500) / 600, (window.innerHeight - 400) / 400, 1), 0.75);
+
+    document.documentElement.style.setProperty('--font-scaler', fontScaler.toPrecision(3));
   }
 
   private clearTimingReferenceIfNeeded(): void {
