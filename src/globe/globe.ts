@@ -4,7 +4,6 @@ import { atan, cos, max, mod, PI, round, sin, SphericalPosition3D, sqrt, to_radi
 import { mergeBufferGeometries } from '../three/three-utils';
 import { Appearance } from '../advanced-options/advanced-options.component';
 
-const GLOBE_SIZE = 500;
 const MAP_HEIGHT = 500;
 const MAP_WIDTH = 1000;
 const DEFAULT_GLOBE_PIXEL_SIZE = 500;
@@ -21,7 +20,7 @@ const HAG_2018 = 0.05;
 const GRID_COLOR = '#262F36';
 
 const VIEW_DISTANCE_OLD = 100; // Earth radii
-const VIEW_ANGLE = atan(sqrt(VIEW_DISTANCE ** 2 + 2 * VIEW_DISTANCE_OLD));
+const VIEW_ANGLE = atan(sqrt(VIEW_DISTANCE_OLD ** 2 + 2 * VIEW_DISTANCE_OLD));
 const VIEW_RADIUS = sin(VIEW_ANGLE);
 const VIEW_PLANE = cos(VIEW_ANGLE);
 
@@ -55,6 +54,7 @@ export class Globe {
   private offscreen = document.createElement('canvas');
   private renderer: WebGLRenderer;
   private rendererHost: HTMLElement;
+  private renderIndex2d = 0;
   private scene: Scene;
 
   static loadMap(): void {
@@ -96,32 +96,26 @@ export class Globe {
         canvas.height = MAP_HEIGHT;
         context.drawImage(image, 0, 0, MAP_WIDTH, MAP_HEIGHT);
         context.strokeStyle = [GRID_COLOR, this.getGoldTrimColor()][mapIndex];
+        context.lineWidth = [1.5, 2][mapIndex];
 
-        // Draw lines of latitude
-        for (let lat = -75; lat < 90; lat += 15) {
-          const y = (lat + 90) / 180 * MAP_HEIGHT;
-
-          strokeLine(context, 0, y - 1, MAP_WIDTH, y - 1);
-        }
-
-        // Draw lines of longitude
-        for (let lon = 0; lon < 360; lon += 15) {
-          const x = lon / 360 * MAP_WIDTH;
-
-          strokeLine(context, x - 1, MAP_HEIGHT / 12, x - 1, MAP_HEIGHT * 5 / 6);
-        }
+        this.drawGlobeGrid(context);
 
         if (mapIndex) {
           this.mapImage2018 = image;
           this.mapCanvas2018 = canvas;
-          this.mapPixels[1] = context.getImageData(0, 0, MAP_WIDTH, MAP_HEIGHT);
+          this.mapPixels[Appearance.CURRENT] = context.getImageData(0, 0, MAP_WIDTH, MAP_HEIGHT);
+          context.fillStyle = this.getSkyColorColor2018();
+          context.fillRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
+          this.drawGlobeGrid(context);
+          this.mapPixels[Appearance.CURRENT_NO_MAP] = context.getImageData(0, 0, MAP_WIDTH, MAP_HEIGHT);
+
           this.mapLoading = false;
           this.waitList.forEach(cb => cb.resolve());
         }
         else {
           this.mapImage = image;
           this.mapCanvas = canvas;
-          this.mapPixels[0] = context.getImageData(0, 0, MAP_WIDTH, MAP_HEIGHT);
+          this.mapPixels[Appearance.PRE_2018] = context.getImageData(0, 0, MAP_WIDTH, MAP_HEIGHT);
           ++mapIndex;
           loadOneMap();
         }
@@ -142,6 +136,22 @@ export class Globe {
 
   private static getSkyColorColor2018(): string {
     return getComputedStyle(document.documentElement).getPropertyValue('--sky-color-2018').trim() || '#2F9DE7';
+  }
+
+  private static drawGlobeGrid(context: CanvasRenderingContext2D): void {
+    // Draw lines of latitude
+    for (let lat = -75; lat < 90; lat += 15) {
+      const y = (lat + 90) / 180 * MAP_HEIGHT;
+
+      strokeLine(context, 0, y - 1, MAP_WIDTH, y - 1);
+    }
+
+    // Draw lines of longitude
+    for (let lon = 0; lon < 360; lon += 15) {
+      const x = lon / 360 * MAP_WIDTH;
+
+      strokeLine(context, x - 1, MAP_HEIGHT / 12, x - 1, MAP_HEIGHT * 11 / 12);
+    }
   }
 
   constructor(rendererHost: string | HTMLElement) {
@@ -190,6 +200,12 @@ export class Globe {
   }
 
   private async render2D(lon: number, lat: number): Promise<void> {
+    if (this.lastGlobeResolve) {
+      ++this.renderIndex2d;
+      this.lastGlobeResolve();
+      this.lastGlobeResolve = undefined;
+    }
+
     let target = this.rendererHost.querySelector('canvas') as HTMLCanvasElement;
     let doDraw = true;
 
@@ -213,6 +229,7 @@ export class Globe {
         const renderSome = (): void => {
           if (generator.next().done) {
             doDraw = true;
+            this.lastGlobeResolve = undefined;
             resolve();
           }
           else
@@ -317,7 +334,7 @@ export class Globe {
 
     context.clearRect(0, 0, size, size);
 
-    const rt = GLOBE_SIZE / 2;
+    const rt = size / 2;
     const eye = new SphericalPosition3D(0, 0, VIEW_DISTANCE + 1).xyz;
     const yaw = to_radian(lon);
     const pitch = to_radian(-lat);
@@ -340,15 +357,20 @@ export class Globe {
     const Azy = cosb * sinc;
     const Azz = cosb * cosc;
 
-    const pixels = Globe.mapPixels[this.appearance < Appearance.PRE_2018 ? 1 : 0];
+    const pixels = Globe.mapPixels[this.appearance] ?? Globe.mapPixels[Appearance.CURRENT];
+    const renderIndex = this.renderIndex2d;
 
-    for (let yt = 0; yt < GLOBE_SIZE; ++yt) {
+    for (let yt = 0; yt < size; ++yt) {
       if (processMillis() > time + 100) {
         yield;
+
+        if (renderIndex !== this.renderIndex2d)
+          return;
+
         time = processMillis();
       }
 
-      for (let xt = 0; xt < GLOBE_SIZE; ++xt) {
+      for (let xt = 0; xt < size; ++xt) {
         const d = sqrt((xt - rt) ** 2 + (yt - rt) ** 2);
         let alpha = 1;
 
@@ -358,8 +380,8 @@ export class Globe {
           alpha = rt - d + 0.5;
 
         const x0 = VIEW_PLANE;
-        const y0 = (xt - rt) / GLOBE_SIZE * VIEW_RADIUS * 2;
-        const z0 = (rt - yt) / GLOBE_SIZE * VIEW_RADIUS * 2;
+        const y0 = (xt - rt) / size * VIEW_RADIUS * 2;
+        const z0 = (rt - yt) / size * VIEW_RADIUS * 2;
         const dx = eye.x - x0;
         const dy = eye.y - y0;
         const dz = eye.z - z0;
