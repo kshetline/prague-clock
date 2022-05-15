@@ -358,6 +358,10 @@ svg {
   top: 36.333%;
   transform: scale(-1, -1);
   width: 27.333%;
+
+  &.no-web-gl {
+    transform: unset;
+  }
 }
 
 @media

@@ -1,6 +1,6 @@
 import { BufferGeometry, CanvasTexture, CylinderGeometry, DoubleSide, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, SphereGeometry, WebGLRenderer } from 'three';
 import { getPixel, isString, noop, processMillis, strokeLine } from '@tubular/util';
-import { atan, cos, max, mod, PI, round, sin, SphericalPosition3D, sqrt, to_radian } from '@tubular/math';
+import { cos, max, mod, PI, round, sin, SphericalPosition3D, sqrt, tan_deg, to_radian } from '@tubular/math';
 import { mergeBufferGeometries } from '../three/three-utils';
 import { Appearance } from '../advanced-options/advanced-options.component';
 
@@ -18,11 +18,6 @@ const HAG = -0.02; // Sleight distance above globe that longitude/latitude lines
 const HAG_2018 = 0.05;
 
 const GRID_COLOR = '#262F36';
-
-const VIEW_DISTANCE_OLD = 100; // Earth radii
-const VIEW_ANGLE = atan(sqrt(VIEW_DISTANCE_OLD ** 2 + 2 * VIEW_DISTANCE_OLD));
-const VIEW_RADIUS = sin(VIEW_ANGLE);
-const VIEW_PLANE = cos(VIEW_ANGLE);
 
 let hasWebGl = !/\bwebgl=[0fn]/i.test(location.search);
 
@@ -96,7 +91,7 @@ export class Globe {
         canvas.height = MAP_HEIGHT;
         context.drawImage(image, 0, 0, MAP_WIDTH, MAP_HEIGHT);
         context.strokeStyle = [GRID_COLOR, this.getGoldTrimColor()][mapIndex];
-        context.lineWidth = [1.5, 2][mapIndex];
+        context.lineWidth = [1.5, 3][mapIndex];
 
         this.drawGlobeGrid(context);
 
@@ -141,14 +136,14 @@ export class Globe {
   private static drawGlobeGrid(context: CanvasRenderingContext2D): void {
     // Draw lines of latitude
     for (let lat = -75; lat < 90; lat += 15) {
-      const y = (lat + 90) / 180 * MAP_HEIGHT;
+      const y = (lat + 90) / 180 * MAP_HEIGHT + 2;
 
       strokeLine(context, 0, y - 1, MAP_WIDTH, y - 1);
     }
 
     // Draw lines of longitude
-    for (let lon = 0; lon < 360; lon += 15) {
-      const x = lon / 360 * MAP_WIDTH;
+    for (let lon = 0; lon <= 360; lon += 15) {
+      const x = lon / 360 * MAP_WIDTH + 2;
 
       strokeLine(context, x - 1, MAP_HEIGHT / 12, x - 1, MAP_HEIGHT * 11 / 12);
     }
@@ -159,6 +154,9 @@ export class Globe {
       this.rendererHost = document.getElementById(rendererHost);
     else
       this.rendererHost = rendererHost;
+
+    if (!hasWebGl)
+      this.rendererHost.classList.add('no-web-gl');
 
     if (!Globe.mapImage && !Globe.mapFailed && !Globe.mapLoading)
       Globe.loadMap();
@@ -328,6 +326,10 @@ export class Globe {
   }
 
   * generateRotatedGlobe(lon: number, lat: number): Generator<void> {
+    const post2018 = (this.appearance === Appearance.CURRENT || this.appearance === Appearance.CURRENT_NO_MAP);
+    const cameraZ = post2018 ? VIEW_DISTANCE_2018 : VIEW_DISTANCE;
+    const fieldOfView = post2018 ? FIELD_OF_VIEW_2018 : FIELD_OF_VIEW;
+    const viewRadius = (cameraZ + GLOBE_RADIUS) * tan_deg(fieldOfView / 2);
     const context = this.offscreen.getContext('2d');
     const size = this.currentPixelSize;
     let time = processMillis();
@@ -335,10 +337,11 @@ export class Globe {
     context.clearRect(0, 0, size, size);
 
     const rt = size / 2;
-    const eye = new SphericalPosition3D(0, 0, VIEW_DISTANCE + 1).xyz;
-    const yaw = to_radian(lon);
-    const pitch = to_radian(-lat);
-    const roll = (lat >= 0 ? PI : 0);
+    const eye = new SphericalPosition3D(0, 0, cameraZ).xyz;
+    const signX = (cameraZ > GLOBE_RADIUS ? 1 : -1);
+    const yaw = to_radian(lon + (post2018 ? 0 : 180));
+    const pitch = to_radian(lat * (post2018 ? -1 : 1));
+    const roll = ((post2018 ? -1 : 1) * lat >= 0 ? PI : 0);
 
     const cose = Math.cos(yaw);
     const sina = Math.sin(yaw);
@@ -379,9 +382,9 @@ export class Globe {
         else if (d > rt - 0.5)
           alpha = rt - d + 0.5;
 
-        const x0 = VIEW_PLANE;
-        const y0 = (xt - rt) / size * VIEW_RADIUS * 2;
-        const z0 = (rt - yt) / size * VIEW_RADIUS * 2;
+        const x0 = -GLOBE_RADIUS;
+        const y0 = ((xt - rt) * signX) / size * viewRadius * 2;
+        const z0 = (rt - yt) / size * viewRadius * 2;
         const dx = eye.x - x0;
         const dy = eye.y - y0;
         const dz = eye.z - z0;
@@ -392,9 +395,9 @@ export class Globe {
         const zu = dz / mag;
         // Dot product of unit vector and origin
         const dp = xu * eye.x + yu * eye.y + zu * eye.z;
-        const nabla = max(dp ** 2 - (VIEW_DISTANCE + 1) ** 2 + 1, 0);
+        const nabla = max(dp ** 2 - eye.x ** 2 + GLOBE_RADIUS ** 2, 0);
         // Distance from eye to globe intersection
-        const di = -dp + sqrt(nabla);
+        const di = -dp + sqrt(nabla) * signX;
         // Point of intersection with surface of globe
         const xi = eye.x + di * xu;
         const yi = eye.y + di * yu;
