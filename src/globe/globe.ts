@@ -1,9 +1,10 @@
 import { BufferGeometry, CanvasTexture, CylinderGeometry, DoubleSide, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, SphereGeometry, WebGLRenderer } from 'three';
-import { isString } from '@tubular/util';
-import { cos, PI, sin, to_radian } from '@tubular/math';
+import { getPixel, isString, noop, processMillis, strokeLine } from '@tubular/util';
+import { atan, cos, max, mod, PI, round, sin, SphericalPosition3D, sqrt, to_radian } from '@tubular/math';
 import { mergeBufferGeometries } from '../three/three-utils';
 import { Appearance } from '../advanced-options/advanced-options.component';
 
+const GLOBE_SIZE = 500;
 const MAP_HEIGHT = 500;
 const MAP_WIDTH = 1000;
 const DEFAULT_GLOBE_PIXEL_SIZE = 500;
@@ -19,6 +20,18 @@ const HAG_2018 = 0.05;
 
 const GRID_COLOR = '#262F36';
 
+const VIEW_DISTANCE_OLD = 100; // Earth radii
+const VIEW_ANGLE = atan(sqrt(VIEW_DISTANCE ** 2 + 2 * VIEW_DISTANCE_OLD));
+const VIEW_RADIUS = sin(VIEW_ANGLE);
+const VIEW_PLANE = cos(VIEW_ANGLE);
+
+let hasWebGl = !/\bwebgl=[0fn]/i.test(location.search);
+
+try {
+  hasWebGl = hasWebGl && !!document.createElement('canvas').getContext('webgl2');
+}
+catch {}
+
 export class Globe {
   private static mapCanvas: HTMLCanvasElement;
   private static mapCanvas2018: HTMLCanvasElement;
@@ -30,12 +43,16 @@ export class Globe {
 
   private appearance = Appearance.CURRENT;
   private camera: PerspectiveCamera;
+  private currentPixelSize = DEFAULT_GLOBE_PIXEL_SIZE;
   private globeMesh: Mesh;
   private initialized = false;
+  private lastGlobeResolve: () => void;
   private lastLatitude: number;
   private lastLongitude: number;
   private lastPixelSize = DEFAULT_GLOBE_PIXEL_SIZE;
   private lastRenderer: HTMLElement;
+  private static mapPixels: ImageData[] = [];
+  private offscreen = document.createElement('canvas');
   private renderer: WebGLRenderer;
   private rendererHost: HTMLElement;
   private scene: Scene;
@@ -43,7 +60,7 @@ export class Globe {
   static loadMap(): void {
     this.mapLoading = true;
 
-    let map = 0;
+    let mapIndex = 0;
 
     const loadOneMap = (): void => {
       const imagePromise = new Promise<HTMLImageElement>((resolve, reject) => {
@@ -68,26 +85,44 @@ export class Globe {
           reject(new Error('Map image failed to load from: ' + image.src));
         };
 
-        image.src = map ? 'assets/world-p2018.jpg' : 'assets/world.jpg';
+        image.src = mapIndex ? 'assets/world-p2018.jpg' : 'assets/world.jpg';
       });
 
       imagePromise.then(image => {
         const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
 
         canvas.width = MAP_WIDTH;
         canvas.height = MAP_HEIGHT;
-        canvas.getContext('2d').drawImage(image, 0, 0, MAP_WIDTH, MAP_HEIGHT);
+        context.drawImage(image, 0, 0, MAP_WIDTH, MAP_HEIGHT);
+        context.strokeStyle = [GRID_COLOR, this.getGoldTrimColor()][mapIndex];
 
-        if (map) {
+        // Draw lines of latitude
+        for (let lat = -75; lat < 90; lat += 15) {
+          const y = (lat + 90) / 180 * MAP_HEIGHT;
+
+          strokeLine(context, 0, y - 1, MAP_WIDTH, y - 1);
+        }
+
+        // Draw lines of longitude
+        for (let lon = 0; lon < 360; lon += 15) {
+          const x = lon / 360 * MAP_WIDTH;
+
+          strokeLine(context, x - 1, MAP_HEIGHT / 12, x - 1, MAP_HEIGHT * 5 / 6);
+        }
+
+        if (mapIndex) {
           this.mapImage2018 = image;
           this.mapCanvas2018 = canvas;
+          this.mapPixels[1] = context.getImageData(0, 0, MAP_WIDTH, MAP_HEIGHT);
           this.mapLoading = false;
           this.waitList.forEach(cb => cb.resolve());
         }
         else {
           this.mapImage = image;
           this.mapCanvas = canvas;
-          ++map;
+          this.mapPixels[0] = context.getImageData(0, 0, MAP_WIDTH, MAP_HEIGHT);
+          ++mapIndex;
           loadOneMap();
         }
       }, reason => {
@@ -125,14 +160,24 @@ export class Globe {
     else if (!Globe.mapImage2018)
       await new Promise<void>((resolve, reject) => Globe.waitList.push({ resolve, reject }));
 
+    this.currentPixelSize = (this.rendererHost.getBoundingClientRect().width * 2) || DEFAULT_GLOBE_PIXEL_SIZE;
+
+    if (hasWebGl)
+      this.renderWebGl(lon, lat);
+    else
+      await this.render2D(lon, lat);
+
+    this.lastPixelSize = this.currentPixelSize;
+    this.lastLatitude = lat;
+    this.lastLongitude = lon;
+  }
+
+  private renderWebGl(lon: number, lat: number): void {
     if (!this.initialized)
       this.setUpRenderer();
 
-    const currentPixelSize = (this.renderer.domElement.getBoundingClientRect().width * 2) || DEFAULT_GLOBE_PIXEL_SIZE;
-
-    if (!this.initialized || this.lastPixelSize !== currentPixelSize) {
-      this.renderer.setSize(currentPixelSize, currentPixelSize);
-      this.lastPixelSize = currentPixelSize;
+    if (!this.initialized || this.lastPixelSize !== this.currentPixelSize) {
+      this.renderer.setSize(this.currentPixelSize, this.currentPixelSize);
       this.initialized = true;
     }
 
@@ -140,10 +185,48 @@ export class Globe {
     this.globeMesh.rotation.x = to_radian(lat);
     this.camera.rotation.z = (lat >= 0 || this.appearance === Appearance.CURRENT ||
       this.appearance === Appearance.CURRENT_NO_MAP ? PI : 0);
-    this.lastLatitude = lat;
-    this.lastLongitude = lon;
 
     requestAnimationFrame(() => this.renderer.render(this.scene, this.camera));
+  }
+
+  private async render2D(lon: number, lat: number): Promise<void> {
+    let target = this.rendererHost.querySelector('canvas') as HTMLCanvasElement;
+    let doDraw = true;
+
+    if (!target) {
+      target = document.createElement('canvas');
+      this.rendererHost.appendChild(target);
+    }
+
+    if (!this.initialized || this.lastPixelSize !== this.currentPixelSize) {
+      target.width = this.offscreen.width = this.currentPixelSize;
+      target.height = this.offscreen.height = this.currentPixelSize;
+    }
+
+    if (!this.initialized || this.lastLatitude !== lat || this.lastLongitude !== lon) {
+      doDraw = false;
+      const generator = this.generateRotatedGlobe(lon, lat);
+
+      await new Promise<void>(resolve => {
+        this.lastGlobeResolve = resolve;
+
+        const renderSome = (): void => {
+          if (generator.next().done) {
+            doDraw = true;
+            resolve();
+          }
+          else
+            setTimeout(renderSome);
+        };
+
+        renderSome();
+      });
+    }
+
+    this.initialized = true;
+
+    if (doDraw)
+      target.getContext('2d').drawImage(this.offscreen, 0, 0, target.width, target.height);
   }
 
   setAppearance(appearance: Appearance): void {
@@ -157,9 +240,14 @@ export class Globe {
     if (!this.initialized)
       return;
 
-    this.setUpRenderer();
-    this.renderer.setSize(this.lastPixelSize, this.lastPixelSize);
-    this.orient(this.lastLongitude, this.lastLatitude).finally();
+    if (hasWebGl) {
+      this.setUpRenderer();
+      this.renderer.setSize(this.lastPixelSize, this.lastPixelSize);
+    }
+    else
+      this.initialized = false;
+
+    this.orient(this.lastLongitude, this.lastLatitude).catch(noop);
   }
 
   private setUpRenderer(): void {
@@ -220,5 +308,87 @@ export class Globe {
 
     this.rendererHost.appendChild(this.renderer.domElement);
     this.lastRenderer = this.renderer.domElement;
+  }
+
+  * generateRotatedGlobe(lon: number, lat: number): Generator<void> {
+    const context = this.offscreen.getContext('2d');
+    const size = this.currentPixelSize;
+    let time = processMillis();
+
+    context.clearRect(0, 0, size, size);
+
+    const rt = GLOBE_SIZE / 2;
+    const eye = new SphericalPosition3D(0, 0, VIEW_DISTANCE + 1).xyz;
+    const yaw = to_radian(lon);
+    const pitch = to_radian(-lat);
+    const roll = (lat >= 0 ? PI : 0);
+
+    const cose = Math.cos(yaw);
+    const sina = Math.sin(yaw);
+    const cosb = Math.cos(pitch);
+    const sinb = Math.sin(pitch);
+    const cosc = Math.cos(roll);
+    const sinc = Math.sin(roll);
+
+    const Axx = cose * cosb;
+    const Axy = cose * sinb * sinc - sina * cosc;
+    const Axz = cose * sinb * cosc + sina * sinc;
+    const Ayx = sina * cosb;
+    const Ayy = sina * sinb * sinc + cose * cosc;
+    const Ayz = sina * sinb * cosc - cose * sinc;
+    const Azx = -sinb;
+    const Azy = cosb * sinc;
+    const Azz = cosb * cosc;
+
+    const pixels = Globe.mapPixels[this.appearance < Appearance.PRE_2018 ? 1 : 0];
+
+    for (let yt = 0; yt < GLOBE_SIZE; ++yt) {
+      if (processMillis() > time + 100) {
+        yield;
+        time = processMillis();
+      }
+
+      for (let xt = 0; xt < GLOBE_SIZE; ++xt) {
+        const d = sqrt((xt - rt) ** 2 + (yt - rt) ** 2);
+        let alpha = 1;
+
+        if (d > rt + 0.5)
+          continue;
+        else if (d > rt - 0.5)
+          alpha = rt - d + 0.5;
+
+        const x0 = VIEW_PLANE;
+        const y0 = (xt - rt) / GLOBE_SIZE * VIEW_RADIUS * 2;
+        const z0 = (rt - yt) / GLOBE_SIZE * VIEW_RADIUS * 2;
+        const dx = eye.x - x0;
+        const dy = eye.y - y0;
+        const dz = eye.z - z0;
+        // Unit vector for line-of-sight
+        const mag = sqrt(dx ** 2 + dy ** 2 + dz ** 2);
+        const xu = dx / mag;
+        const yu = dy / mag;
+        const zu = dz / mag;
+        // Dot product of unit vector and origin
+        const dp = xu * eye.x + yu * eye.y + zu * eye.z;
+        const nabla = max(dp ** 2 - (VIEW_DISTANCE + 1) ** 2 + 1, 0);
+        // Distance from eye to globe intersection
+        const di = -dp + sqrt(nabla);
+        // Point of intersection with surface of globe
+        const xi = eye.x + di * xu;
+        const yi = eye.y + di * yu;
+        const zi = eye.z + di * zu;
+        // Rotate to match lat/long
+        const x1 = Axx * xi + Axy * yi + Axz * zi;
+        const y1 = Ayx * xi + Ayy * yi + Ayz * zi;
+        const z1 = Azx * xi + Azy * yi + Azz * zi;
+        const i = SphericalPosition3D.convertRectangular(x1, y1, z1);
+        const xs = mod(i.longitude.degrees + 180, 360) / 360 * MAP_WIDTH;
+        const ys = (90 - i.latitude.degrees) / 180 * MAP_HEIGHT;
+        const pixel = getPixel(pixels, round(xs), round(ys));
+
+        context.fillStyle = `rgba(${(pixel & 0xFF0000) >> 16}, ${(pixel & 0xFF00) >> 8}, ${pixel & 0xFF}, ${alpha})`;
+        context.fillRect(xt, yt, 1, 1);
+      }
+    }
   }
 }

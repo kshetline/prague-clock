@@ -28,7 +28,7 @@
         eval('Symbol("symbol")');
         eval('Array.from([])');
         eval('new Promise(resolve => resolve()).finally()');
-        success = !!(''.startsWith && document.createElement('canvas').getContext('webgl2'));
+        success = !!(''.startsWith);
       }
       catch (e) {
         success = false;
