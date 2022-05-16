@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService, PrimeNGConfig } from 'primeng/api';
 import { abs, floor, max, min, mod, mod2 } from '@tubular/math';
 import {
-  clone, extendDelimited, forEach, getCssValue, isAndroid, isEqual, isIOS, isLikelyMobile, isMacOS, isObject, isSafari,
+  clone, extendDelimited, forEach, getCssValue, isAndroid, isEqual, isIOS, isLikelyMobile, isMacOS, isObject, isSafari, noop,
   processMillis
 } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
@@ -865,7 +865,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   }
 
   private updateGlobe(): void {
-    this.globe.orient(this._longitude, this.latitude).finally();
+    this.globe.orient(this._longitude, this.latitude).catch(noop);
   }
 
   updateTime(forceUpdate = false): void {

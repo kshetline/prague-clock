@@ -1,3 +1,7 @@
+## 1.6.2
+
+* Relaxed browser requirements, with WebGL capability no long required.
+
 ## 1.6.1
 
 * Added ability to open info display from collapsed control panel.

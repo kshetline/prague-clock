@@ -29,6 +29,13 @@
 </head>
 <body>
   <div class="page">
+    <script>
+      // noinspection ES6ConvertVarToLetConst
+      var msg = (/\bmsg=([^&]*)/.exec(location.search) || [])[1];
+
+      if (msg)
+        document.write('<p style="color: red">' + decodeURIComponent(msg) + '</p>');
+    </script>
     <p>Your web browser does not have the capabilities needed to run the simulator.</p>
     <!-- cspell:disable -->
     <p>Váš webový prohlížeč nemá schopnosti potřebné ke spuštění simulátoru.</p>
