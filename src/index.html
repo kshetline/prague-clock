@@ -19,7 +19,7 @@
     (function () {
       // Test browser feature support.
       // noinspection ES6ConvertVarToLetConst
-      var success;
+      var success, msg = '';
 
       try {
         eval('// noinspection JSUnusedLocalSymbols\nlet a = `a`');
@@ -29,13 +29,33 @@
         eval('Array.from([])');
         eval('new Promise(resolve => resolve()).finally()');
         success = !!(''.startsWith);
+
+        if (success) {
+          (() => {
+            const ua = navigator.userAgent;
+            const chromeVersion = parseInt((/\bChrome\/(\d+)/.exec(ua) || ['0', '0'])[1]);
+
+            if (chromeVersion && chromeVersion < 79) {
+              msg = 'Chrome version (' + chromeVersion + ') must be 79 or later';
+              return;
+            }
+
+            const firefoxVersion = parseInt((/\bFirefox\/(\d+)/.exec(ua) || ['0', '0'])[1]);
+
+            if (firefoxVersion && firefoxVersion < 79) {
+              msg = 'Firefox version (' + firefoxVersion + ') must be 79 or later';
+              return;
+            }
+          })();
+        }
       }
       catch (e) {
         success = false;
+        msg = e.message || e.toString();
       }
 
-      if (!success) {
-        location.href = location.origin + '/orloj/assets/incompatible.html';
+      if (!success || msg) {
+        location.href = location.origin + '/orloj/assets/incompatible.html?msg=' + encodeURIComponent(msg);
         return;
       }
 
@@ -103,7 +123,7 @@
   </app-root></div>
   <script>
     (() => {
-      const specificLocale = (/\?(.*)\blang=([^&]+)/.exec(window.location.href) ?? [])[2];
+      const specificLocale = (/\?(.*)\blang=([^&]+)/.exec(window.location.href) || [])[2];
       const urlLocale = (/\borloj\/([^/]+)/.exec(window.location.href) || [])[1];
       let locales = [];
 

@@ -224,6 +224,11 @@ export class Globe {
       target.height = this.offscreen.height = this.currentPixelSize;
     }
 
+    if (this.appearance === Appearance.ORIGINAL_1410) {
+      target.getContext('2d').clearRect(0, 0, this.currentPixelSize, this.currentPixelSize);
+      return;
+    }
+
     if (!this.initialized || this.lastLatitude !== lat || this.lastLongitude !== lon) {
       doDraw = false;
       const generator = this.generateRotatedGlobe(lon, lat);
