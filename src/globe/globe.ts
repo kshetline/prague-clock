@@ -100,10 +100,13 @@ export class Globe {
           this.mapImage2018 = image;
           this.mapCanvas2018 = canvas;
           this.mapPixels[Appearance.CURRENT] = context.getImageData(0, 0, MAP_WIDTH, MAP_HEIGHT);
+          // Make mapless grid for Appearance.CURRENT_NO_MAP
           context.fillStyle = this.getSkyColorColor2018();
           context.fillRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
           this.drawGlobeGrid(context);
           this.mapPixels[Appearance.CURRENT_NO_MAP] = context.getImageData(0, 0, MAP_WIDTH, MAP_HEIGHT);
+          // Restore map pixels to canvas
+          context.putImageData(this.mapPixels[Appearance.CURRENT], 0, 0);
 
           this.mapLoading = false;
           this.waitList.forEach(cb => cb.resolve());
