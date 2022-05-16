@@ -38,6 +38,7 @@ export class Globe {
   private appearance = Appearance.CURRENT;
   private camera: PerspectiveCamera;
   private currentPixelSize = DEFAULT_GLOBE_PIXEL_SIZE;
+  private drawingTimer: any;
   private globeMesh: Mesh;
   private initialized = false;
   private lastGlobeResolve: () => void;
@@ -204,6 +205,9 @@ export class Globe {
       this.lastGlobeResolve = undefined;
     }
 
+    if (!this.drawingTimer)
+      this.drawingTimer = setTimeout(() => this.rendererHost.style.opacity = '0.25', 1000);
+
     let target = this.rendererHost.querySelector('canvas') as HTMLCanvasElement;
     let doDraw = true;
 
@@ -225,8 +229,10 @@ export class Globe {
         this.lastGlobeResolve = resolve;
 
         const renderSome = (): void => {
-          if (generator.next().done) {
-            doDraw = true;
+          const next = generator.next();
+
+          if (next.done) {
+            doDraw = next.value;
             this.lastGlobeResolve = undefined;
             resolve();
           }
@@ -240,8 +246,15 @@ export class Globe {
 
     this.initialized = true;
 
-    if (doDraw)
+    if (doDraw) {
       target.getContext('2d').drawImage(this.offscreen, 0, 0, target.width, target.height);
+      this.rendererHost.style.opacity = '1';
+
+      if (this.drawingTimer) {
+        clearTimeout(this.drawingTimer);
+        this.drawingTimer = undefined;
+      }
+    }
   }
 
   setAppearance(appearance: Appearance): void {
@@ -325,7 +338,7 @@ export class Globe {
     this.lastRenderer = this.renderer.domElement;
   }
 
-  * generateRotatedGlobe(lon: number, lat: number): Generator<void> {
+  * generateRotatedGlobe(lon: number, lat: number): Generator<boolean> {
     const post2018 = (this.appearance === Appearance.CURRENT || this.appearance === Appearance.CURRENT_NO_MAP);
     const cameraZ = post2018 ? VIEW_DISTANCE_2018 : VIEW_DISTANCE;
     const fieldOfView = post2018 ? FIELD_OF_VIEW_2018 : FIELD_OF_VIEW;
@@ -368,7 +381,7 @@ export class Globe {
         yield;
 
         if (renderIndex !== this.renderIndex2d)
-          return;
+          return false;
 
         time = processMillis();
       }
@@ -415,5 +428,7 @@ export class Globe {
         context.fillRect(xt, yt, 1, 1);
       }
     }
+
+    return true;
   }
 }
