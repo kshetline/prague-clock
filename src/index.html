@@ -46,6 +46,11 @@
               msg = 'Firefox version (' + firefoxVersion + ') must be 79 or later';
               return;
             }
+
+            const safariVersion = parseFloat((/\bVersion\/(\d+(\.\d+)?).*\bSafari\/\d+/.exec(ua) || ['0', '0'])[1]);
+
+            if (safariVersion && safariVersion < 13.1)
+              msg = 'Safari version (' + safariVersion + ') must be 13.1 or later';
           })();
         }
       }
