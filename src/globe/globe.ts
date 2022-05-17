@@ -1,6 +1,6 @@
 import { BufferGeometry, CanvasTexture, CylinderGeometry, DoubleSide, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, SphereGeometry, WebGLRenderer } from 'three';
-import { getPixel, isString, noop, processMillis, strokeLine } from '@tubular/util';
-import { cos, max, mod, PI, round, sin, SphericalPosition3D, sqrt, tan_deg, to_radian } from '@tubular/math';
+import { getPixel, isString, noop, processMillis, setPixel, strokeLine } from '@tubular/util';
+import { cos, floor, max, mod, PI, round, sin, SphericalPosition3D, sqrt, tan_deg, to_radian } from '@tubular/math';
 import { mergeBufferGeometries } from '../three/three-utils';
 import { Appearance } from '../advanced-options/advanced-options.component';
 
@@ -47,7 +47,7 @@ export class Globe {
   private lastPixelSize = DEFAULT_GLOBE_PIXEL_SIZE;
   private lastRenderer: HTMLElement;
   private static mapPixels: ImageData[] = [];
-  private offscreen = document.createElement('canvas');
+  private offscreen: ImageData;
   private renderer: WebGLRenderer;
   private rendererHost: HTMLElement;
   private renderIndex2d = 0;
@@ -219,9 +219,10 @@ export class Globe {
       this.rendererHost.appendChild(target);
     }
 
-    if (!this.initialized || this.lastPixelSize !== this.currentPixelSize) {
-      target.width = this.offscreen.width = this.currentPixelSize;
-      target.height = this.offscreen.height = this.currentPixelSize;
+    if (!this.initialized || this.lastPixelSize !== this.currentPixelSize || !this.offscreen) {
+      target.width = this.currentPixelSize;
+      target.height = this.currentPixelSize;
+      this.offscreen = new ImageData(this.currentPixelSize, this.currentPixelSize);
     }
 
     if (this.appearance === Appearance.ORIGINAL_1410) {
@@ -255,7 +256,7 @@ export class Globe {
     this.initialized = true;
 
     if (doDraw) {
-      target.getContext('2d').drawImage(this.offscreen, 0, 0, target.width, target.height);
+      target.getContext('2d').putImageData(this.offscreen, 0, 0);
       this.rendererHost.style.opacity = '1';
 
       if (this.drawingTimer) {
@@ -351,11 +352,8 @@ export class Globe {
     const cameraZ = post2018 ? VIEW_DISTANCE_2018 : VIEW_DISTANCE;
     const fieldOfView = post2018 ? FIELD_OF_VIEW_2018 : FIELD_OF_VIEW;
     const viewRadius = (cameraZ + GLOBE_RADIUS) * tan_deg(fieldOfView / 2);
-    const context = this.offscreen.getContext('2d');
     const size = this.currentPixelSize;
     let time = processMillis();
-
-    context.clearRect(0, 0, size, size);
 
     const rt = size / 2;
     const eye = new SphericalPosition3D(0, 0, cameraZ).xyz;
@@ -396,12 +394,12 @@ export class Globe {
 
       for (let xt = 0; xt < size; ++xt) {
         const d = sqrt((xt - rt) ** 2 + (yt - rt) ** 2);
-        let alpha = 1;
+        let alpha = 0xFF000000;
 
         if (d > rt + 0.5)
           continue;
         else if (d > rt - 0.5)
-          alpha = rt - d + 0.5;
+          alpha = floor((rt - d + 0.5) * 255) << 24;
 
         const x0 = -GLOBE_RADIUS;
         const y0 = ((xt - rt) * signX) / size * viewRadius * 2;
@@ -430,10 +428,9 @@ export class Globe {
         const i = SphericalPosition3D.convertRectangular(x1, y1, z1);
         const xs = mod(i.longitude.degrees + 180, 360) / 360 * MAP_WIDTH;
         const ys = (90 - i.latitude.degrees) / 180 * MAP_HEIGHT;
-        const pixel = getPixel(pixels, round(xs), round(ys));
+        const pixel = getPixel(pixels, round(xs), round(ys)) & 0xFFFFFF;
 
-        context.fillStyle = `rgba(${(pixel & 0xFF0000) >> 16}, ${(pixel & 0xFF00) >> 8}, ${pixel & 0xFF}, ${alpha})`;
-        context.fillRect(xt, yt, 1, 1);
+        setPixel(this.offscreen, xt, yt, pixel | alpha);
       }
     }
 
