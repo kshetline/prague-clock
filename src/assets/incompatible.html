@@ -28,14 +28,16 @@
 </style>
 </head>
 <body>
-  <div class="page">
-    <script>
-      // noinspection ES6ConvertVarToLetConst
-      var msg = (/\bmsg=([^&]*)/.exec(location.search) || [])[1];
+  <script>
+    var msg = (/\bmsg=([^&]*)/.exec(location.search) || [])[1];
 
-      if (msg)
-        document.write('<p style="color: red">' + decodeURIComponent(msg) + '</p>');
-    </script>
+    if (msg)
+      document.write('<p style="color: red">' + decodeURIComponent(msg) + '</p>');
+
+    if (location.href.includes('?'))
+        history.replaceState(undefined, undefined, location.href.replace(/\?.*$/, ''));
+  </script>
+  <div class="page">
     <p>Your web browser does not have the capabilities needed to run the simulator.</p>
     <!-- cspell:disable -->
     <p>Váš webový prohlížeč nemá schopnosti potřebné ke spuštění simulátoru.</p>

@@ -15,52 +15,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link type="text/css" rel="stylesheet" href="assets/fonts.css">
   <script>
     (function () {
       // Test browser feature support.
-      // noinspection ES6ConvertVarToLetConst
-      var success, msg = '';
+      var msg = '';
 
-      try {
-        eval('// noinspection JSUnusedLocalSymbols\nlet a = `a`');
-        eval('// noinspection JSUnusedLocalSymbols\nconst [x, y] = [1, 2]');
-        eval('(y = 0) => -y');
-        eval('Symbol("symbol")');
-        eval('Array.from([])');
-        eval('new Promise(resolve => resolve()).finally()');
-        success = !!(''.startsWith);
+      (function () {
+        var ua = navigator.userAgent;
 
-        if (success) {
-          (() => {
-            const ua = navigator.userAgent;
-            const chromeVersion = parseInt((/\bChrome\/(\d+)/.exec(ua) || ['0', '0'])[1]);
+        if (/\b(MSIE|(Windows NT\b.+\brv:11))\b/.test(ua)) {
+          msg = 'Internet Explorer is not supported';
+          return;
+        }
 
-            if (chromeVersion && chromeVersion < 79) {
-              msg = 'Chrome version (' + chromeVersion + ') must be 79 or later';
-              return;
-            }
+        var highlight = '<span style="font-weight: bold; color: magenta;">$1</span>';
+        var chromeVersion = parseInt((/\bChrome\/(\d+)/.exec(ua) || ['0', '0'])[1]);
 
-            const firefoxVersion = parseInt((/\bFirefox\/(\d+)/.exec(ua) || ['0', '0'])[1]);
+        if (chromeVersion && chromeVersion < 79) {
+          msg = 'Your browser: ' + ua.replace(/(\bChrome\/[.\d]+)/, highlight) +
+            '<br><br>\nChrome version must be 79 or later';
+          return;
+        }
 
-            if (firefoxVersion && firefoxVersion < 79) {
-              msg = 'Firefox version (' + firefoxVersion + ') must be 79 or later';
-              return;
-            }
+        var firefoxVersion = parseInt((/\bFirefox\/(\d+)/.exec(ua) || ['0', '0'])[1]);
 
-            const safariVersion = parseFloat((/\bVersion\/(\d+(\.\d+)?).*\bSafari\/\d+/.exec(ua) || ['0', '0'])[1]);
+        if (firefoxVersion && firefoxVersion < 79) {
+          msg = 'Your browser: ' + ua.replace(/(\bFirefox\/[.\d]+)/, highlight) +
+            '<br><br>\nFirefox version must be 79 or later';
+          return;
+        }
 
-            if (safariVersion && safariVersion < 13.1)
-              msg = 'Safari version (' + safariVersion + ') must be 13.1 or later';
-          })();
+        var safariVersion = parseFloat((/\bVersion\/(\d+(\.\d+)?).*\bSafari\/\d+/.exec(ua) || ['0', '0'])[1]);
+
+        if (safariVersion && safariVersion < 13.1)
+          msg = 'Your browser: ' + ua.replace(/(\bVersion\/[.\d]+(.*\bSafari\b)?)/, highlight) +
+            '<br><br>\nSafari version must be 13.1 or later';
+      })();
+
+      if (!msg) {
+        try {
+          eval('// noinspection JSUnusedLocalSymbols\nlet a = `a`');
+          eval('// noinspection JSUnusedLocalSymbols\nconst [x, y] = [1, 2]');
+          eval('(y = 0) => -y');
+          eval('Symbol("symbol")');
+          eval('Array.from([])');
+          eval('new Promise(resolve => resolve()).finally()');
+          msg = !(''.startsWith) ? 'No String.startsWith()' : '';
+        }
+        catch (e) {
+          msg = e.message || e.toString();
         }
       }
-      catch (e) {
-        success = false;
-        msg = e.message || e.toString();
-      }
 
-      if (!success || msg) {
-        location.href = location.origin + '/orloj/assets/incompatible.html?msg=' + encodeURIComponent(msg);
+      if (msg) {
+        location.href = location.origin + (/\borloj\b/.test(location.pathname) ? '/orloj' : '') +
+          '/assets/incompatible.html?msg=' + encodeURIComponent(msg);
         return;
       }
 

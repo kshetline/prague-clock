@@ -132,8 +132,28 @@
   "overrides": [
     {
       "files": ["*.js", "*.cjs"],
+      "parser": "babel-eslint",
+      "parserOptions": {
+        "ecmaVersion": 2018,
+        "sourceType": "module"
+      },
       "rules": {
-        "@typescript-eslint/explicit-function-return-type": "off"
+        "@typescript-eslint/consistent-type-assertions": "off",
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/indent": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+        "indent": [
+          "error",
+          2,
+          {
+            "ArrayExpression": "first",
+            "FunctionDeclaration": { "parameters": "off" },
+            "FunctionExpression": { "parameters": "off" },
+            "ignoreComments": true,
+            "ObjectExpression": "first",
+            "SwitchCase": 1
+          }
+        ]
       }
     }
   ]
