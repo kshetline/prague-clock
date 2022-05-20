@@ -2,6 +2,7 @@
   // Test browser feature support.
   var script = document.currentScript || document.querySelector('script[data-bc-vers]');
   var args = script.getAttribute('data-bc-vers').split(',').map(function (arg) { return parseFloat(arg); });
+  var url = script.getAttribute('data-bc-url') || 'assets/incompatible.html';
   var msg = '';
   var features = {};
 
@@ -76,8 +77,7 @@
   }
 
   if (msg) {
-    alert('assets/incompatible.html?msg=' + encodeURIComponent(msg));
-    location.href = 'assets/incompatible.html?msg=' + encodeURIComponent(msg);
+    location.href = url + '?msg=' + encodeURIComponent(msg);
     return;
   }
 
