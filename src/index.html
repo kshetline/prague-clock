@@ -16,86 +16,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link type="text/css" rel="stylesheet" href="assets/fonts.css">
-  <script>
-    (function () {
-      // Test browser feature support.
-      var msg = '';
-
-      (function () {
-        var ua = navigator.userAgent;
-
-        if (/\b(MSIE|(Windows NT\b.+\brv:11))\b/.test(ua)) {
-          msg = 'Internet Explorer is not supported';
-          return;
-        }
-
-        var highlight = '<span style="font-weight: bold; color: magenta;">$1</span>';
-        var chromeVersion = parseInt((/\bChrome\/(\d+)/.exec(ua) || ['0', '0'])[1]);
-
-        if (chromeVersion && chromeVersion < 79) {
-          msg = 'Your browser: ' + ua.replace(/(\bChrome\/[.\d]+)/, highlight) +
-            '<br><br>\nChrome version must be 79 or later';
-          return;
-        }
-
-        var firefoxVersion = parseInt((/\bFirefox\/(\d+)/.exec(ua) || ['0', '0'])[1]);
-
-        if (firefoxVersion && firefoxVersion < 79) {
-          msg = 'Your browser: ' + ua.replace(/(\bFirefox\/[.\d]+)/, highlight) +
-            '<br><br>\nFirefox version must be 79 or later';
-          return;
-        }
-
-        var safariVersion = parseFloat((/\bVersion\/(\d+(\.\d+)?).*\bSafari\/\d+/.exec(ua) || ['0', '0'])[1]);
-
-        if (safariVersion && safariVersion < 13.1)
-          msg = 'Your browser: ' + ua.replace(/(\bVersion\/[.\d]+(.*\bSafari\b)?)/, highlight) +
-            '<br><br>\nSafari version must be 13.1 or later';
-      })();
-
-      if (!msg) {
-        try {
-          eval('// noinspection JSUnusedLocalSymbols\nlet a = `a`');
-          eval('// noinspection JSUnusedLocalSymbols\nconst [x, y] = [1, 2]');
-          eval('(y = 0) => -y');
-          eval('Symbol("symbol")');
-          eval('Array.from([])');
-          eval('new Promise(resolve => resolve()).finally()');
-          msg = !(''.startsWith) ? 'No String.startsWith()' : '';
-        }
-        catch (e) {
-          msg = e.message || e.toString();
-        }
-      }
-
-      if (msg) {
-        location.href = location.origin + (/\borloj\b/.test(location.pathname) ? '/orloj' : '') +
-          '/assets/incompatible.html?msg=' + encodeURIComponent(msg);
-        return;
-      }
-
-      // Handle forwarding of settings from old site.
-      if (!location.search)
-        return;
-
-      let ls = (new URL(document.location)).searchParams.get('ls');
-
-      if (ls) {
-        try {
-          JSON.parse(ls);
-        }
-        catch (e) {
-          console.error(e);
-          ls = '';
-        }
-
-        if (ls && !localStorage.getItem('pac-settings'))
-          localStorage.setItem('pac-settings', ls);
-
-        location.href = location.origin + location.pathname;
-      }
-    })();
-  </script>
+  <script src="browser-check.es5.js" type="text/javascript" data-bc-vers="0,79,79,13.1"></script>
   <style>
     .startup-spinner {
       animation-delay: 0s;
@@ -136,7 +57,7 @@
               48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49
               48-48-21.491-48-48-48z"></path></svg>&nbsp;&nbsp;<span id="loading">Loading...</span></div>
   </app-root></div>
-  <script>
+  <script type="text/javascript">
     (() => {
       const specificLocale = (/\?(.*)\blang=([^&]+)/.exec(window.location.href) || [])[2];
       const urlLocale = (/\borloj\/([^/]+)/.exec(window.location.href) || [])[1];

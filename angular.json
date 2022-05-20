@@ -48,6 +48,7 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
+              "src/browser-check.es5.js",
               "src/favicon.ico",
               "src/assets"
             ],

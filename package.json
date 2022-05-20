@@ -1,6 +1,6 @@
 {
   "name": "prague-clock",
-  "version": "1.6.4",
+  "version": "1.6.5",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --configuration=development",
