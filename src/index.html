@@ -16,7 +16,33 @@
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link type="text/css" rel="stylesheet" href="assets/fonts.css">
-  <script src="browser-check.es5.js" type="text/javascript" data-bc-vers="0,79,79,13.1"></script>
+  <!--suppress HtmlUnknownTarget -->
+  <script src="assets/browser-check.min.js" type="text/javascript" data-bc-vers="0,79,79,13.1,605" data-bc-min-es="2017"
+    data-bc-fail-url="assets/incompatible.html"></script>
+  <script type="text/javascript">
+    (function() {
+      // Handle forwarding of settings from old site.
+      if (!location.search || typeof URL === 'undefined'|| typeof JSON === 'undefined' || !window.localStorage)
+        return;
+
+      var ls = (new URL(document.location)).searchParams.get('ls');
+
+      if (ls) {
+        try {
+          JSON.parse(ls);
+        }
+        catch (e) {
+          console.error(e);
+          ls = '';
+        }
+
+        if (ls && !localStorage.getItem('pac-settings'))
+          localStorage.setItem('pac-settings', ls);
+
+        location.href = location.origin + location.pathname;
+      }
+    })();
+  </script>
   <style>
     .startup-spinner {
       animation-delay: 0s;

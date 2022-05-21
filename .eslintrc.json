@@ -163,6 +163,7 @@
       },
       "rules": {
         "no-eval": "off",
+        "no-template-curly-in-string": "off",
         "no-var": "off"
       }
     }

@@ -48,9 +48,13 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              "src/browser-check.es5.js",
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              {
+                "glob": "browser-check.min.js*",
+                "input": "./node_modules/@tubular/browser-check/dist/",
+                "output": "./assets/"
+              }
             ],
             "styles": [
               "node_modules/primeng/resources/themes/arya-blue/theme.css",
@@ -143,7 +147,12 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              {
+                "glob": "browser-check.min.js*",
+                "input": "./node_modules/@tubular/browser-check/dist/",
+                "output": "./assets/"
+              }
             ],
             "styles": [
               "src/styles.scss"

@@ -1,6 +1,6 @@
 {
   "name": "prague-clock",
-  "version": "1.6.5",
+  "version": "1.6.6",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --configuration=development",
@@ -32,6 +32,7 @@
     "@fortawesome/free-regular-svg-icons": "^6.0.0",
     "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "@tubular/astronomy": "^3.1.0",
+    "@tubular/browser-check": "^0.0.2-alpha",
     "@tubular/math": "^3.1.0",
     "@tubular/ng-widgets": "^2.1.2",
     "@tubular/time": "^3.8.1",
