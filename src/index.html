@@ -12,6 +12,12 @@
   <meta property="og:description" content="A simulation of the Prague Astronomical Clock (Pražský Orloj), configurable for any location on Earth, with user-settable time.">
   <meta property="og:image" content="https://shetline.com/orloj/assets/clock.jpg">
   <base href="/">
+  <!--[if IE]><script type="text/javascript">
+    (function() { // Fix for IE ignoring relative base tags.
+        var baseTag = document.getElementsByTagName('base')[0];
+        baseTag.href = baseTag.href + '';
+    })();
+  </script><![endif]-->
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -75,75 +81,9 @@
       position: absolute; top: 0; bottom: 0; left: 0; right: 0; margin: auto; height: 3em;">
       <svg role="img" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="spinner"
            class="startup-spinner" xmlns="http://www.w3.org/2000/svg"
-           viewBox="0 0 512 512"><path fill="currentColor" d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48
-              48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51
-              0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49
-              48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49
-              48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49
-              48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49
-              48-48-21.491-48-48-48z"></path></svg>&nbsp;&nbsp;<span id="loading">Loading...</span></div>
+           viewBox="0 0 512 512"><path fill="currentColor"
+             d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"></path></svg>&nbsp;&nbsp;<span id="loading">Loading...</span></div>
   </app-root></div>
-  <script type="text/javascript">
-    (() => {
-      const specificLocale = (/\?(.*)\blang=([^&]+)/.exec(window.location.href) || [])[2];
-      const urlLocale = (/\borloj\/([^/]+)/.exec(window.location.href) || [])[1];
-      let locales = [];
-
-      if (navigator.languages)
-        locales = navigator.languages;
-      else if (navigator.language)
-        locales = [navigator.language];
-
-      if (specificLocale)
-        locales = [specificLocale];
-      else if (urlLocale) {
-        let matched = false;
-
-        for (const locale of locales) {
-          if (locale.startsWith(urlLocale)) {
-            locales = [locale];
-            matched = true;
-            break;
-          }
-        }
-
-        if (!matched)
-          locales = [urlLocale];
-      }
-
-      for (const locale of locales) {
-        if (locale.startsWith('cs')) {
-          /* cSpell:disable-next-line */ // noinspection SpellCheckingInspection
-          document.querySelector('title').innerText = 'Simulátor pražského orloje';
-          /* cSpell:disable-next-line */ // noinspection SpellCheckingInspection
-          document.getElementById('loading').innerText = 'Načítání...';
-          break;
-        }
-        else if (locale.startsWith('de')) {
-          /* cSpell:disable-next-line */ // noinspection SpellCheckingInspection
-          document.querySelector('title').innerText = 'Pražský Orloj - Simulator der Prager astronomischen Uhr';
-          /* cSpell:disable-next-line */ // noinspection SpellCheckingInspection
-          document.getElementById('loading').innerText = 'Wird geladen...';
-          break;
-        }
-        else if (locale.startsWith('es')) {
-          /* cSpell:disable-next-line */ // noinspection SpellCheckingInspection
-          document.querySelector('title').innerText = 'Pražský Orloj - Simulador de Reloj Astronómico de Praga';
-          /* cSpell:disable-next-line */ // noinspection SpellCheckingInspection
-          document.getElementById('loading').innerText = 'Cargando...';
-          break;
-        }
-        else if (locale.startsWith('fr')) {
-          /* cSpell:disable-next-line */ // noinspection SpellCheckingInspection
-          document.querySelector('title').innerText = 'Pražský Orloj - Simulateur d\'horloge astronomique de Prague';
-          /* cSpell:disable-next-line */ // noinspection SpellCheckingInspection
-          document.getElementById('loading').innerText = 'Chargement...';
-          break;
-        }
-        else if (locale.startsWith('en'))
-          break;
-      }
-    })();
-  </script>
+  <script src="assets/home-page-lang.js" type="text/javascript"></script>
 </body>
 </html>
