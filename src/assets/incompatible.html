@@ -3,28 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <title>Pražský Orloj - Simulator incompatible with your web browser</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <base href="./">
 <style>
   body {
-    align-items: center;
-    background: rgb(212,150,76);
-    background: linear-gradient(90deg,
-      rgba(212, 150, 76, 0.33) 0%, rgba(176, 186, 177, 0.33) 8%, rgba(140, 168, 167, 0.33) 17%, rgba(71, 153, 174, 0.33) 25%,
-      rgba(24, 146, 178, 0.33) 33%, rgba(11, 138, 176, 0.33) 42%, rgba(18, 133, 174, 0.33) 50%, rgba(11, 138, 176, 0.33) 58%,
-      rgba(24, 146, 178, 0.33) 67%, rgba(71, 153, 174, 0.33) 75%, rgba(140, 168, 167, 0.33) 83%, rgba(176, 186, 177, 0.33) 92%,
-      rgba(212, 150, 76, 0.33) 100%);
-    color: #444;
-    display: flex;
-    flex-direction: column;
+    background: #0E3D64;
+    color: white;
     font: 14px Arial, Helvetica, sans-serif;
     margin: 1em;
-    width: calc(100vw - 2em);
   }
 
-  .page {
-    background: none;
-    width: calc(min(800px, calc(100vw - 2em)));
+  a {
+    color: #6AF;
+    font: 14px Arial, Helvetica, sans-serif;
   }
+  a:active, a:hover { color: #9DF; }
+  a:visited { color: #6AF; }
 </style>
 </head>
 <body>
@@ -32,18 +26,23 @@
     var msg = (/\bmsg=([^&]*)/.exec(location.search) || [])[1];
 
     if (msg)
-      document.write('<p style="color: red">' + decodeURIComponent(msg) + '</p>');
+      document.write('<p style="color: #F9B">' + decodeURIComponent(msg) + '</p>');
 
-    if (location.href.includes('?'))
+    if (history.replaceState && location.href.indexOf('?') >= 0)
         history.replaceState(undefined, undefined, location.href.replace(/\?.*$/, ''));
   </script>
-  <div class="page">
-    <p>Your web browser does not have the capabilities needed to run the simulator.</p>
+  <div>
+    <p>Your web browser does not have the capabilities needed to run the simulator.
+      Please try again with a more up-to-date web browser.</p>
     <!-- cspell:disable -->
-    <p>Váš webový prohlížeč nemá schopnosti potřebné ke spuštění simulátoru.</p>
-    <p>Ihr Webbrowser verfügt nicht über die zum Ausführen des Simulators erforderlichen Funktionen.</p>
-    <p>Su navegador web no tiene las capacidades necesarias para ejecutar el simulador.</p>
-    <p>Votre navigateur Web n'a pas les capacités nécessaires pour exécuter le simulateur.</p>
+    <p>Váš webový prohlížeč nemá schopnosti potřebné ke spuštění simulátoru.
+      Zkuste to prosím znovu s aktuálnějším webovým prohlížečem.</p>
+    <p>Ihr Webbrowser verfügt nicht über die zum Ausführen des Simulators erforderlichen Funktionen.
+      Bitte versuchen Sie es erneut mit einem aktuelleren Webbrowser.</p>
+    <p>Su navegador web no tiene las capacidades necesarias para ejecutar el simulador.
+      Vuelva a intentarlo con un navegador web más actualizado.</p>
+    <p>Votre navigateur Web n'a pas les capacités nécessaires pour exécuter le simulateur.
+      Veuillez réessayer avec un navigateur Web plus récent.</p>
     <a href="https://orloj.eu">orloj.eu</a>
   </div>
 </body>

@@ -155,6 +155,17 @@
           }
         ]
       }
+    },
+    {
+      "files": ["*.es5.js"],
+      "env": {
+        "browser": true
+      },
+      "rules": {
+        "no-eval": "off",
+        "no-template-curly-in-string": "off",
+        "no-var": "off"
+      }
     }
   ]
 }
