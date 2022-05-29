@@ -19,13 +19,17 @@ import { faForward, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 import { AdvancedOptionsComponent, Appearance, SettingsHolder, Timing }
   from '../advanced-options/advanced-options.component';
 import {
-  adjustForEclipticWheel, AngleTriplet, BasicPositions, calculateBasicPositions, calculateMechanicalPositions, MILLIS_PER_DAY,
-  solarSystem, ZeroAngles
+  adjustForEclipticWheel, AngleTriplet, BasicPositions, calculateBasicPositions, calculateMechanicalPositions,
+  MILLIS_PER_DAY, MILLIS_PER_SIDEREAL_DAY, solarSystem, ZeroAngles
 } from 'src/math/math';
 import { adjustGraphicsForLatitude, initSvgHost, sunlitMoonPath, SvgHost } from 'src/svg/svg';
 import { sizeChanges } from '../main';
+import { Subscription, timer } from 'rxjs';
 
 const { DATE, DATETIME_LOCAL, julianDay, TIME } = ttime;
+
+const CLICK_REPEAT_DELAY = 500;
+const CLICK_REPEAT_RATE  = 100;
 
 const RESUME_FILTERING_DELAY = 1000;
 const SIMPLE_FILTER_IS_SLOW_TOO = isAndroid() || (isSafari() && isMacOS());
@@ -44,6 +48,7 @@ const pragueLon = 14.4185;
 
 const defaultSettings = {
   additionalPlanets: false,
+  animateBySiderealDays: false,
   appearance: Appearance.CURRENT,
   background: '#4D4D4D',
   collapsed: false,
@@ -161,7 +166,9 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   private _background = '#4D4D4D';
   private _collapsed = false;
   private delayedCollapse = false;
+  private eventClickTimer: Subscription;
   private eventFinder = new EventFinder();
+  private eventGoBack = false;
   private eventType = EventType.EQUISOLSTICE;
   private globe: Globe
   private graphicsChangeLastTime = -1;
@@ -222,6 +229,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   self: AppComponent & SvgHost = this;
 
   altFour = false;
+  animateBySiderealDays = false;
   bohemianTime = '';
   canEditName = false;
   canSaveName = false;
@@ -615,7 +623,13 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   }
 
   stop(): void {
-    this.playing = false;
+    if (this.playing) {
+      this.playing = false;
+
+      // Round time to the nearest whole minute when animation stops.
+      if (this.playSpeed === PlaySpeed.FAST)
+        this.time = floor((this.time + 30000) / 60000) * 60000;
+    }
   }
 
   private playStep = (): void => {
@@ -627,7 +641,8 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
     if (this.playSpeed === PlaySpeed.NORMAL)
       this.time = this.playTimeBase + floor(elapsed / 25) * 60_000;
     else
-      this.time = this.playTimeBase + floor(elapsed / 100) * MILLIS_PER_DAY;
+      this.time = this.playTimeBase + floor(elapsed / 100) *
+        (this.animateBySiderealDays ? MILLIS_PER_SIDEREAL_DAY : MILLIS_PER_DAY);
 
     if (this.lastWallTime && this.lastWallTime.y === this.MAX_YEAR &&
         this.lastWallTime.m === 12 && this.lastWallTime.d === 31)
@@ -1079,8 +1094,42 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
     this.canSaveName = false;
   }
 
-  skipToEvent(previous = false): void {
+  eventClick(evt?: TouchEvent | MouseEvent, goBack = false): void {
+    if (!evt)
+      this.stopEventClickTimer();
+    else if (evt?.type === 'touchstart' || evt?.type === 'mousedown') {
+      if (evt.type === 'touchstart' && evt.cancelable)
+        evt.preventDefault();
+
+      this.eventGoBack = goBack;
+
+      if (!this.eventClickTimer) {
+        this.eventClickTimer = timer(CLICK_REPEAT_DELAY, CLICK_REPEAT_RATE).subscribe(() => {
+          this.skipToEvent(this.eventGoBack);
+        });
+      }
+    }
+    else if (evt?.type === 'touchend' || evt?.type === 'mouseup') {
+      if (evt.type === 'touchend' && evt.cancelable)
+        evt.preventDefault();
+
+      if (this.eventClickTimer) {
+        this.stopEventClickTimer();
+        this.skipToEvent(this.eventGoBack);
+      }
+    }
+  }
+
+  private stopEventClickTimer(): void {
+    if (this.eventClickTimer) {
+      this.eventClickTimer.unsubscribe();
+      this.eventClickTimer = undefined;
+    }
+  }
+
+  private skipToEvent(previous: boolean): void {
     if (this.trackTime) {
+      this.stopEventClickTimer();
       this.confirmService.confirm({
         message: $localize`Turn off "Track current time" and change the clock time?`,
         accept: () => {
@@ -1122,12 +1171,14 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
       const eventText = AppComponent.translateEvent(evt.eventText);
       const year = new DateTime(evt.eventTime.utcMillis, this.zone).wallTime.year;
 
+      this.messageService.clear();
+
       if (year < this.MIN_YEAR || year > this.MAX_YEAR)
         this.messageService.add({ severity: 'error', summary: $localize`Event`,
                                   detail: $localize`Event outside of ${this.MIN_YEAR}-${this.MAX_YEAR} year range.` });
       else {
         this.time = evt.eventTime.utcMillis;
-        this.messageService.add({ severity: 'info', summary: $localize`Event`, detail: eventText, life: 1000 });
+        this.messageService.add({ severity: 'info', summary: $localize`Event`, detail: eventText });
       }
     }
   }

@@ -5,6 +5,7 @@ export enum Timing { MODERN, MECHANICAL_ORIGINAL, MECHANICAL_UPDATED, CONSTRAINE
 
 export interface SettingsHolder {
   additionalPlanets: boolean;
+  animateBySiderealDays: boolean;
   appearance: Appearance;
   background: string;
   detailedMechanism: boolean;

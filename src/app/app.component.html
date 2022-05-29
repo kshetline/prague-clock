@@ -20,7 +20,8 @@
       <i *ngIf="canSaveName" class="pi pi-undo" (click)="cancelEdit()"></i>
     </div>
     <div class="time-row">
-      <i class="pi pi-caret-left" (click)="skipToEvent(true)"></i>
+      <i class="pi pi-caret-left" (touchstart)="eventClick($event, true)" (touchend)="eventClick($event)"
+          (mousedown)="eventClick($event, true)" (mouseup)="eventClick($event)" (mouseleave)="eventClick()"></i>
       <tbw-time-editor
         [max]="MAX_YEAR + '-12-31'"
         [min]="MIN_YEAR + '-01-01'"
@@ -35,7 +36,8 @@
         [timezone]="getZone()"
         [disableMobileKeyboard]="suppressOsKeyboard"
         [(ngModel)]="time"></tbw-time-editor>
-      <i class="pi pi-caret-right" (click)="skipToEvent()"></i>
+      <i class="pi pi-caret-right" (touchstart)="eventClick($event)" (touchend)="eventClick($event)"
+          (mousedown)="eventClick($event)" (mouseup)="eventClick($event)" (mouseleave)="eventClick()"></i>
     </div>
     <div class="button-row">
       <p-checkbox [(ngModel)]="isoFormat" [binary]="true"
@@ -667,6 +669,6 @@
 
   <div i18n id="graphics-credit">Original SVG clock graphics by Jan Tošovský</div>
 
-  <p-toast position="center"></p-toast>
+  <p-toast position="bottom-center" [showTransitionOptions]="'0ms'" [hideTransitionOptions]="'0ms'"></p-toast>
   <p-confirmDialog i18n-header header="Change time"></p-confirmDialog>
 </div>
