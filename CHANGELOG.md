@@ -1,3 +1,9 @@
+## 1.7.0
+
+* New option to step one sidereal day at a time (instead of 24 hours at a time) during high-speed animation.
+* Auto-repeat on backward/forward event buttons.
+* Improved event messages.
+
 ## 1.6.2
 
 * Relaxed browser requirements, with WebGL capability no long required.

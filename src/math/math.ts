@@ -11,6 +11,7 @@ export const ECLIPTIC_CENTER_OFFSET = 71.1;
 
 export const solarSystem = new SolarSystem();
 export const MILLIS_PER_DAY = 86_400_000;
+export const MILLIS_PER_SIDEREAL_DAY = 86_164_091;
 
 export function circleIntersections(x1: number, y1: number, r1: number, x2: number, y2: number, r2: number): Point[] {
   // See https://planetcalc.com/8098/
