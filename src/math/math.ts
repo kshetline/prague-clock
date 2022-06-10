@@ -114,11 +114,11 @@ export function eclipticToOffCenter(angle: number, inner = true): number {
   return mod((inner ? 26.207 : 23.4172) * cos_deg(angle) - angle, 360);
 }
 
-export function adjustForEclipticWheel(angle: number): AngleTriplet {
+export function adjustForEclipticWheel(angle: number, southern: boolean): AngleTriplet {
   return {
     orig: angle,
-    ie: 90 + eclipticToOffCenter(angle),
-    oe: 90 + eclipticToOffCenter(angle, false)
+    ie: 90 + eclipticToOffCenter(angle * (southern ? -1 : 1)),
+    oe: 90 + eclipticToOffCenter(angle * (southern ? -1 : 1), false)
   };
 }
 
@@ -133,20 +133,21 @@ export function calculateEclipticAnglesFromHandAngle(handAngle: number, sidereal
 }
 
 export function calculateBasicPositions(time: number, zone: string | Timezone, observer: SkyObserver,
-                                        rotateSign: number, disableDst: boolean, timing: Timing): BasicPositions {
+                                        disableDst: boolean, timing: Timing): BasicPositions {
   const _jdu = julianDay(time);
   const _jde = utToTdt(_jdu);
   const _date = new DateTime(time, zone);
   const wt = _date.wallTime;
+  const southern = observer.latitude.degrees < 0;
   const _hourOfDay = wt.hour + wt.minute / 60 -
     (disableDst || (timing !== Timing.MODERN && timing !== Timing.CONSTRAINED_SUN) ? wt.dstOffset / 3600 : 0);
   const handAngle = _hourOfDay * 15 - 180;
   const baseSunAngle = solarSystem.getEclipticPosition(SUN, _jde).longitude.degrees;
   const baseMoonAngle = solarSystem.getEclipticPosition(MOON, _jde).longitude.degrees;
-  const sunAngle = adjustForEclipticWheel(baseSunAngle);
-  const moonAngle = adjustForEclipticWheel(baseMoonAngle);
+  const sunAngle = adjustForEclipticWheel(baseSunAngle, southern);
+  const moonAngle = adjustForEclipticWheel(baseMoonAngle, southern);
   const siderealAngle = observer.getLocalHourAngle(_jdu, true).degrees - 90;
-  const moonPhase = mod((baseMoonAngle - baseSunAngle) * rotateSign, 360);
+  const moonPhase = mod(baseMoonAngle - baseSunAngle, 360);
   const moonHandAngle = calculateMoonHandAngle(moonAngle.ie, siderealAngle);
   const _constrainedSunAngle = calculateEclipticAnglesFromHandAngle(handAngle, siderealAngle);
 

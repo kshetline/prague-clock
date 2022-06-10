@@ -340,22 +340,22 @@
           <g [attr.filter]="filterEcliptic"
               [style.opacity]="translucentEcliptic ? '0.33' : '1'">
             <g [attr.filter]="filterRelief">
-              <g id="ecliptic_positive_levers" [attr.transform]="rotate(siderealAngle)">
+              <g id="ecliptic_positive_levers" [attr.transform]="eclipticTransform()">
                 <use href="#leverSymbol" class="leverSymbol"/>
               </g>
             </g>
             <g *ngIf="appearance !== ORIGINAL_1410" [attr.filter]="filterRelief">
-              <g id="ecliptic_positive_hourAngleStar" [attr.transform]="rotate(siderealAngle)">
+              <g id="ecliptic_positive_hourAngleStar" [attr.transform]="eclipticTransform()">
                 <use href="#hourAngleStarSymbol" class="hourAngleStarSymbol"/>
               </g>
             </g>
-            <g id="ecliptic_positive_signsArea" [attr.transform]="rotate(siderealAngle)">
+            <g id="ecliptic_positive_signsArea" [attr.transform]="eclipticTransform()">
               <g transform="translate(0, -71.1)">
                 <path d="M0.0 -161.0C88.9 -161.0 161.0 -88.9 161.0 0.0C161.0 88.9 88.9 161.0 0.0 161.0C-88.9 161.0 -161.0 88.9 -161.0 0.0C-161.0 -88.9 -88.9 -161.0 0.0 -161.0M0.0 -116.3C-64.2 -116.3 -116.3 -64.2 -116.3 0.0C-116.3 64.2 -64.2 116.3 0.0 116.3C64.2 116.3 116.3 64.2 116.3 0.0C116.3 -64.2 64.2 -116.3 0.0 -116.3" class="signsArea"/>
               </g>
             </g>
             <g [attr.filter]="filterRelief">
-              <g id="ecliptic_positive_ecliptic" [attr.transform]="rotate(siderealAngle)">
+              <g id="ecliptic_positive_ecliptic" [attr.transform]="eclipticTransform()">
                 <g transform="translate(0, -71.1)">
                   <g id="disc">
                     <circle cx="0" cy="0" r="178.9" class="eclipticCircle"/>
@@ -409,41 +409,41 @@
                     </g>
                   </g>
                   <g *ngIf="self.southern" id="symbols" transform="translate(0, 71.1)">
-                    <g transform="rotate(-63) translate(0,-133) rotate(-66)">
-                      <text class="eclipticSymbol">♈&#xFE0E;</text>
+                    <g transform="rotate(-64) translate(0,-130) rotate(-66)">
+                      <text class="eclipticSymbol">♓&#xFE0E;</text>
                     </g>
-                    <g transform="rotate(-39) translate(0,-164) rotate(-42)">
-                      <text class="eclipticSymbol">♉&#xFE0E;</text>
-                    </g>
-                    <g transform="rotate(-15.5) translate(0,-183.5) scale(-1, 1) rotate(-2)">
-                      <text class="eclipticSymbol">♊&#xFE0E;</text>
-                    </g>
-                    <g transform="rotate(13.5) translate(0,-185) rotate(10)">
-                      <text class="eclipticSymbol">♋&#xFE0E;</text>
-                    </g>
-                    <g transform="rotate(41.5) translate(0,-160) rotate(47)">
-                      <text class="eclipticSymbol">♌&#xFE0E;</text>
-                    </g>
-                    <g transform="rotate(65) translate(0,-128) rotate(65)">
-                      <text class="eclipticSymbol">♍&#xFE0E;</text>
-                    </g>
-                    <g transform="rotate(-255.5) translate(0,-76.5) scale(-1, 1)">
-                      <text class="eclipticSymbol">♎&#xFE0E;</text>
-                    </g>
-                    <g transform="rotate(-235) translate(0,-61) rotate(43)">
-                      <text class="eclipticSymbol">♏&#xFE0E;</text>
-                    </g>
-                    <g transform="rotate(-195.5) translate(0,-48) scale(-0.93, 0.93)">
-                      <text class="eclipticSymbol">♐&#xFE0E;</text>
-                    </g>
-                    <g transform="rotate(-167) translate(0,-45.2) rotate(5)">
-                      <text class="eclipticSymbol">♑&#xFE0E;</text>
-                    </g>
-                    <g transform="rotate(-134) translate(0,-58.5) scale(-0.93, 0.93)">
+                    <g transform="rotate(-39) translate(0,-163) rotate(-45)">
                       <text class="eclipticSymbol">♒&#xFE0E;</text>
                     </g>
-                    <g transform="rotate(-104.5) translate(0,-79) scale(-1, 1)">
-                      <text class="eclipticSymbol">♓&#xFE0E;</text>
+                    <g transform="rotate(-15) translate(0,-183.5) scale(-1, 1) rotate(-2)">
+                      <text class="eclipticSymbol">♑&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(20.5) translate(0,-202) rotate(-90)">
+                      <text class="eclipticSymbol">♐&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(42) translate(0,-158) scale(-1.3, 1) rotate(-8)">
+                      <text class="eclipticSymbol">♏&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(73) translate(0,-114.4) rotate(5) scale(-1.2, 1)">
+                      <text class="eclipticSymbol">♎&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(-255.5) translate(0,-80) scale(-0.9, 0.9)">
+                      <text class="eclipticSymbol">♍&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(-223) translate(0,-63) scale(0.8, -0.8) rotate(195)">
+                      <text class="eclipticSymbol">♌&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(-185) translate(0,-70) scale(-0.6, 0.6) rotate(105)">
+                      <text class="eclipticSymbol">♋&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(-161) translate(0,-55) scale(0.7) rotate(-20)">
+                      <text class="eclipticSymbol">♊&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(-138) translate(0,-63) scale(-0.8, 0.8) rotate(-10)">
+                      <text class="eclipticSymbol">♉&#xFE0E;</text>
+                    </g>
+                    <g transform="rotate(-104) translate(0,-82) scale(-0.9, 0.9)">
+                      <text class="eclipticSymbol">♈&#xFE0E;</text>
                     </g>
                   </g>
                 </g>
@@ -461,7 +461,7 @@
                 </g>
               </g>
               <g [attr.filter]="filterRelief">
-                <g id="ecliptic_positive_sunBeamLargeSymbol_A" [attr.transform]="rotate(siderealAngle)">
+                <g id="ecliptic_positive_sunBeamLargeSymbol_A" [attr.transform]="eclipticTransform()">
                   <g transform="translate(0, -71.1)">
                     <g id="sun_positive_sunBeamLargeSymbol_A" [attr.transform]="rotate(sunAngle.ie)">
                       <g id="sun_translate_sunBeamLargeSymbol_A" transform="translate(0,-161.0)">
@@ -471,14 +471,14 @@
                   </g>
                 </g>
               </g>
-              <g id="ecliptic_positive_sunBeamLargeSymbol_B0" [attr.transform]="rotate(siderealAngle)">
+              <g id="ecliptic_positive_sunBeamLargeSymbol_B0" [attr.transform]="eclipticTransform()">
                 <g transform="translate(0, -71.1)">
                   <g id="sun_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(sunAngle.ie)">
                     <g id="sun_translate_sunBeamLargeSymbol_B" transform="translate(0,-161.0)">
                       <rect *ngIf="detailedMechanism" x="-1" y="0" width="2" height="161"
                           class="sun-moon-arms" [attr.filter]="filterRelief"/>
                       <g id="sun_negative_sunBeamLargeSymbol_B" [attr.transform]="rotate(-sunAngle.ie)">
-                        <g id="ecliptic_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(-siderealAngle)">
+                        <g id="ecliptic_positive_sunBeamLargeSymbol_B" [attr.transform]="rotate(siderealAngle)">
                           <path d="M0.0 -9.6C5.3 -9.6 9.6 -5.3 9.6 0.0C9.6 5.3 5.3 9.6 0.0 9.6C-5.3 9.6 -9.6 5.3 -9.6 0.0C-9.6 -5.3 -5.3 -9.6 0.0 -9.6" class="sunSphere"/>
                         </g>
                       </g>
@@ -487,7 +487,7 @@
                 </g>
               </g>
               <g [attr.filter]="filterRelief">
-                <g id="ecliptic_positive_sunBeamSmallSymbol_A" [attr.transform]="rotate(siderealAngle)">
+                <g id="ecliptic_positive_sunBeamSmallSymbol_A" [attr.transform]="eclipticTransform()">
                   <g transform="translate(0, -71.1)">
                     <g id="sun_positive_sunBeamSmallSymbol_A" [attr.transform]="rotate(sunAngle.ie)">
                       <g id="sun_translate_sunBeamSmallSymbol_A" transform="translate(0,-161.0)">
@@ -497,7 +497,7 @@
                   </g>
                 </g>
               </g>
-              <g id="ecliptic_positive_sunBeamSmallSymbol_B0" [attr.transform]="rotate(siderealAngle)">
+              <g id="ecliptic_positive_sunBeamSmallSymbol_B0" [attr.transform]="eclipticTransform()">
                 <g transform="translate(0, -71.1)">
                   <g id="sun_positive_sunBeamSmallSymbol_B" [attr.transform]="rotate(sunAngle.ie)">
                     <g id="sun_translate_sunBeamSmallSymbol_B" transform="translate(0,-161.0)">
@@ -522,7 +522,7 @@
               </g>
             </g>
             <g [attr.filter]="filterRelief">
-              <g id="ecliptic_positive_moonGroup" [attr.transform]="rotate(siderealAngle)">
+              <g id="ecliptic_positive_moonGroup" [attr.transform]="eclipticTransform()">
                 <g transform="translate(0, -71.1)">
                   <g id="moon_positive" [attr.transform]="rotate(moonAngle.ie)">
                     <g transform="translate(0,-161.0)">

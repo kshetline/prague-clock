@@ -566,7 +566,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
     }
 
     this.timingReference = calculateBasicPositions(refTime.utcMillis, this.getZone(), this.observer,
-      this.rotateSign, this.disableDst, this.timing);
+      this.disableDst, this.timing);
     this.lastWallTime = this.timingReference._date?.wallTime;
     this.timingReference._referenceTime = refTime.utcMillis;
     this.timingReference._endTime = endTime.utcMillis;
@@ -901,20 +901,21 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
     const dayLength = this.sunsetB.ut - this.sunsetA.ut;
     const bohemianHour = (jdu - this.sunsetA.ut) / dayLength * 24;
     const basicPositions =
-      calculateBasicPositions(this.time, this.getZone(), this.observer, this.rotateSign, this.disableDst, this.timing);
+      calculateBasicPositions(this.time, this.getZone(), this.observer, this.disableDst, this.timing);
     const date = basicPositions._date;
     const wt = date.wallTime;
     const dateLocal = new DateTime(this.time, this.localTimezone);
     const jde = basicPositions._jde;
+    const southern = this.self.southern;
 
     this.lastWallTime = basicPositions._date?.wallTime;
     forEach(basicPositions as any, (key, value) => basicPosKey(key) && ((this as any)['true_' + key] = value));
 
-    this.mercuryAngle = adjustForEclipticWheel(solarSystem.getEclipticPosition(MERCURY, jde).longitude.degrees);
-    this.venusAngle = adjustForEclipticWheel(solarSystem.getEclipticPosition(VENUS, jde).longitude.degrees);
-    this.marsAngle = adjustForEclipticWheel(solarSystem.getEclipticPosition(MARS, jde).longitude.degrees);
-    this.jupiterAngle = adjustForEclipticWheel(solarSystem.getEclipticPosition(JUPITER, jde).longitude.degrees);
-    this.saturnAngle = adjustForEclipticWheel(solarSystem.getEclipticPosition(SATURN, jde).longitude.degrees);
+    this.mercuryAngle = adjustForEclipticWheel(solarSystem.getEclipticPosition(MERCURY, jde).longitude.degrees, southern);
+    this.venusAngle = adjustForEclipticWheel(solarSystem.getEclipticPosition(VENUS, jde).longitude.degrees, southern);
+    this.marsAngle = adjustForEclipticWheel(solarSystem.getEclipticPosition(MARS, jde).longitude.degrees, southern);
+    this.jupiterAngle = adjustForEclipticWheel(solarSystem.getEclipticPosition(JUPITER, jde).longitude.degrees, southern);
+    this.saturnAngle = adjustForEclipticWheel(solarSystem.getEclipticPosition(SATURN, jde).longitude.degrees, southern);
 
     if (this.timing !== Timing.MODERN && this.timing !== Timing.CONSTRAINED_SUN) {
       if (!this.timingReference || this.time < this.timingReference._referenceTime ||
@@ -1005,12 +1006,17 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
     }
   }
 
+  eclipticTransform(): string {
+    return this.rotate(this.siderealAngle) + (this.self.southern ? ' scale(1, -1)' : '');
+  }
+
   rotate(angle: number): string {
     return `rotate(${angle * this.rotateSign})`;
   }
 
   reorient(angle: AngleTriplet): string {
-    return isSafari() ? null : `rotate(${(90 - angle.orig - angle.oe) * this.rotateSign})`;
+    return isSafari() ? null : this.self.southern ?
+      `scale(-1, 1) rotate(${90 + angle.orig - angle.oe})` : `rotate(${90 - angle.orig - angle.oe})`;
   }
 
   sunlitMoonPath(): string {

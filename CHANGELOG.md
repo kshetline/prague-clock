@@ -1,3 +1,7 @@
+## 1.7.1
+
+* Fix ecliptic positioning of sun, moon, and planets in southern hemisphere sky.
+
 ## 1.7.0
 
 * New option to step one sidereal day at a time (instead of 24 hours at a time) during high-speed animation.
