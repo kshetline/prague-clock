@@ -1015,7 +1015,8 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   }
 
   reorient(angle: AngleTriplet): string {
-    return isSafari() ? null : `rotate(${(90 - angle.orig - angle.oe) * this.rotateSign})`;
+    return isSafari() ? null : this.self.southern ?
+      `scale(-1, 1) rotate(${90 + angle.orig - angle.oe})` : `rotate(${90 - angle.orig - angle.oe})`;
   }
 
   sunlitMoonPath(): string {

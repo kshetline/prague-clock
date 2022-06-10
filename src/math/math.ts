@@ -147,7 +147,7 @@ export function calculateBasicPositions(time: number, zone: string | Timezone, o
   const sunAngle = adjustForEclipticWheel(baseSunAngle, southern);
   const moonAngle = adjustForEclipticWheel(baseMoonAngle, southern);
   const siderealAngle = observer.getLocalHourAngle(_jdu, true).degrees - 90;
-  const moonPhase = mod((baseMoonAngle - baseSunAngle) * (southern ? -1 : 0), 360);
+  const moonPhase = mod(baseMoonAngle - baseSunAngle, 360);
   const moonHandAngle = calculateMoonHandAngle(moonAngle.ie, siderealAngle);
   const _constrainedSunAngle = calculateEclipticAnglesFromHandAngle(handAngle, siderealAngle);
 
