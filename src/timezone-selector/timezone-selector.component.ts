@@ -195,7 +195,7 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
         this.lastRemoteSearch.unsubscribe();
 
       const params = urlEncodeParams({
-        client: 'web',
+        client: 'orl',
         pt: 'false', lang: specificLocale || '',
         q: search
       });
