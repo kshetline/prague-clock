@@ -195,7 +195,7 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
         this.lastRemoteSearch.unsubscribe();
 
       const params = urlEncodeParams({
-        client: 'orl',
+        client: 'orl', remote: 'skip',
         pt: 'false', lang: specificLocale || '',
         q: search
       });
@@ -243,7 +243,7 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
     const zone = toCanonicalZone(newValue);
     const sn = SOUTH_NORTH.join('');
     const ew = WEST_EAST.join('');
-    const matcher = new RegExp(`^(.+?):\\xA0.*?([0-9.]+).([${sn}]).+?([0-9.]+).([${ew}])`);
+    const matcher = new RegExp(`^(.+?):\\xA0.*?([\\d.]+).([${sn}]).+?([\\d.]+).([${ew}])`);
 
     if ($ && ($ = matcher.exec(newValue)))
       this.location.emit({
@@ -275,7 +275,7 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
         newZone = aliasFor;
     }
 
-    const groups: string[] = /^(America\/Argentina\/|America\/Indiana\/|SystemV\/\w+|\w+\/|[-+:0-9A-Za-z]+)(.+)?$/.exec(newZone);
+    const groups: string[] = /^(America\/Argentina\/|America\/Indiana\/|SystemV\/\w+|\w+\/|[-+:\dA-Za-z]+)(.+)?$/.exec(newZone);
 
     if (groups) {
       let g1 = groups[1];
@@ -460,8 +460,8 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
   searchSelect(s: any): void {
     this.searching = false;
 
-    const remoteQuery = (s.query || '').trim().replace(/\s+/g, '_').toLowerCase();
-    const query = (remoteQuery || '#');
+    const remoteQuery = (s.query || '').trim().toLowerCase();
+    const query = (remoteQuery.replace(/\s+/g, '_') || '#');
     const zones = Timezone.getAvailableTimezones();
     const kiev = zones.indexOf('Europe/Kiev');
 
