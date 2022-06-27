@@ -37,7 +37,7 @@
     "@tubular/time": "^3.8.2",
     "@tubular/util": "^4.11.0",
     "primeicons": "^5.0.0",
-    "primeng": "^13.3.3",
+    "primeng": "^13.4.1",
     "rxjs": "~7.5.0",
     "three": "^0.140.0",
     "tslib": "^2.4.0",
