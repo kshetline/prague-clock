@@ -8,6 +8,7 @@
     "declaration-block-single-line-max-declarations": null,
     "color-function-notation": null,
     "color-hex-case": "upper",
+    "import-notation": null,
     "no-descending-specificity": null,
     "no-empty-source": null,
     "no-invalid-position-at-import-rule": null,

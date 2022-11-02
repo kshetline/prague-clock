@@ -222,7 +222,7 @@ span.p-menuitem-text {
   .tbw-view-only-text.tbw-dse-fade { opacity: 0.2; }
 
   @keyframes tbw-dse-blinker-dark {
-    from, to { background-color: #DDD; color: #121212; }
+    0%, 100% { background-color: #DDD; color: #121212; }
     10%, 20% { background-color: #DDD; color: #121212; }
     50%, 60%, 70% { background-color: transparent; color: #DDD; }
   }

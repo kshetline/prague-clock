@@ -163,7 +163,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   private delayedCollapse = false;
   private eventFinder = new EventFinder();
   private eventType = EventType.EQUISOLSTICE;
-  private globe: Globe
+  private globe: Globe;
   private graphicsChangeLastTime = -1;
   private graphicsChangeStartTime = -1;
   private graphicsChangeStopTimer: any;
@@ -219,7 +219,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   ];
 
   // This trick is need to be able to access SvgHost fields which are not explicitly declared here.
-  self: AppComponent & SvgHost = this;
+  self: AppComponent & SvgHost = this; // eslint-disable-line no-use-before-define
 
   altFour = false;
   bohemianTime = '';
@@ -634,7 +634,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
       this.stop();
     else
       requestAnimationFrame(this.playStep);
-  }
+  };
 
   clearLocationItem(index: number): void {
     if (this.placeName === this.recentLocations[index].name)

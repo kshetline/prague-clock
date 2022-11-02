@@ -69,5 +69,5 @@ export class AdvancedOptionsComponent {
 
     if (r && (evt.pageX < r.left || evt.pageX > r.right || evt.pageY < r.top || evt.pageY > r.bottom))
       this.hide();
-  }
+  };
 }
