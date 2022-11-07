@@ -70,6 +70,8 @@ function toDisplayOffset(offset: string): string {
     off = $[1];
     dst = $[2] ?? '';
 
+    if (!dst && off.substring(1) === '00:00')
+      off = '';
     if (dst === '§')
       dst = $localize`:Abbreviation for Daylight Saving Time:DST`;
     else if (dst === '#')
