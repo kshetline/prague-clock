@@ -11,7 +11,7 @@ import {
   NEW_MOON, RISE_EVENT, SATURN, SET_EVENT, SkyObserver, SPRING_EQUINOX, SUMMER_SOLSTICE, SUN, TRANSIT_EVENT, VENUS,
   WINTER_SOLSTICE
 } from '@tubular/astronomy';
-import ttime, { DateAndTime, DateTime, Timezone } from '@tubular/time';
+import ttime, { addZonesUpdateListener, DateAndTime, DateTime, pollForTimezoneUpdates, Timezone, zonePollerBrowser } from '@tubular/time';
 import { TzsLocation } from '../timezone-selector/timezone-selector.component';
 import { Globe } from '../globe/globe';
 import { basePath, languageList, localeSuffix, SOUTH_NORTH, specificLocale, WEST_EAST } from '../locales/locale-info';
@@ -349,6 +349,8 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
     this.updateObserver();
     this.updateMenu();
 
+    addZonesUpdateListener(result => result && this.updateTime(true));
+    pollForTimezoneUpdates(zonePollerBrowser, 'large-alt');
     window.addEventListener('beforeunload', () => this.saveSettings());
     setInterval(() => this.saveSettings(), 5000);
   }

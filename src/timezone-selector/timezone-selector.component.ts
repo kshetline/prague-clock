@@ -55,7 +55,7 @@ function toCanonicalOffset(offset: string): string {
 }
 
 function toCanonicalZone(zone: string): string {
-  return zone?.replace(/^.+:\xA0/, '').replace(/\s+\([^)]+\)$/, '').replace(/ /g, '_').replace(/\bKyiv\b/, 'Kiev');
+  return zone?.replace(/^.+:\xA0/, '').replace(/\s+\([^)]+\)$/, '').replace(/ /g, '_');
 }
 
 function toDisplayOffset(offset: string): string {
@@ -70,6 +70,8 @@ function toDisplayOffset(offset: string): string {
     off = $[1];
     dst = $[2] ?? '';
 
+    if (!dst && off.substring(1) === '00:00')
+      off = '';
     if (dst === '§')
       dst = $localize`:Abbreviation for Daylight Saving Time:DST`;
     else if (dst === '#')
@@ -93,7 +95,7 @@ function toDisplayOffset(offset: string): string {
 }
 
 function toDisplayZone(zone: string): string {
-  return zone?.replace(/_/g, ' ').replace(/\bKiev\b/, 'Kyiv');
+  return zone?.replace(/_/g, ' ');
 }
 
 function formatSearchResult(location: AtlasLocation): string {
@@ -463,10 +465,6 @@ export class TimezoneSelectorComponent implements ControlValueAccessor, OnInit {
     const remoteQuery = (s.query || '').trim().toLowerCase();
     const query = (remoteQuery.replace(/\s+/g, '_') || '#');
     const zones = Timezone.getAvailableTimezones();
-    const kiev = zones.indexOf('Europe/Kiev');
-
-    if (kiev >= 0)
-      zones.splice(kiev, 0, 'Europe/Kyiv');
 
     this.matchZones = zones.filter(zone => zone.toLowerCase().includes(query));
 
