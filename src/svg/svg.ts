@@ -85,14 +85,14 @@ export function initSvgHost(host: SvgHost): void {
 
   host.romanHours = host.romanHoursSouth = '';
 
-  const hours = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x', 'xi', 'xii'];
+  const hours = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
   const rh = (p: number, i: number, t?: string): string => {
     const pct = (i === 24 ? '50.0' : (100 * p / 24).toFixed(1));
     const text = t || hours[(i - 1) % 12];
     const mod = (t ? ' class="four-iiii"' :
       i === 24 ? ' transform="rotate(180)"' : i === 4 || i === 16 ? ' class="four-iv"' : '');
 
-    return `<text${mod}><textPath href="#timeTextPath" startOffset="${
+    return `<text dy="1"${mod}><textPath href="#timeTextPath" startOffset="${
       pct}%" class="timeText">${text}</textPath></text>\n`;
   };
 
@@ -101,8 +101,8 @@ export function initSvgHost(host: SvgHost): void {
     host.romanHoursSouth += rh(24 - i, i);
 
     if (i === 4 || i === 16) {
-      host.romanHours += rh(i, i, 'iiii');
-      host.romanHoursSouth += rh(24 - i, i, 'iiii');
+      host.romanHours += rh(i, i, 'IIII');
+      host.romanHoursSouth += rh(24 - i, i, 'IIII');
     }
   }
 

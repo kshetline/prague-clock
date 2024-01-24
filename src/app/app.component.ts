@@ -2,8 +2,8 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService, PrimeNGConfig } from 'primeng/api';
 import { abs, floor, max, min, mod, mod2 } from '@tubular/math';
 import {
-  clone, extendDelimited, forEach, getCssValue, isAndroid, isEqual, isIOS, isLikelyMobile, isMacOS, isObject, isSafari, noop,
-  processMillis
+  clone, extendDelimited, forEach, getCssValue, isAndroid, isEqual, isIOS, isLikelyMobile,
+  isMacOS, isObject, isSafari, noop, processMillis
 } from '@tubular/util';
 import { AngleStyle, DateTimeStyle, TimeEditorOptions } from '@tubular/ng-widgets';
 import {
@@ -148,7 +148,7 @@ export class AppComponent implements OnInit, SettingsHolder, SvgHost {
   smallMobile = smallMobile;
   SOUTH_NORTH = SOUTH_NORTH;
   specificLocale = specificLocale;
-  toZodiac = (angle: number): string => '♈♉♊♋♌♍♎♏♐♑♒♓'.charAt(floor(mod(angle, 360) / 30)) + '\uFE0E';
+  toZodiac = (angle: number): string => '①②③④⑤⑥⑦⑧⑨⑩⑪⑫'.charAt(floor(mod(angle, 360) / 30));
   WEST_EAST = WEST_EAST;
 
   LOCAL_OPTS: TimeEditorOptions = {
