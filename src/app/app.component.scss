@@ -3,7 +3,7 @@
 .wrapper {
   box-sizing: border-box;
   display: grid;
-  font-family: Horologium, NoEmojiAstronomy2, sans-serif;
+  font-family: HorologiumII, NoEmojiAstronomyII, sans-serif;
   gap: 12px;
   grid-template-columns: 1fr 400px;
   min-height: var(--mfvh);
@@ -290,7 +290,7 @@ svg {
   box-sizing: border-box;
   color: $controls-text;
   font-size: 1em;
-  font-family: NoEmojiAstronomy2, Arial, sans-serif;
+  font-family: NoEmojiAstronomyII, Arial, sans-serif;
   max-width: 400px;
   padding: 0.5em 2.5em 0.5em 0.5em;
   position: relative;
@@ -309,7 +309,7 @@ svg {
 
   .num {
     color: #64B5F6;
-    font: 0.9em NoEmojiAstronomy2, Verdana, sans-serif;
+    font: 0.9em NoEmojiAstronomyII, Verdana, sans-serif;
     min-width: 4.2em;
     white-space: nowrap;
   }

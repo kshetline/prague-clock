@@ -1,3 +1,8 @@
+## 1.7.5
+
+* Fix issue suppressing glyph-to-emoji mapping.
+* Update timezone selector.
+
 ## 1.7.1
 
 * Fix ecliptic positioning of sun, moon, and planets in southern hemisphere sky.
